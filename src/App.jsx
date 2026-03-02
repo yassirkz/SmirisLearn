@@ -27,7 +27,7 @@ function App() {
     testSupabase();
   }, []);
 
-  return (
+  return   (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Éléments de fond animés */}
       <div className="absolute inset-0 overflow-hidden">
