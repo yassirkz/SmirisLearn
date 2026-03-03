@@ -2,15 +2,23 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "./lib/supabase";
 
+
+
 function App() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+  useEffect(() => {
+    const testAuth = async () => {
+      const { data } = await supabase.auth.getSession()
+      console.log('🧪 Test Auth:', data)
+    }
+    testAuth()
+  }, []);
 
   useEffect(() => {
-    // Test Supabase dans la console
     const testSupabase = async () => {
       console.log("🔍 Test de connexion Supabase...");
 
@@ -62,6 +70,35 @@ function App() {
         >
           Smiris Learn
         </motion.h1>
+
+        <div className="flex gap-4 justify-center mt-8">
+  <button 
+    onClick={async () => {
+      const { data } = await supabase.auth.signUp({
+        email: 'test@example.com',
+        password: 'Test123!'
+      })
+      console.log('Inscription:', data)
+    }}
+    className="btn-primary"
+  >
+    Test Inscription
+  </button>
+  
+  <button 
+    onClick={async () => {
+      const { data } = await supabase.auth.signInWithPassword({
+        email: 'test@example.com',
+        password: 'Test123!'
+      })
+      console.log('Connexion:', data)
+    }}
+    className="btn-secondary"
+  >
+    Test Connexion
+  </button>
+</div>
+
 
         {/* Sous-titre avec animation */}
         <motion.p
