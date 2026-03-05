@@ -36,7 +36,9 @@ export default function LoginForm() {
 
   const validatePassword = (value) => {
     if (!value) return "Mot de passe requis";
-    if (value.length < 6) return "Minimum 6 caractères";
+    if (value.length < 8) return "Minimum 8 caractères";
+    if (!/[A-Z]/.test(value)) return "Au moins une majuscule";
+    if (!/[0-9]/.test(value)) return "Au moins un chiffre";
     return "";
   };
 

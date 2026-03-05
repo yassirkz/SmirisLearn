@@ -111,8 +111,12 @@ export function AuthProvider({ children }) {
         return { error: { message: "Rate limit exceeded" } };
       }
 
-      // 2. Validation email
-      const validatedEmail = validateEmail(untrusted(email));
+      // 2. Validation email simple
+      const emailStr = String(email).trim().toLowerCase();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailStr)) {
+        throw new Error("Email invalide");
+      }
 
       // 3. Validation password (OWASP)
       if (!password || password.length < 8) {
@@ -129,20 +133,31 @@ export function AuthProvider({ children }) {
 
       setLoading(true);
 
-      // 4. Tentative d'inscription
+      const fullName = metadata.data?.full_name || metadata.full_name || "";
+
+      // 4. Tentative d'inscription - LE TRIGGER SQL VA CRÉER LE PROFIL AUTOMATIQUEMENT
       const { data, error } = await supabase.auth.signUp({
-        email: validatedEmail,
+        email: emailStr,
         password,
         options: {
-          data: metadata,
+          data: {
+            full_name: fullName,
+            role: "student",
+          },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur signUp auth:", error);
+        throw error;
+      }
+
+      // ✅ PLUS D'INSERTION MANUELLE - Le trigger SQL s'en charge !
 
       return { data, error: null };
     } catch (error) {
+      console.error("Erreur dans signUp:", error);
       setError(error.message);
       return { data: null, error };
     } finally {
@@ -187,7 +202,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // ✅ NOUVELLE FONCTION : Connexion avec Google
+  // ✅ Connexion avec Google
   const signInWithGoogle = async () => {
     try {
       setError(null);
@@ -243,7 +258,7 @@ export function AuthProvider({ children }) {
     signUp,
     signIn,
     signOut,
-    signInWithGoogle, 
+    signInWithGoogle,
     clearError: () => setError(null),
   };
 

@@ -1,51 +1,51 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
+import { useUserRole } from './hooks/useUserRole'
 import LoginPage from './pages/LoginPage'
 import AuthCallback from './pages/AuthCallback'
+import Unauthorized from './pages/Unauthorized'
+import ProtectedRoute from './components/auth/ProtectedRoute'
+import LoadingSpinner from './components/ui/LoadingSpinner'
+
+// Pages temporaires pour les dashboards
+function SuperAdminDashboard() {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Dashboard Super Admin</h1>
+      <p className="text-gray-600">Gestion de toutes les entreprises</p>
+    </div>
+  )
+}
+
+function AdminDashboard() {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Dashboard Admin Entreprise</h1>
+      <p className="text-gray-600">Gestion de votre entreprise</p>
+    </div>
+  )
+}
+
+function StudentDashboard() {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Espace Étudiant</h1>
+      <p className="text-gray-600">Vos formations</p>
+    </div>
+  )
+}
 
 function HomePage() {
   const { user } = useAuth()
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-blue-100">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-            <span className="text-xl font-bold text-white">S</span>
-          </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-              Smiris Learn
-            </h1>
-            <p className="text-sm text-gray-500">
-              Plateforme de formation sécurisée
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-100 pt-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Bienvenue sur votre espace
-          </h2>
-          
-          <div className="bg-blue-50 rounded-lg p-4 mb-4">
-            <p className="text-gray-700">
-              <span className="font-medium">Connecté en tant que :</span>{' '}
-              <span className="text-blue-600">{user?.email}</span>
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              ID: {user?.id?.substring(0, 8)}...
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <div className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg text-sm border border-green-200">
-              ✅ Authentification sécurisée
-            </div>
-            <div className="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-sm border border-purple-200">
-              🔒 Session active
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          Bienvenue sur Smiris Learn
+        </h1>
+        <p className="text-gray-600">
+          Connecté en tant que : {user?.email}
+        </p>
       </div>
     </div>
   )
@@ -53,17 +53,19 @@ function HomePage() {
 
 function App() {
   const { user, loading } = useAuth()
+const { role } = useUserRole();
 
+  
   // Afficher un loader pendant la vérification de session
   if (loading) {
+    // Afficher les informations de debug
+  console.log("👤 Utilisateur connecté:", user?.email);
+  console.log("🎭 Rôle depuis useUserRole:", role);
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="relative mx-auto w-16 h-16 mb-4">
-            <div className="absolute inset-0 rounded-full border-4 border-blue-200"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
-          </div>
-          <p className="text-gray-600">Chargement de votre session...</p>
+          <LoadingSpinner size="lg" color="primary" />
+          <p className="mt-4 text-gray-600">Chargement de votre session...</p>
         </div>
       </div>
     )
@@ -71,20 +73,55 @@ function App() {
 
   return (
     <Routes>
-      {/* Route pour le callback Google */}
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      
-      {/* Page de login - accessible seulement si non connecté */}
+      {/* Routes publiques */}
       <Route path="/login" element={
         user ? <Navigate to="/" replace /> : <LoginPage />
       } />
-      
-      {/* Page d'accueil - accessible seulement si connecté */}
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+
+      {/* Routes protégées - Super Admin uniquement */}
+      <Route path="/super-admin" element={
+        <ProtectedRoute allowedRoles={['super_admin']}>
+          <SuperAdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/super-admin/*" element={
+        <ProtectedRoute allowedRoles={['super_admin']}>
+          <div>Sous-routes Super Admin</div>
+        </ProtectedRoute>
+      } />
+
+      {/* Routes protégées - Admin Entreprise (ou Super Admin) */}
+      <Route path="/admin" element={
+        <ProtectedRoute allowedRoles={['super_admin', 'org_admin']}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/*" element={
+        <ProtectedRoute allowedRoles={['super_admin', 'org_admin']}>
+          <div>Sous-routes Admin</div>
+        </ProtectedRoute>
+      } />
+
+      {/* Routes protégées - Étudiant (tout utilisateur connecté) */}
+      <Route path="/student" element={
+        <ProtectedRoute allowedRoles={['super_admin', 'org_admin', 'student']}>
+          <StudentDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/student/*" element={
+        <ProtectedRoute allowedRoles={['super_admin', 'org_admin', 'student']}>
+          <div>Sous-routes Étudiant</div>
+        </ProtectedRoute>
+      } />
+
+      {/* Page d'accueil - accessible à tous les connectés */}
       <Route path="/" element={
         user ? <HomePage /> : <Navigate to="/login" replace />
       } />
-      
-      {/* Redirection pour les routes inconnues */}
+
+      {/* Redirection 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
