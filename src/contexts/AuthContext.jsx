@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../lib/supabase";
+// eslint-disable-next-line no-unused-vars
 import { checkRateLimit, untrusted, validateEmail } from "../utils/security";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
@@ -100,7 +102,7 @@ export function AuthProvider({ children }) {
 
   // ========== FONCTIONS AUTH SÉCURISÉES ==========
 
-  const signUp = async (email, password) => {
+  const signUp = async (email, password, metadata = {}) => {
     try {
       setError(null);
 
@@ -132,6 +134,7 @@ export function AuthProvider({ children }) {
         email: validatedEmail,
         password,
         options: {
+          data: metadata,
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -184,25 +187,16 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signOut = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // ✅ NOUVELLE FONCTION : Connexion avec Google
   const signInWithGoogle = async () => {
     try {
       setError(null);
 
       // Rate limiting
       if (!checkActionLimit("LOGIN", "google")) {
-        return;
+        return {
+          error: { message: "Trop de tentatives. Réessayez plus tard." },
+        };
       }
 
       setLoading(true);
@@ -229,6 +223,18 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signOut = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     user,
     session,
@@ -237,7 +243,7 @@ export function AuthProvider({ children }) {
     signUp,
     signIn,
     signOut,
-    signInWithGoogle,
+    signInWithGoogle, 
     clearError: () => setError(null),
   };
 

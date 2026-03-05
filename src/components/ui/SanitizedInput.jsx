@@ -1,15 +1,12 @@
-import React, { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
-import { untrusted, escapeText, validateEmail } from "../../utils/security";
+import{ useState } from 'react'
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion'
+import { AlertCircle, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { untrusted, escapeText, validateEmail } from '../../utils/security'
 
-/**
- * Composant d'input avec sanitization automatique
- * Suit les guidelines OWASP pour la validation des entrées
- */
 export default function SanitizedInput({
-    type = "text",
-    value = "",
+    type = 'text',
+    value = '',
     onChange,
     onBlur,
     placeholder,
@@ -18,126 +15,144 @@ export default function SanitizedInput({
     minLength,
     maxLength,
     pattern,
-    validate = "none", // 'none', 'email', 'text', 'html'
+    validate = 'none',
     error: externalError,
-    className = "",
+    className = '',
     ...props
     }) {
-    const [internalError, setInternalError] = useState("");
-    const [touched, setTouched] = useState(false);
-
-    const error = externalError || (touched ? internalError : "");
+    const [internalError, setInternalError] = useState('')
+    const [touched, setTouched] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
+    
+    const error = externalError || (touched ? internalError : '')
+    const isValid = touched && !error && value.length > 0
+    
+    const inputType = type === 'password' && showPassword ? 'text' : type
 
     const handleChange = (e) => {
-        const rawValue = e.target.value;
-        const untrustedValue = untrusted(rawValue);
-
-        // Validation en temps réel
-        let errorMsg = "";
-        let safeValue = rawValue;
-
+        const rawValue = e.target.value
+        const untrustedValue = untrusted(rawValue)
+        
+        let errorMsg = ''
+        
         switch (validate) {
-        case "email":
+        case 'email':
             try {
-            safeValue = validateEmail(untrustedValue);
+            validateEmail(untrustedValue)
             } catch (err) {
-            errorMsg = err.message;
+            errorMsg = err.message
             }
-            break;
-        case "text":
-            safeValue = escapeText(untrustedValue);
-            break;
-        case "html":
-            // Attention: le HTML nécessite sanitization spécifique
-            safeValue = rawValue; // Ne pas échapper pour l'édition
-            break;
-        default:
-            // Validation basique contre XSS
-            safeValue = rawValue.replace(/[<>]/g, "");
+            break
+        case 'text':
+            escapeText(untrustedValue)
+            break
         }
-
-        // Validation longueur
-        if (minLength && rawValue.length < minLength) {
-        errorMsg = `Minimum ${minLength} caractères`;
+        
+        if (minLength && rawValue.length < minLength && rawValue.length > 0) {
+        errorMsg = `Minimum ${minLength} caractères`
         }
-
+        
         if (maxLength && rawValue.length > maxLength) {
-        errorMsg = `Maximum ${maxLength} caractères`;
+        errorMsg = `Maximum ${maxLength} caractères`
         }
-
-        // Validation pattern
-        if (pattern && rawValue && !new RegExp(pattern).test(rawValue)) {
-        errorMsg = "Format invalide";
-        }
-
-        setInternalError(errorMsg);
-
-        // Modifier le target.value avant de passer l'event au parent
-        e.target.value = safeValue;
-        onChange?.(e);
-    };
-
-    const handleBlur = (e) => {
-        setTouched(true);
-        onBlur?.(e);
-    };
+        
+        setInternalError(errorMsg)
+        onChange?.(e)
+    }
 
     return (
-        <div className="space-y-1">
+        <div className="space-y-2">
         {label && (
-            <label className="block text-sm font-medium text-secondary-700">
+            <motion.label 
+            className="block text-sm font-medium text-secondary-700"
+            animate={{ 
+                color: isFocused ? '#4f46e5' : '#334155',
+                x: isFocused ? 4 : 0
+            }}
+            >
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
-            </label>
+            </motion.label>
         )}
-
+        
         <div className="relative">
             <input
-            type={type}
+            type={inputType}
             value={value}
             onChange={handleChange}
-            onBlur={handleBlur}
+            onFocus={() => setIsFocused(true)}
+            onBlur={(e) => {
+                setIsFocused(false)
+                setTouched(true)
+                onBlur?.(e)
+            }}
             placeholder={placeholder}
             required={required}
             minLength={minLength}
             maxLength={maxLength}
             pattern={pattern}
             className={`
-                        w-full px-4 py-2.5 bg-white/80 backdrop-blur-sm
-                        border-2 rounded-xl outline-none transition-all
-                        ${
-                        error
-                            ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                            : "border-secondary-200 focus:border-primary-400 focus:ring-4 focus:ring-primary-100"
-                        }
-                        ${className}
-                    `}
+                w-full px-4 py-3 bg-white/90 backdrop-blur-sm
+                border-2 rounded-xl outline-none transition-all
+                ${error 
+                ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-100' 
+                : isValid
+                    ? 'border-emerald-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100'
+                    : 'border-secondary-200 focus:border-primary-400 focus:ring-4 focus:ring-primary-100'
+                }
+                ${className}
+            `}
             {...props}
             />
-
-            {/* Indicateur de validation */}
-            <AnimatePresence>
-            {error && (
-                <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+            
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
+            {type === 'password' && (
+                <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="p-1 hover:bg-secondary-100 rounded-lg transition-colors"
                 >
-                <AlertCircle className="w-5 h-5 text-red-500" />
-                </motion.div>
+                {showPassword ? 
+                    <EyeOff className="w-5 h-5 text-secondary-400" /> : 
+                    <Eye className="w-5 h-5 text-secondary-400" />
+                }
+                </button>
             )}
+            
+            <AnimatePresence>
+                {isValid && !error && (
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                >
+                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                </motion.div>
+                )}
             </AnimatePresence>
+            
+            <AnimatePresence>
+                {error && (
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                >
+                    <AlertCircle className="w-5 h-5 text-red-500" />
+                </motion.div>
+                )}
+            </AnimatePresence>
+            </div>
         </div>
-
-        {/* Message d'erreur animé */}
+        
         <AnimatePresence>
             {error && (
             <motion.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="text-sm text-red-500 flex items-center gap-1"
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                className="text-sm text-red-500 flex items-center gap-1 overflow-hidden"
             >
                 <AlertCircle className="w-4 h-4" />
                 {error}
@@ -145,5 +160,5 @@ export default function SanitizedInput({
             )}
         </AnimatePresence>
         </div>
-    );
+    )
 }

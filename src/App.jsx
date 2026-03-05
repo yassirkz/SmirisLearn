@@ -1,193 +1,93 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { supabase } from "./lib/supabase";
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './hooks/useAuth'
+import LoginPage from './pages/LoginPage'
+import AuthCallback from './pages/AuthCallback'
 
+function HomePage() {
+  const { user } = useAuth()
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 md:p-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-blue-100">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+            <span className="text-xl font-bold text-white">S</span>
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Smiris Learn
+            </h1>
+            <p className="text-sm text-gray-500">
+              Plateforme de formation sécurisée
+            </p>
+          </div>
+        </div>
 
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Bienvenue sur votre espace
+          </h2>
+          
+          <div className="bg-blue-50 rounded-lg p-4 mb-4">
+            <p className="text-gray-700">
+              <span className="font-medium">Connecté en tant que :</span>{' '}
+              <span className="text-blue-600">{user?.email}</span>
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              ID: {user?.id?.substring(0, 8)}...
+            </p>
+          </div>
 
-function App() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-  useEffect(() => {
-    const testAuth = async () => {
-      const { data } = await supabase.auth.getSession()
-      console.log('🧪 Test Auth:', data)
-    }
-    testAuth()
-  }, []);
-
-  useEffect(() => {
-    const testSupabase = async () => {
-      console.log("🔍 Test de connexion Supabase...");
-
-      const { data, error } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error("❌ Erreur Supabase:", error.message);
-      } else {
-        console.log("✅ Supabase connecté !");
-        console.log("Session:", data);
-      }
-    };
-
-    testSupabase();
-  }, []);
-
-  return   (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Éléments de fond animés */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-float"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-float animate-delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-secondary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-soft"></div>
+          <div className="flex flex-wrap gap-3">
+            <div className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg text-sm border border-green-200">
+              ✅ Authentification sécurisée
+            </div>
+            <div className="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-sm border border-purple-200">
+              🔒 Session active
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Carte principale avec glassmorphism */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={isVisible ? { opacity: 1, scale: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
-        className="relative glass-card rounded-3xl p-10 max-w-2xl w-full text-center border border-white/30 shadow-2xl"
-      >
-        {/* Logo avec animation */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
-          className="w-24 h-24 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-primary-200"
-        >
-          <span className="text-4xl font-bold text-white">S</span>
-        </motion.div>
-
-        {/* Titre avec effet de gradient */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-5xl font-bold title-gradient mb-4"
-        >
-          Smiris Learn
-        </motion.h1>
-
-        <div className="flex gap-4 justify-center mt-8">
-  <button 
-    onClick={async () => {
-      const { data } = await supabase.auth.signUp({
-        email: 'test@example.com',
-        password: 'Test123!'
-      })
-      console.log('Inscription:', data)
-    }}
-    className="btn-primary"
-  >
-    Test Inscription
-  </button>
-  
-  <button 
-    onClick={async () => {
-      const { data } = await supabase.auth.signInWithPassword({
-        email: 'test@example.com',
-        password: 'Test123!'
-      })
-      console.log('Connexion:', data)
-    }}
-    className="btn-secondary"
-  >
-    Test Connexion
-  </button>
-</div>
-
-
-        {/* Sous-titre avec animation */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-xl text-secondary-600 mb-8"
-        >
-          La formation flexible pour les entreprises
-        </motion.p>
-
-        {/* Message de succès avec animation */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, type: "spring" }}
-          className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shimmer"></div>
-          <span className="text-5xl mb-2 block">🚀</span>
-          <p className="text-emerald-700 font-semibold text-lg">
-            Setup réussi !
-          </p>
-          <p className="text-emerald-600">
-            Jour 1 - Structure de projet avec animations premium
-          </p>
-        </motion.div>
-
-        {/* Stats animées */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          {[
-            { label: "Animations", value: "24+", icon: "✨" },
-            { label: "Composants", value: "50+", icon: "🧩" },
-            { label: "Couleurs", value: "100+", icon: "🎨" },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="glass rounded-xl p-4 text-center hover:shadow-xl transition-all duration-300"
-            >
-              <span className="text-2xl mb-1 block">{stat.icon}</span>
-              <div className="font-bold text-primary-600 text-xl">
-                {stat.value}
-              </div>
-              <div className="text-xs text-secondary-500">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Boutons avec animations */}
-        <div className="flex gap-4 justify-center">
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-primary"
-          >
-            Commencer
-          </motion.button>
-
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 }}
-            whileHover={{ scale: 1.05, backgroundColor: "#f8fafc" }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-secondary"
-          >
-            En savoir plus
-          </motion.button>
-        </div>
-
-        {/* Footer */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="text-sm text-secondary-400 mt-8"
-        >
-          Configuration premium avec Tailwind CSS + Framer Motion
-        </motion.p>
-      </motion.div>
     </div>
-  );
+  )
 }
 
-export default App;
+function App() {
+  const { user, loading } = useAuth()
+
+  // Afficher un loader pendant la vérification de session
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="text-center">
+          <div className="relative mx-auto w-16 h-16 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-blue-200"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+          </div>
+          <p className="text-gray-600">Chargement de votre session...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <Routes>
+      {/* Route pour le callback Google */}
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      
+      {/* Page de login - accessible seulement si non connecté */}
+      <Route path="/login" element={
+        user ? <Navigate to="/" replace /> : <LoginPage />
+      } />
+      
+      {/* Page d'accueil - accessible seulement si connecté */}
+      <Route path="/" element={
+        user ? <HomePage /> : <Navigate to="/login" replace />
+      } />
+      
+      {/* Redirection pour les routes inconnues */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
+
+export default App

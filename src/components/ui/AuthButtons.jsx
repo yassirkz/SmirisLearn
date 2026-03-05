@@ -1,19 +1,31 @@
-import React from 'react'
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion'
+import { useAuth } from '../../hooks/useAuth'  
 
-export default function AuthButtons({ onGoogleSignIn }) {
+export default function AuthButtons() {  
+  const { signInWithGoogle } = useAuth()  
+
+  const handleGoogleSignIn = async () => {  
+    try {
+      await signInWithGoogle()
+      // La redirection est gérée par Supabase
+    } catch (error) {
+      console.error('Erreur connexion Google:', error)
+    }
+  }
+
   return (
     <div className="space-y-3">
       {/* Bouton Google */}
       <motion.button
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
-        onClick={onGoogleSignIn}
+        onClick={handleGoogleSignIn}  // ✅ MODIFIÉ (était onGoogleSignIn)
         className="group relative w-full flex items-center justify-center gap-3 px-6 py-3.5 
-                   bg-white border-2 border-secondary-200 rounded-xl 
-                   text-secondary-700 font-semibold
-                   hover:border-primary-300 hover:bg-primary-50/50
-                   transition-all duration-300 overflow-hidden"
+                  bg-white border-2 border-secondary-200 rounded-xl 
+                  text-secondary-700 font-semibold
+                  hover:border-primary-300 hover:bg-primary-50/50
+                  transition-all duration-300 overflow-hidden"
       >
         {/* Effet de shine */}
         <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full 
