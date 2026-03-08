@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {  Edit, Trash2, Eye, ChevronLeft, ChevronRight, Search, X, Building2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import CreateCompanyModal from './CreateCompanyModal';
 
 export default function CompaniesTable() {
     const [companies, setCompanies] = useState([])
@@ -12,6 +13,7 @@ export default function CompaniesTable() {
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedPlan, setSelectedPlan] = useState('all')
     const itemsPerPage = 5
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchCompanies = async () => {
@@ -146,7 +148,8 @@ export default function CompaniesTable() {
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium shadow-lg whitespace-nowrap"
+                            onClick={() => setIsModalOpen(true)}
+                            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium shadow-lg"
                         >
                             + Nouvelle entreprise
                         </motion.button>
@@ -301,6 +304,14 @@ export default function CompaniesTable() {
                     </div>
                 </div>
             )}
+            <CreateCompanyModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={(newInvitation) => {
+                    // Optionnel: rafraîchir ou afficher un message
+                    console.log('Invitation créée:', newInvitation);
+                }}
+            />  
         </div>
     )
 }

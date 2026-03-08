@@ -16,35 +16,48 @@ export function useUserRole() {
 
     const fetchUserRole = async () => {
       try {
-        // 1. D'abord, chercher dans user_metadata
-        let roleValue = user?.user_metadata?.role
         console.log('🔍 Recherche rôle pour:', user.id)
-        console.log('  - user_metadata.role:', roleValue)
+        
+        // 1. chercher dans la table profiles
+        let roleValue = null
+        
+        console.log('  - Cherche dans la table profiles...')
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle() 
 
-        // 2. Si pas dans user_metadata, chercher dans la table profiles
-        if (!roleValue) {
-          console.log('  - Cherche dans la table profiles...')
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
+        console.log('  - Résultat profiles:', { data, error })
 
-          console.log('  - Résultat profiles:', { data, error })
-
-          if (!error && data && data.length > 0) {
-            roleValue = data[0].role
-            console.log('  - Rôle trouvé dans profiles:', roleValue)
-          } else if (error) {
-            console.error('  - Erreur query profiles:', error)
-          }
+        if (!error && data) {
+          roleValue = data.role
+          console.log('  - Rôle trouvé dans profiles:', roleValue)
+        } else if (error) {
+          console.error('  - Erreur query profiles:', error)
         }
 
-        // 3. Sinon, rôle par défaut
+        // Fallback vers user_metadata si pas dans profiles
+        if (!roleValue) {
+          roleValue = user?.user_metadata?.role
+          console.log('  - Fallback vers user_metadata:', roleValue)
+        }
+
+        //  Si toujours pas de rôle, utiliser 'student' par défaut
         const finalRole = roleValue || 'student'
         console.log('  - Rôle final:', finalRole)
         setRole(finalRole)
+
+        // Mettre à jour user_metadata pour qu'il soit cohérent avec profiles
+        if (data && user?.user_metadata?.role !== data.role) {
+          console.log(' - Mise à jour des métadonnées...')
+          await supabase.auth.updateUser({
+            data: { role: data.role }
+          })
+        }
+
       } catch (err) {
-        console.error('❌ Erreur récupération rôle:', err)
+        console.error('Erreur récupération rôle:', err)
         setRole('student')
       } finally {
         setLoading(false)
