@@ -69,9 +69,22 @@ export function useInvitation() {
 
             if (error) throw error;
 
+            // RÉCUPÉRER L'EMAIL DU SUPER ADMIN ACTUEL
+            const { data: { user: superAdmin } } = await supabase.auth.getUser();
+            const fromEmail = superAdmin?.email || "yassirkezzi05@gmail.com";
+
+            console.log('DEBUG INVITATION:', {
+                from: fromEmail,
+                to: validatedEmail,
+                adminName: companyData.adminName,
+                company: companyData.name
+            });
+
             // ENVOI DE L'EMAIL
             const { success, error: emailError } = await sendInvitationEmail({
+                fromEmail,
                 to: validatedEmail,
+                fromName: "Super Admin Smiris Learn",
                 companyName: companyData.name.trim(),
                 adminName: companyData.adminName.trim(),
                 token: data.token

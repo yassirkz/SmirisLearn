@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser';
 // Initialiser EmailJS
 emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
 
-export const sendInvitationEmail = async ({ to, companyName, adminName, token }) => {
+export const sendInvitationEmail = async ({ to, companyName, adminName, token, fromEmail, fromName }) => {
     try {
         console.log('📧 Envoi email via EmailJS...');
         
@@ -12,6 +12,9 @@ export const sendInvitationEmail = async ({ to, companyName, adminName, token })
 
         // Préparer les variables du template
         const templateParams = {
+            from_name: fromName || "Smiris Learn",
+            from_email: fromEmail,
+            reply_to: fromEmail,
             to_email: to,
             adminName: adminName,
             companyName: companyName,
