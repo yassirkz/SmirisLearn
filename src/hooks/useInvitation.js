@@ -69,9 +69,9 @@ export function useInvitation() {
 
             if (error) throw error;
 
-            // RÉCUPÉRER L'EMAIL DU SUPER ADMIN ACTUEL
+            // RÉCUPÉRER L'EMAIL DU SUPER ADMIN ACTUEL DEPUIS SUPABASE
             const { data: { user: superAdmin } } = await supabase.auth.getUser();
-            const fromEmail = superAdmin?.email || "yassirkezzi05@gmail.com";
+            const fromEmail = superAdmin?.email || "kezziyassir005@gmail.com";
 
             console.log('DEBUG INVITATION:', {
                 from: fromEmail,
