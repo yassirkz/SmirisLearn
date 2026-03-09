@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Building, Mail, User, CheckCircle, AlertCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { useInvitation } from '../../hooks/useInvitation';

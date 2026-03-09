@@ -15,24 +15,18 @@ export function useUserRole() {
     }
 
     const fetchUserRole = async () => {
-      try {
-        console.log('🔍 Recherche rôle pour:', user.id)
-        
-        // 1. chercher dans la table profiles
+      try {  
+        // chercher dans la table profiles
         let roleValue = null
         
-        console.log('  - Cherche dans la table profiles...')
         const { data, error } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
           .maybeSingle() 
 
-        console.log('  - Résultat profiles:', { data, error })
-
         if (!error && data) {
           roleValue = data.role
-          console.log('  - Rôle trouvé dans profiles:', roleValue)
         } else if (error) {
           console.error('  - Erreur query profiles:', error)
         }
@@ -50,7 +44,6 @@ export function useUserRole() {
 
         // Mettre à jour user_metadata pour qu'il soit cohérent avec profiles
         if (data && user?.user_metadata?.role !== data.role) {
-          console.log(' - Mise à jour des métadonnées...')
           await supabase.auth.updateUser({
             data: { role: data.role }
           })

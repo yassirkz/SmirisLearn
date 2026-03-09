@@ -7,6 +7,8 @@ import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
+import AcceptInvitePage from './pages/AcceptInvitePage';
+
 
 // Pages temporaires pour les dashboards
 function AdminDashboard() {
@@ -142,6 +144,8 @@ function App() {
           )
         }
       />
+      <Route path="/accept-invite" element={<AcceptInvitePage />} />
+
 
       {/* Redirection 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
