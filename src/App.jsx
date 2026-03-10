@@ -6,11 +6,23 @@ import AuthCallback from "./pages/AuthCallback";
 import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
-import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import AcceptInvitePage from './pages/AcceptInvitePage';
+// ============================================
+// SUPER ADMIN PAGES
+// ============================================
+import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
+import SuperAdminCompanies from "./pages/super-admin/SuperAdminCompanies";
+import SuperAdminCompanyDetail from "./pages/super-admin/SuperAdminCompanyDetail";
+import SuperAdminUsers from "./pages/super-admin/SuperAdminUsers";
+import SuperAdminSettings from "./pages/super-admin/SuperAdminSettings";
+// ============================================
+// ADMIN ENTREPRISE PAGES
+// ============================================
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSettings from './pages/admin/AdminSettings';
-
+// ============================================
+// STUDENT PAGES
+// ============================================
 function StudentDashboard() {
   return (
     <div className="p-8">
@@ -37,7 +49,9 @@ function App() {
 
   return (
     <Routes>
-      {/* Routes publiques */}
+      {/* ============================================
+          ROUTES PUBLIQUES
+      ============================================ */}
       <Route
         path="/login"
         element={user ? <Navigate to="/" replace /> : <LoginPage />}
@@ -46,7 +60,45 @@ function App() {
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/accept-invite" element={<AcceptInvitePage />} />
 
-      {/* Super Admin */}
+      {/* ============================================
+          SUPER ADMIN ROUTES
+      ============================================ */}
+      <Route
+        path="/super-admin/companies/:id"
+        element={
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <SuperAdminCompanyDetail />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/super-admin/companies"
+        element={
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <SuperAdminCompanies />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/super-admin/users"
+        element={
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <SuperAdminUsers />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/super-admin/settings"
+        element={
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            <SuperAdminSettings />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/super-admin"
         element={
@@ -56,7 +108,9 @@ function App() {
         }
       />
 
-      {/* Admin Entreprise */}
+      {/* ============================================
+          ADMIN ENTREPRISE ROUTES
+      ============================================ */}
       <Route
         path="/admin"
         element={
@@ -65,8 +119,9 @@ function App() {
           </ProtectedRoute>
         }
       />
+      
       <Route
-        path="/admin/settings" 
+        path="/admin/settings"
         element={
           <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
             <AdminSettings />
@@ -74,7 +129,9 @@ function App() {
         }
       />
 
-      {/* Étudiant */}
+      {/* ============================================
+          STUDENT ROUTES
+      ============================================ */}
       <Route
         path="/student"
         element={
@@ -84,7 +141,9 @@ function App() {
         }
       />
 
-      {/* Redirections */}
+      {/* ============================================
+          REDIRECTIONS
+      ============================================ */}
       <Route
         path="/"
         element={
@@ -100,6 +159,7 @@ function App() {
         }
       />
 
+      {/* 404 - Redirection vers l'accueil */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

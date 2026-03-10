@@ -1,10 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MoreVertical, Edit, Trash2, Eye, ChevronLeft, ChevronRight, Search, X, Building2, Users, Calendar, Mail, RefreshCw } from 'lucide-react';
+import { 
+    MoreVertical, Edit, Trash2, Eye, ChevronLeft, ChevronRight, 
+    Search, X, Building2, Users, Calendar, Mail, RefreshCw,
+    LayoutDashboard
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import CreateCompanyModal from './CreateCompanyModal';
+import EditCompanyModal from './EditCompanyModal';
 
 export default function CompaniesTable() {
+    const navigate = useNavigate();
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -12,6 +19,8 @@ export default function CompaniesTable() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPlan, setSelectedPlan] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingCompany, setEditingCompany] = useState(null);
     const [showActions, setShowActions] = useState(null);
     const itemsPerPage = 5;
 
@@ -248,11 +257,16 @@ export default function CompaniesTable() {
                                         className="hover:bg-blue-50/50 transition-colors group"
                                     >
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm group-hover:scale-110 transition-transform">
+                                            <div 
+                                                className="flex items-center gap-3 cursor-pointer group/name"
+                                                onClick={() => navigate(`/super-admin/companies/${company.id}`)}
+                                            >
+                                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm group-hover/name:scale-110 transition-transform">
                                                     {company.name?.charAt(0).toUpperCase() || '?'}
                                                 </div>
-                                                <span className="font-medium text-gray-800">{company.name}</span>
+                                                <span className="font-medium text-gray-800 group-hover/name:text-blue-600 transition-colors">
+                                                    {company.name}
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -284,14 +298,38 @@ export default function CompaniesTable() {
                                                 <motion.button
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}
+                                                    onClick={() => navigate(`/super-admin/companies/${company.id}`)}  // ← CORRIGÉ
                                                     className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600 opacity-0 group-hover:opacity-100"
                                                     title="Voir détails"
                                                 >
                                                     <Eye size={18} />
+                                                </motion.button>    
+                                                <motion.button
+                                                    whileHover={{ scale: 1.1 }}
+                                                    whileTap={{ scale: 0.9 }}
+                                                    onClick={() => navigate(`/admin?orgId=${company.id}`)}
+                                                    className="p-2 hover:bg-purple-100 rounded-lg transition-colors text-purple-600 opacity-0 group-hover:opacity-100"
+                                                    title="Voir Dashboard Admin"
+                                                >
+                                                    <LayoutDashboard size={18} />
                                                 </motion.button>
                                                 <motion.button
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}
+                                                    onClick={async () => {
+                                                        const { data: profiles } = await supabase
+                                                            .from('profiles')
+                                                            .select('email')
+                                                            .eq('organization_id', company.id)
+                                                            .eq('role', 'org_admin')
+                                                            .single();
+                                                        
+                                                        if (profiles?.email) {
+                                                            window.location.href = `mailto:${profiles.email}?subject=Question concernant ${company.name}`;
+                                                        } else {
+                                                            alert("Aucun email d'administrateur trouvé.");
+                                                        }
+                                                    }}
                                                     className="p-2 hover:bg-green-100 rounded-lg transition-colors text-green-600 opacity-0 group-hover:opacity-100"
                                                     title="Envoyer un email"
                                                 >
@@ -314,11 +352,35 @@ export default function CompaniesTable() {
                                                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                                                                 className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-10"
                                                             >
-                                                                <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2">
+                                                                <button 
+                                                                    onClick={() => {
+                                                                        setEditingCompany(company);
+                                                                        setIsEditModalOpen(true);
+                                                                        setShowActions(null);
+                                                                    }}
+                                                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2"
+                                                                >
                                                                     <Edit size={16} />
                                                                     Modifier
                                                                 </button>
-                                                                <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                                                <button 
+                                                                    onClick={async () => {
+                                                                        if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${company.name} ?`)) {
+                                                                            const { error } = await supabase
+                                                                                .from('organizations')
+                                                                                .delete()
+                                                                                .eq('id', company.id);
+                                                                            
+                                                                            if (!error) {
+                                                                                fetchCompanies();
+                                                                            } else {
+                                                                                alert("Erreur lors de la suppression: " + error.message);
+                                                                            }
+                                                                        }
+                                                                        setShowActions(null);
+                                                                    }}
+                                                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                                >
                                                                     <Trash2 size={16} />
                                                                     Supprimer
                                                                 </button>
@@ -400,6 +462,16 @@ export default function CompaniesTable() {
             <CreateCompanyModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onSuccess={fetchCompanies}
+            />
+
+            <EditCompanyModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setEditingCompany(null);
+                }}
+                company={editingCompany}
                 onSuccess={fetchCompanies}
             />
         </>

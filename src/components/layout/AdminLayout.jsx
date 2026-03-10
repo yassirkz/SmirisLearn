@@ -5,7 +5,7 @@ import {
     Award, Users, Settings, LogOut, Sparkles,
     Shield, Zap
 } from 'lucide-react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import { useUserRole } from '../../hooks/useUserRole';
@@ -17,7 +17,10 @@ export default function AdminLayout({ children }) {
     const [trialDays, setTrialDays] = useState(0);
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
-    const { isAdminAccess, loading } = useUserRole(); 
+    const [searchParams] = useSearchParams();
+    const orgId = searchParams.get('orgId');
+    const { isAdminAccess, loading, role } = useUserRole(); 
+    const isImpersonating = role === 'super_admin' && orgId;
 
     // ============================================
     // SÉCURITÉ : Vérification du rôle (avec gestion du loading)
@@ -36,19 +39,26 @@ export default function AdminLayout({ children }) {
             if (!user) return;
 
             try {
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('organization_id')
-                    .eq('id', user.id)
-                    .maybeSingle();
+                let resolvedOrgId = null;
 
-                if (profileError) throw profileError;
+                if (isImpersonating) {
+                    resolvedOrgId = orgId;
+                } else {
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('organization_id')
+                        .eq('id', user.id)
+                        .maybeSingle();
 
-                if (profile?.organization_id) {
+                    if (profileError) throw profileError;
+                    resolvedOrgId = profile?.organization_id;
+                }
+
+                if (resolvedOrgId) {
                     const { data: org, error: orgError } = await supabase
                         .from('organizations')
                         .select('name, plan_type, trial_ends_at')
-                        .eq('id', profile.organization_id)
+                        .eq('id', resolvedOrgId)
                         .maybeSingle();
 
                     if (orgError) throw orgError;
@@ -71,7 +81,7 @@ export default function AdminLayout({ children }) {
         };
 
         fetchCompanyInfo();
-    }, [user]);
+    }, [user, isImpersonating, orgId]);
 
     // ============================================
     // Loader pendant le chargement
@@ -103,6 +113,19 @@ export default function AdminLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+            {/* Banner Impersonation */}
+            {isImpersonating && (
+                <div className="bg-amber-500 text-white p-2 text-center text-sm font-bold flex items-center justify-center gap-4 sticky top-0 z-[60]">
+                    <Shield className="w-4 h-4" />
+                    <span>Mode Lecture Seule - Vous visualisez l'entreprise {companyName}</span>
+                    <button 
+                        onClick={() => navigate('/super-admin')}
+                        className="bg-white text-amber-600 px-3 py-1 rounded-lg text-xs hover:bg-amber-50 transition-colors"
+                    >
+                        Quitter
+                    </button>
+                </div>
+            )}
             {/* Bouton menu mobile */}
             <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
