@@ -8,17 +8,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import AcceptInvitePage from './pages/AcceptInvitePage';
-
-
-// Pages temporaires pour les dashboards
-function AdminDashboard() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Dashboard Admin Entreprise</h1>
-      <p className="text-gray-600">Gestion de votre entreprise</p>
-    </div>
-  );
-}
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminSettings from './pages/admin/AdminSettings';
 
 function StudentDashboard() {
   return (
@@ -29,28 +20,11 @@ function StudentDashboard() {
   );
 }
 
-function HomePage() {
-  const { user } = useAuth();
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Bienvenue sur Smiris Learn
-        </h1>
-        <p className="text-gray-600">Connecté en tant que : {user?.email}</p>
-      </div>
-    </div>
-  );
-}
-
 function App() {
   const { user, loading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
 
-  // Afficher un loader pendant la vérification de session
   if (loading || roleLoading) {
-    console.log("👤 Utilisateur connecté:", user?.email);
-    console.log("🎭 Rôle depuis useUserRole:", role);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -70,8 +44,9 @@ function App() {
       />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/accept-invite" element={<AcceptInvitePage />} />
 
-      {/* Routes protégées - Super Admin uniquement */}
+      {/* Super Admin */}
       <Route
         path="/super-admin"
         element={
@@ -80,16 +55,8 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/super-admin/*"
-        element={
-          <ProtectedRoute allowedRoles={["super_admin"]}>
-            <div>Sous-routes Super Admin</div>
-          </ProtectedRoute>
-        }
-      />
 
-      {/* Routes protégées - Admin Entreprise (ou Super Admin) */}
+      {/* Admin Entreprise */}
       <Route
         path="/admin"
         element={
@@ -99,37 +66,25 @@ function App() {
         }
       />
       <Route
-        path="/admin/*"
+        path="/admin/settings" 
         element={
           <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
-            <div>Sous-routes Admin</div>
+            <AdminSettings />
           </ProtectedRoute>
         }
       />
 
-      {/* Routes protégées - Étudiant (tout utilisateur connecté) */}
+      {/* Étudiant */}
       <Route
         path="/student"
         element={
-          <ProtectedRoute
-            allowedRoles={["super_admin", "org_admin", "student"]}
-          >
+          <ProtectedRoute allowedRoles={["super_admin", "org_admin", "student"]}>
             <StudentDashboard />
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/student/*"
-        element={
-          <ProtectedRoute
-            allowedRoles={["super_admin", "org_admin", "student"]}
-          >
-            <div>Sous-routes Étudiant</div>
-          </ProtectedRoute>
-        }
-      />
 
-      {/* Page d'accueil - Redirection selon le rôle */}
+      {/* Redirections */}
       <Route
         path="/"
         element={
@@ -144,10 +99,7 @@ function App() {
           )
         }
       />
-      <Route path="/accept-invite" element={<AcceptInvitePage />} />
 
-
-      {/* Redirection 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

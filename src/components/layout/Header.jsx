@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion'
 import { Bell, Search, User } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
-
+    
 export default function Header() {
     const { user } = useAuth()
 
