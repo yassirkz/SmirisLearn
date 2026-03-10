@@ -15,42 +15,49 @@ export function useUserRole() {
     }
 
     const fetchUserRole = async () => {
-      try {  
-        // chercher dans la table profiles
+      try {
+        console.log('🔍 Recherche rôle pour:', user.id)
+        
+        // 1. Chercher dans la table profiles (source de vérité)
         let roleValue = null
         
+        console.log('  - Cherche dans la table profiles...')
         const { data, error } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .maybeSingle() 
+          .maybeSingle()
+
+        console.log('  - Résultat profiles:', { data, error })
 
         if (!error && data) {
           roleValue = data.role
+          console.log('  - Rôle trouvé dans profiles:', roleValue)
         } else if (error) {
           console.error('  - Erreur query profiles:', error)
         }
 
-        // Fallback vers user_metadata si pas dans profiles
+        // 2. Fallback vers user_metadata si pas dans profiles
         if (!roleValue) {
           roleValue = user?.user_metadata?.role
           console.log('  - Fallback vers user_metadata:', roleValue)
         }
 
-        //  Si toujours pas de rôle, utiliser 'student' par défaut
+        // 3. Rôle par défaut
         const finalRole = roleValue || 'student'
         console.log('  - Rôle final:', finalRole)
         setRole(finalRole)
 
-        // Mettre à jour user_metadata pour qu'il soit cohérent avec profiles
+        // 4. Optionnel: Mettre à jour user_metadata pour synchronisation
         if (data && user?.user_metadata?.role !== data.role) {
+          console.log('  - Mise à jour des métadonnées...')
           await supabase.auth.updateUser({
             data: { role: data.role }
           })
         }
 
       } catch (err) {
-        console.error('Erreur récupération rôle:', err)
+        console.error('❌ Erreur récupération rôle:', err)
         setRole('student')
       } finally {
         setLoading(false)
@@ -65,6 +72,7 @@ export function useUserRole() {
     isSuperAdmin: role === 'super_admin',
     isOrgAdmin: role === 'org_admin',
     isStudent: role === 'student',
+    isAdminAccess: role === 'super_admin' || role === 'org_admin',
     organizationId: user?.user_metadata?.organization_id || null,
     loading
   }

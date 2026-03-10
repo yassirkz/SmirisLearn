@@ -20,13 +20,7 @@ export default function ProtectedRoute({
 
   // DEBUG: Afficher les infos
   console.log("🔐 ProtectedRoute DEBUG:");
-  console.log("  - User:", user?.email);
-  console.log("  - Role:", role);
-  console.log("  - AllowedRoles:", allowedRoles);
-  console.log("  - User metadata:", user?.user_metadata);
-  console.log("  - Auth Loading:", authLoading);
-  console.log("  - Role Loading:", roleLoading);
-
+  
   // Afficher un loader pendant la vérification
   if (authLoading || roleLoading) {
     return (
