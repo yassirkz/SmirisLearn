@@ -118,18 +118,11 @@ export default function AdminStats() {
             }
 
             // ============================================
-            // Récupérer les membres avec leur progression pour le calcul du taux de complétion
+            // Récupérer les membres avec leur progression (Fix 400 error by splitting queries)
             // ============================================
-            const { data: members } = await supabase
+            const { data: profiles } = await supabase
                 .from('profiles')
-                .select(`
-                    id,
-                    created_at,
-                    user_progress (
-                        watched,
-                        video_id
-                    )
-                `)
+                .select('id, created_at')
                 .eq('organization_id', orgId)
                 .eq('role', 'student'); 
 
@@ -139,7 +132,17 @@ export default function AdminStats() {
             let avgCompletion = 0;
             let previousAvgCompletion = 0;
 
-            if (members && members.length > 0) {
+            if (profiles && profiles.length > 0) {
+                const userIds = profiles.map(p => p.id);
+                const { data: progressData } = await supabase
+                    .from('user_progress')
+                    .select('user_id, watched')
+                    .in('user_id', userIds);
+
+                const members = profiles.map(profile => ({
+                    ...profile,
+                    user_progress: progressData?.filter(p => p.user_id === profile.id) || []
+                }));
                 // Complétion moyenne des membres actuels
                 const totalCompletion = members.reduce((acc, member) => {
                     const watchedCount = member.user_progress?.filter(p => p.watched).length || 0;

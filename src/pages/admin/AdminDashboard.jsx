@@ -8,11 +8,18 @@ import { Users, Video, Award, TrendingUp,
 import AdminLayout from '../../components/layout/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
+import { useUserRole } from '../../hooks/useUserRole';
 import { untrusted, escapeText } from '../../utils/security';
 
 
 export default function AdminDashboard() {
     const { user } = useAuth();
+    const { role } = useUserRole();
+    const [searchParams] = useSearchParams();
+    const orgIdFromUrl = searchParams.get('orgId');
+    const isReadOnly = role === 'super_admin' && orgIdFromUrl;
+
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         members: { current: 0, previous: 0, growth: 0 },
@@ -43,17 +50,22 @@ export default function AdminDashboard() {
 
     const fetchDashboardData = async () => {
         try {
-            // 1. Récupérer le profil de l'utilisateur
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('organization_id, full_name, email')
-                .eq('id', user.id)
-                .maybeSingle();
+            let orgId = null;
 
-            if (profileError) throw profileError;
-            if (!profile?.organization_id) return;
+            if (isReadOnly) {
+                orgId = orgIdFromUrl;
+            } else {
+                // 1. Récupérer le profil de l'utilisateur
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('organization_id, full_name, email')
+                    .eq('id', user.id)
+                    .maybeSingle();
 
-            const orgId = profile.organization_id;
+                if (profileError) throw profileError;
+                if (!profile?.organization_id) return;
+                orgId = profile.organization_id;
+            }
             // 2. Date du mois dernier pour comparaison
             const lastMonth = new Date();
             lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -175,23 +187,25 @@ export default function AdminDashboard() {
                 }
             }
             // ============================================
-            // 8. TOP MEMBRES PAR PROGRESSION 
+            // 8. TOP MEMBRES PAR PROGRESSION (Fix 400 error by splitting queries)
             // ============================================
-            const { data: members, error: membersProgressError } = await supabase
+            const { data: profiles, error: membersProgressError } = await supabase
                 .from('profiles')
-                .select(`
-                    id,
-                    full_name,
-                    email,
-                    user_progress (
-                        watched,
-                        quiz_score,
-                        video_id
-                    )
-                `)
+                .select('id, full_name, email')
                 .eq('organization_id', orgId);
 
-            if (!membersProgressError && members) {
+            if (!membersProgressError && profiles) {
+                const userIds = profiles.map(p => p.id);
+                const { data: progressData } = await supabase
+                    .from('user_progress')
+                    .select('user_id, watched, quiz_score, video_id')
+                    .in('user_id', userIds);
+
+                // Create a map for easy lookup
+                const members = profiles.map(profile => ({
+                    ...profile,
+                    user_progress: progressData?.filter(p => p.user_id === profile.id) || []
+                }));
                 // Compter le nombre total de vidéos dans l'entreprise
                 let totalVideos = 1; // Éviter division par zéro
                 if (pillars && pillars.length > 0) {

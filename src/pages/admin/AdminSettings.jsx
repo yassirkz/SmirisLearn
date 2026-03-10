@@ -9,11 +9,18 @@ import {
 import AdminLayout from '../../components/layout/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
+import { useUserRole } from '../../hooks/useUserRole';
 import { untrusted, escapeText } from '../../utils/security';
 import SanitizedInput from '../../components/ui/SanitizedInput';
 
 export default function AdminSettings() {
     const { user } = useAuth();
+    const { role } = useUserRole();
+    const [searchParams] = useSearchParams();
+    const orgIdFromUrl = searchParams.get('orgId');
+    const isReadOnly = role === 'super_admin' && orgIdFromUrl;
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [success, setSuccess] = useState('');
@@ -53,22 +60,41 @@ export default function AdminSettings() {
 
     const fetchSettings = async () => {
         try {
-            // Récupérer le profil
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('organization_id, email, full_name')
-                .eq('id', user.id)
-                .maybeSingle();
+            let resolvedOrgId = null;
+            let profileData = null;
 
-            if (profileError) throw profileError;
+            if (isReadOnly) {
+                resolvedOrgId = orgIdFromUrl;
+                // On a besoin d'un admin de cette org pour les infos par défaut
+                const { data: adminProfile } = await supabase
+                    .from('profiles')
+                    .select('email, full_name')
+                    .eq('organization_id', resolvedOrgId)
+                    .eq('role', 'org_admin')
+                    .limit(1)
+                    .maybeSingle();
+                
+                profileData = adminProfile;
+            } else {
+                // Récupérer le profil
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('organization_id, email, full_name')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                if (profileError) throw profileError;
+                resolvedOrgId = profile?.organization_id;
+                profileData = profile;
+            }
 
             let companyName = '';
 
-            if (profile?.organization_id) {
+            if (resolvedOrgId) {
                 const { data: org, error: orgError } = await supabase
                     .from('organizations')
                     .select('name')
-                    .eq('id', profile.organization_id)
+                    .eq('id', resolvedOrgId)
                     .maybeSingle();
 
                 if (orgError) throw orgError;
@@ -79,8 +105,8 @@ export default function AdminSettings() {
 
             const newSettings = {
                 companyName: escapeText(untrusted(companyName)),
-                companyEmail: escapeText(untrusted(profile?.email || '')),
-                adminName: escapeText(untrusted(profile?.full_name || '')),
+                companyEmail: escapeText(untrusted(profileData?.email || '')),
+                adminName: escapeText(untrusted(profileData?.full_name || '')),
                 emailNotifications: localStorage.getItem('emailNotifications') !== 'false',
                 memberJoined: localStorage.getItem('memberJoined') !== 'false',
                 videoUploaded: localStorage.getItem('videoUploaded') !== 'false',
@@ -309,6 +335,7 @@ export default function AdminSettings() {
                                     minLength={3}
                                     maxLength={100}
                                     required
+                                    disabled={isReadOnly}
                                 />
 
                                 <div className="bg-gray-50 p-4 rounded-xl">
@@ -329,6 +356,7 @@ export default function AdminSettings() {
                                     validate="text"
                                     minLength={3}
                                     required
+                                    disabled={isReadOnly}
                                 />
                             </div>
                         </motion.div>
@@ -370,7 +398,7 @@ export default function AdminSettings() {
 
                                 {settings.emailNotifications && (
                                     <div className="ml-8 space-y-2">
-                                        {[
+                                        { [
                                             { key: 'memberJoined', label: 'Nouveau membre rejoint' },
                                             { key: 'videoUploaded', label: 'Nouvelle vidéo uploadée' },
                                             { key: 'quizCompleted', label: 'Quiz complété' }
@@ -381,6 +409,7 @@ export default function AdminSettings() {
                                                     checked={settings[item.key]}
                                                     onChange={(e) => setSettings({...settings, [item.key]: e.target.checked})}
                                                     className="rounded text-indigo-600"
+                                                    disabled={isReadOnly}
                                                 />
                                                 <span className="text-sm text-gray-600">{item.label}</span>
                                             </label>
@@ -437,6 +466,7 @@ export default function AdminSettings() {
                                         value={settings.language}
                                         onChange={(e) => setSettings({...settings, language: e.target.value})}
                                         className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+                                        disabled={isReadOnly}
                                     >
                                         <option value="fr">Français</option>
                                         <option value="en">English</option>
@@ -468,6 +498,7 @@ export default function AdminSettings() {
                                     value={settings.sessionTimeout}
                                     onChange={(e) => setSettings({...settings, sessionTimeout: e.target.value})}
                                     className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+                                    disabled={isReadOnly}
                                 >
                                     <option value="15">15 minutes</option>
                                     <option value="30">30 minutes</option>
