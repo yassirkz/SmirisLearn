@@ -1,80 +1,181 @@
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion'
-import { useAuth } from '../../hooks/useAuth'  
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
+import { 
+  Chrome, Mail, Shield, Zap, Sparkles, 
+  AlertCircle, CheckCircle, Loader2 
+} from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
-export default function AuthButtons() {  
-  const { signInWithGoogle } = useAuth()  
+export default function AuthButtons() {
+  const { signInWithGoogle } = useAuth();
+  const { success, error: showError } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [showSecurity, setShowSecurity] = useState(false);
 
-  const handleGoogleSignIn = async () => {  
+  const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle()
+      setLoading(true);
+      
+      // Animation de sécurité
+      setShowSecurity(true);
+      
+      const { data, error } = await signInWithGoogle();
+      
+      if (error) {
+        throw error;
+      }
+
       // La redirection est gérée par Supabase
+      // On montre juste un message de succès avant redirection
+      success('Redirection vers Google...', {
+        duration: 2000,
+        icon: Chrome
+      });
+
     } catch (error) {
-      console.error('Erreur connexion Google:', error)
+      console.error('Erreur connexion Google:', error);
+      
+      showError(error.message || 'Erreur lors de la connexion avec Google', {
+        duration: 5000,
+        action: () => window.location.reload(),
+        actionLabel: 'Réessayer'
+      });
+    } finally {
+      setLoading(false);
+      setTimeout(() => setShowSecurity(false), 1000);
     }
-  }
+  };
 
   return (
-    <div className="space-y-3">
-      {/* Bouton Google */}
+    <div className="space-y-4">
+      {/* Bouton Google avec animations avancées */}
       <motion.button
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
-        onClick={handleGoogleSignIn}  // ✅ MODIFIÉ (était onGoogleSignIn)
-        className="group relative w-full flex items-center justify-center gap-3 px-6 py-3.5 
-                  bg-white border-2 border-secondary-200 rounded-xl 
-                  text-secondary-700 font-semibold
-                  hover:border-primary-300 hover:bg-primary-50/50
-                  transition-all duration-300 overflow-hidden"
+        onClick={handleGoogleSignIn}
+        disabled={loading}
+        className="group relative w-full overflow-hidden rounded-2xl bg-white px-6 py-4 
+                   border-2 border-gray-200 hover:border-blue-300 
+                   disabled:opacity-50 disabled:cursor-not-allowed
+                   transition-all duration-300 shadow-lg hover:shadow-xl"
       >
         {/* Effet de shine */}
-        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full 
-                      transition-transform duration-700 bg-gradient-to-r 
-                      from-transparent via-white/60 to-transparent" />
-        
-        <svg width="20" height="20" viewBox="0 0 24 24">
-          <path
-            fill="#4285F4"
-            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-          />
-          <path
-            fill="#34A853"
-            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-          />
-          <path
-            fill="#EA4335"
-            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-          />
-        </svg>
-        
-        <span>Continuer avec Google</span>
+        <motion.div
+          animate={loading ? { x: ['-100%', '100%'] } : {}}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200/30 to-transparent"
+        />
+
+        {/* Effet de glow */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-xl" />
+        </div>
+
+        {/* Contenu */}
+        <div className="relative flex items-center justify-center gap-3">
+          {/* Logo Google avec animation */}
+          <motion.div
+            animate={loading ? { rotate: 360 } : {}}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 text-blue-600" />
+            ) : (
+              <Chrome className="w-5 h-5 text-blue-600" />
+            )}
+          </motion.div>
+
+          <span className="text-gray-700 font-semibold group-hover:text-gray-900 transition-colors">
+            {loading ? 'Connexion en cours...' : 'Continuer avec Google'}
+          </span>
+
+          {/* Badge de sécurité animé */}
+          <AnimatePresence>
+            {showSecurity && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="absolute -right-2 -top-2"
+              >
+                <div className="relative">
+                  <Shield className="w-4 h-4 text-green-500" />
+                  <motion.div
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="absolute inset-0 bg-green-500 rounded-full blur opacity-50"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.button>
 
-      {/* Séparateur */}
-      <div className="relative my-4">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-secondary-200"></div>
-        </div>
+      {/* Séparateur animé */}
+      <div className="relative my-6">
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.2 }}
+          className="absolute inset-0 flex items-center"
+        >
+          <div className="w-full border-t border-gray-200" />
+        </motion.div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-3 bg-white text-secondary-500">ou</span>
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", delay: 0.3 }}
+            className="px-4 bg-white text-gray-400 font-medium"
+          >
+            ou
+          </motion.span>
         </div>
       </div>
 
-      {/* Email/password info */}
+      {/* Message d'information sécurisé */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-center"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="text-center space-y-2"
       >
-        <p className="text-sm text-secondary-600">
-          Ou utilisez votre adresse email ci-dessous
+        <p className="text-sm text-gray-600 flex items-center justify-center gap-2">
+          <Mail className="w-4 h-4 text-gray-400" />
+          Utilisez votre adresse email ci-dessous
         </p>
+
+        {/* Badges de sécurité */}
+        <motion.div
+          animate={{ y: [0, -2, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="flex items-center justify-center gap-4 text-xs text-gray-400"
+        >
+          <div className="flex items-center gap-1">
+            <Shield className="w-3 h-3 text-green-400" />
+            <span>Chiffré</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Zap className="w-3 h-3 text-blue-400" />
+            <span>Rapide</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <CheckCircle className="w-3 h-3 text-purple-400" />
+            <span>Sécurisé</span>
+          </div>
+        </motion.div>
+
+        {/* Message de sécurité (apparaît au hover) */}
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 rounded-full cursor-help"
+        >
+          <Sparkles className="w-3 h-3 text-blue-500" />
+          <span className="text-xs text-blue-600">Connexion 2FA disponible</span>
+        </motion.div>
       </motion.div>
     </div>
-  )
+  );
 }

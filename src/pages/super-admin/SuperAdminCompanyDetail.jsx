@@ -7,13 +7,16 @@ import {
     CheckCircle, AlertCircle, Clock, Shield,
     Download, Filter, Search, X, Sparkles,
     PieChart, BarChart3, Activity, UserPlus,
-    Eye, Trash2, Zap, LayoutDashboard
+    Eye, Trash2, Zap, LayoutDashboard,
+    Gauge, AlertTriangle, HardDrive
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { untrusted, escapeText } from '../../utils/security';
 import EditCompanyModal from '../../components/super-admin/EditCompanyModal';
+
+
 
 export default function SuperAdminCompanyDetail() {
     const { id } = useParams();
@@ -34,10 +37,28 @@ export default function SuperAdminCompanyDetail() {
     const [filterRole, setFilterRole] = useState('all');
     const [showActions, setShowActions] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [limits, setLimits] = useState(null);
+
 
     useEffect(() => {
+    if (id) {
         fetchCompanyDetails();
-    }, [id]);
+        fetchOrganizationLimits();
+    }
+}, [id]);
+    const fetchOrganizationLimits = async () => {
+        try {
+            const { data, error } = await supabase
+                .rpc('check_organization_limits_full', {
+                    p_org_id: id
+                });
+
+            if (error) throw error;
+            setLimits(data);
+        } catch (error) {
+            console.error('Erreur chargement limites:', error);
+        }
+    };
 
     const fetchCompanyDetails = async () => {
         setLoading(true);
@@ -430,12 +451,14 @@ export default function SuperAdminCompanyDetail() {
                 {/* Cartes de statistiques */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {[
-                        { label: 'Membres', data: stats.members, icon: Users, color: 'from-blue-500 to-blue-600' },
-                        { label: 'Vidéos', data: stats.videos, icon: Video, color: 'from-purple-500 to-purple-600' },
-                        { label: 'Quiz', data: stats.quizzes, icon: Award, color: 'from-pink-500 to-pink-600' },
-                        { label: 'Complétion', data: stats.completion, icon: TrendingUp, color: 'from-green-500 to-green-600' }
+                        { label: 'Membres', data: stats.members, icon: Users, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', description: 'Total utilisateurs' },
+                        { label: 'Vidéos', data: stats.videos, icon: Video, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50', description: 'Contenu disponible' },
+                        { label: 'Quiz', data: stats.quizzes, icon: Award, color: 'from-pink-500 to-pink-600', bg: 'bg-pink-50', description: 'Évaluations' },
+                        { label: 'Score moyen', data: stats.completion, icon: TrendingUp, color: 'from-green-500 to-green-600', bg: 'bg-green-50', description: 'Moyenne quiz' }
                     ].map((card, index) => {
                         const isPositive = card.data.growth >= 0;
+                        const value = card.label === 'Score moyen' ? `${card.data.current}%` : card.data.current;
+                        const progress = card.label === 'Score moyen' ? card.data.current : Math.min((card.data.current / 50) * 100, 100);
                         return (
                             <motion.div
                                 key={card.label}
@@ -443,24 +466,35 @@ export default function SuperAdminCompanyDetail() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 whileHover={{ y: -5 }}
-                                className="bg-white rounded-2xl p-6 shadow-lg border border-blue-100 relative overflow-hidden group"
+                                className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                                 
                                 <div className="relative flex items-start justify-between">
                                     <div>
                                         <p className="text-sm text-gray-500 mb-1">{card.label}</p>
-                                        <p className="text-3xl font-bold text-gray-800">
-                                            {card.label === 'Complétion' ? `${card.data.current}%` : card.data.current}
-                                        </p>
+                                        <p className="text-3xl font-bold text-gray-800">{value}</p>
                                         <p className={`text-xs mt-2 flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                                            {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingUp className="w-3 h-3 rotate-180" />}
-                                            <span>{Math.abs(card.data.growth)}% vs mois dernier</span>
+                                            {isPositive ? '↑' : '↓'} {Math.abs(card.data.growth)}%
+                                            <span className="text-gray-400 font-normal ml-1">vs mois dernier</span>
                                         </p>
+                                        <p className="text-xs text-gray-500 mt-2">{card.description}</p>
                                     </div>
-                                    <div className={`p-3 bg-gradient-to-br ${card.color} rounded-xl shadow-lg group-hover:scale-110 transition-transform`}>
+                                    <div className={`p-3 bg-gradient-to-br ${card.color} rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                                         <card.icon className="w-6 h-6 text-white" />
                                     </div>
+                                </div>
+
+                                <div className="mt-4 h-1.5 bg-gray-200/50 rounded-full overflow-hidden relative">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${progress}%` }}
+                                        transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
+                                        className={`h-full bg-gradient-to-r ${card.color} rounded-full relative`}
+                                    >
+                                        {/* Indicateur pointu à la fin */}
+                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white border border-current rounded-full shadow-sm" style={{ color: card.color.split(' ')[1].replace('to-', '') }} />
+                                    </motion.div>
                                 </div>
                             </motion.div>
                         );
@@ -523,6 +557,113 @@ export default function SuperAdminCompanyDetail() {
                         )}
                     </motion.div>
                 </div>
+                {limits && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25 }}
+                        className="bg-white rounded-2xl p-6 shadow-lg border border-blue-100"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <Gauge className="w-5 h-5 text-purple-600" />
+                            Limites du plan {limits.plan_type}
+                        </h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Utilisateurs */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <Users className="w-4 h-4 text-blue-600" />
+                                    <span className="text-sm font-medium text-gray-700">Utilisateurs</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span className="text-gray-500">Utilisés</span>
+                                    <span className={limits.can_add_users ? 'text-green-600' : 'text-red-600'}>
+                                        {limits.current_usage.users} / {limits.limits?.users === -1 ? '∞' : limits.limits?.users}
+                                    </span>
+                                </div>
+                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                                        style={{ 
+                                            width: limits.limits?.users === -1 
+                                                ? '100%' 
+                                                : `${(limits.current_usage.users / limits.limits?.users) * 100}%` 
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Vidéos */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <Video className="w-4 h-4 text-purple-600" />
+                                    <span className="text-sm font-medium text-gray-700">Vidéos</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span className="text-gray-500">Créées</span>
+                                    <span className={limits.can_add_videos ? 'text-green-600' : 'text-red-600'}>
+                                        {limits.current_usage.videos} / {limits.limits?.videos === -1 ? '∞' : limits.limits?.videos}
+                                    </span>
+                                </div>
+                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full bg-purple-600 rounded-full transition-all duration-500"
+                                        style={{ 
+                                            width: limits.limits?.videos === -1 
+                                                ? '100%' 
+                                                : `${(limits.current_usage.videos / limits.limits?.videos) * 100}%` 
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Stockage */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <HardDrive className="w-4 h-4 text-green-600" />
+                                    <span className="text-sm font-medium text-gray-700">Stockage</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span className="text-gray-500">Utilisé</span>
+                                    <span className={limits.storage_percent_used < 80 ? 'text-green-600' : 'text-red-600'}>
+                                        {limits.storage_percent_used}%
+                                    </span>
+                                </div>
+                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                        className={`h-full rounded-full transition-all duration-500 ${
+                                            limits.storage_percent_used > 80 ? 'bg-red-600' : 'bg-green-600'
+                                        }`}
+                                        style={{ width: `${Math.min(limits.storage_percent_used, 100)}%` }}
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    {limits.current_usage.storage_mb} Mo / {limits.limits?.storage} Go
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Alertes */}
+                        {!limits.can_add_users && (
+                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                                <p className="text-sm text-yellow-700">
+                                    Limite utilisateurs atteinte. Passez à un plan supérieur pour ajouter plus de membres.
+                                </p>
+                            </div>
+                        )}
+
+                        {!limits.can_add_videos && (
+                            <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                                <p className="text-sm text-yellow-700">
+                                    Limite vidéos atteinte. Passez à un plan supérieur pour ajouter plus de contenu.
+                                </p>
+                            </div>
+                        )}
+                    </motion.div>
+)}
 
                 {/* Liste des utilisateurs */}
                 <motion.div

@@ -16,15 +16,15 @@ export function useInvitation() {
 
             const email = companyData.adminEmail.toLowerCase().trim();
             
-            // RATE LIMITING
+            // Rate limiting
             if (!checkRateLimit('invitation', email, 5, 60000)) {
                 throw new Error('Trop de tentatives. Réessayez dans quelques minutes.');
             }
 
-            // VALIDATION EMAIL (branded types)
+            // Validation email
             const validatedEmail = validateEmail(untrusted(email));
 
-            // VÉRIFICATION DOUBLONS DANS PENDING_COMPANIES
+            // Vérification doublons
             const { data: existingInvite, error: checkError } = await supabase
                 .from('pending_companies')
                 .select('*')
@@ -37,7 +37,7 @@ export function useInvitation() {
                 throw new Error('Une invitation est déjà en attente pour cet email');
             }
 
-            // VÉRIFICATION DOUBLONS DANS PROFILES
+            // Vérification utilisateur existant
             const { data: existingUser, error: userError } = await supabase
                 .from('profiles')
                 .select('id')
@@ -50,11 +50,11 @@ export function useInvitation() {
                 throw new Error('Cet email est déjà utilisé par un utilisateur existant');
             }
 
-            // GÉNÉRATION TOKEN
+            // Génération token
             const token = generateInvitationToken();
             const expiresAt = getExpirationDate();
 
-            // INSERTION DANS PENDING_COMPANIES
+            // Insertion
             const { data, error } = await supabase
                 .from('pending_companies')
                 .insert({
@@ -69,19 +69,11 @@ export function useInvitation() {
 
             if (error) throw error;
 
-            // RÉCUPÉRER L'EMAIL DU SUPER ADMIN ACTUEL DEPUIS SUPABASE
+            // Envoi email
             const { data: { user: superAdmin } } = await supabase.auth.getUser();
             const fromEmail = superAdmin?.email || "kezziyassir005@gmail.com";
 
-            console.log('DEBUG INVITATION:', {
-                from: fromEmail,
-                to: validatedEmail,
-                adminName: companyData.adminName,
-                company: companyData.name
-            });
-
-            // ENVOI DE L'EMAIL
-            const { success, error: emailError } = await sendInvitationEmail({
+            await sendInvitationEmail({
                 fromEmail,
                 to: validatedEmail,
                 fromName: "Super Admin Smiris Learn",
@@ -89,12 +81,6 @@ export function useInvitation() {
                 adminName: companyData.adminName.trim(),
                 token: data.token
             });
-
-            if (!success) {
-                console.warn('⚠️ Email non envoyé:', emailError);
-            } else {
-                console.log('✅ Invitation créée et email envoyé!');
-            }
 
             return { data, error: null };
 
@@ -152,10 +138,56 @@ export function useInvitation() {
         }
     }, []);
 
+    // ✅ NOUVEAU : Nettoyer les invitations expirées
+    const cleanupExpiredInvitations = useCallback(async () => {
+        try {
+            setLoading(true);
+            
+            const { data, error } = await supabase
+                .rpc('full_system_cleanup');
+
+            if (error) throw error;
+            
+            console.log('✅ Nettoyage effectué:', data);
+            return { data, error: null };
+
+        } catch (err) {
+            console.error('Erreur nettoyage invitations:', err);
+            setError(err.message);
+            return { data: null, error: err };
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // ✅ NOUVEAU : Vérifier les limites avant d'ajouter
+    const checkOrganizationLimits = useCallback(async (orgId, resourceType = 'users') => {
+        try {
+            const { data, error } = await supabase
+                .rpc('check_organization_limits_full', {
+                    p_org_id: orgId
+                });
+
+            if (error) throw error;
+            
+            return { 
+                data,
+                canAdd: resourceType === 'users' ? data?.can_add_users : data?.can_add_videos,
+                error: null 
+            };
+
+        } catch (err) {
+            console.error('Erreur vérification limites:', err);
+            return { data: null, error: err };
+        }
+    }, []);
+
     return {
         createInvitation,
         getInvitationByToken,
         deleteInvitation,
+        cleanupExpiredInvitations,
+        checkOrganizationLimits,
         loading,
         error
     };
