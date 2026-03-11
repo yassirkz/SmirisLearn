@@ -20,6 +20,7 @@ import SuperAdminSettings from "./pages/super-admin/SuperAdminSettings";
 // ============================================
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSettings from './pages/admin/AdminSettings';
+import PillarsPage from './pages/admin/PillarsPage';
 // ============================================
 // STUDENT PAGES
 // ============================================
@@ -125,6 +126,15 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
             <AdminSettings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/pillars"
+        element={
+          <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
+            <PillarsPage />
           </ProtectedRoute>
         }
       />
