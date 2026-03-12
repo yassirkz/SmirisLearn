@@ -22,16 +22,22 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     const { user } = useAuth();
     const { success, error: showError } = useToast();
     
-    // Réfs pour éviter les problèmes de mémoire
-    const abortControllerRef = useRef(null);
+    // ============================================
+    // RÉFS SIMPLIFIÉES (SANS AbortController)
+    // ============================================
     const isMounted = useRef(true);
     const fetchTimeoutRef = useRef(null);
+    const initialLoadRef = useRef(true);
+    const renderCountRef = useRef(0);
+    const fetchingRef = useRef(false);
     
-    // États
+    // ============================================
+    // ÉTATS
+    // ============================================
     const [pillars, setPillars] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [viewMode, setViewMode] = useState(() => {
-        // Récupérer la préférence utilisateur du localStorage
         return localStorage.getItem('pillarViewMode') || 'table';
     });
     const [filters, setFilters] = useState({
@@ -50,16 +56,28 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     });
     const [error, setError] = useState(null);
 
-    // Sauvegarder la préférence de vue
+    // ============================================
+    // DEBUG - COMPTER LES RENDUS (optionnel)
+    // ============================================
+    useEffect(() => {
+        renderCountRef.current += 1;
+        console.log('🔄 PillarsList render #', renderCountRef.current);
+    });
+
+    // ============================================
+    // SAUVEGARDER LA PRÉFÉRENCE DE VUE
+    // ============================================
     useEffect(() => {
         localStorage.setItem('pillarViewMode', viewMode);
     }, [viewMode]);
 
     // ============================================
-    // RÉCUPÉRER L'ORGANIZATION ID 
+    // RÉCUPÉRER L'ORGANIZATION ID
     // ============================================
     const getOrgId = useCallback(async () => {
         if (propOrgId) return propOrgId;
+        
+        if (!user?.id) return null;
         
         try {
             const { data: profile, error } = await supabase
@@ -68,143 +86,145 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 .eq('id', user.id)
                 .maybeSingle();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Erreur récupération orgId:', error);
+                return null;
+            }
+            
             return profile?.organization_id;
         } catch (err) {
-            console.error('Erreur récupération orgId:', err);
+            console.error('Exception récupération orgId:', err);
             return null;
         }
-    }, [user, propOrgId]);
+    }, [user?.id, propOrgId]);
 
     // ============================================
-    // CHARGER LES PILIERS (avec gestion d'annulation)
+    // CHARGER LES PILIERS (SANS AbortController)
     // ============================================
-    const fetchPillars = useCallback(async () => {
+    const fetchPillars = useCallback(async (isRefresh = false) => {
+        // Éviter les appels simultanés
+        if (fetchingRef.current) {
+            console.log('⏳ Fetch déjà en cours, ignoré');
+            return;
+        }
+
         // Nettoyer les timeouts précédents
         if (fetchTimeoutRef.current) {
             clearTimeout(fetchTimeoutRef.current);
+            fetchTimeoutRef.current = null;
         }
 
-        // Annuler la requête précédente si elle existe
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-            abortControllerRef.current = null;
+        fetchingRef.current = true;
+
+        // Gérer l'état de chargement
+        if (isRefresh) {
+            setRefreshing(true);
+        } else {
+            setLoading(true);
         }
-
-        // Créer un nouveau controller
-        abortControllerRef.current = new AbortController();
-
-        setLoading(true);
         setError(null);
 
-        // Petit délai pour éviter les appels trop fréquents
-        fetchTimeoutRef.current = setTimeout(async () => {
-            try {
-                const orgId = await getOrgId();
-                
-                if (!orgId) {
-                    if (isMounted.current) {
-                        setError('Organisation non trouvée');
+        try {
+            const orgId = await getOrgId();
+            
+            if (!orgId) {
+                if (isMounted.current) {
+                    setError('Organisation non trouvée');
+                    if (isRefresh) {
+                        setRefreshing(false);
+                    } else {
                         setLoading(false);
                     }
-                    return;
                 }
+                fetchingRef.current = false;
+                return;
+            }
 
-                if (!isMounted.current) return;
+            if (!isMounted.current) {
+                fetchingRef.current = false;
+                return;
+            }
 
-                // Construire la requête de base
-                let query = supabase
-                    .from('pillars')
-                    .select(`
-                        *,
-                        videos: videos(count)
-                    `)
-                    .eq('organization_id', orgId);
+            console.log('📦 Chargement des piliers pour org:', orgId);
 
-                // IMPORTANT :
-                // - On ne peut pas trier côté Supabase sur des champs calculés
-                //   comme videoCount ou studentCount (qui n'existent pas en base).
-                // - Si l'utilisateur choisit "Nombre de vidéos", on fera le tri
-                //   côté frontend après avoir calculé les stats.
-                if (filters.sortBy !== 'videoCount') {
-                    query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
-                }
+            // Construire la requête SANS AbortSignal
+            let query = supabase
+                .from('pillars')
+                .select(`
+                    *,
+                    videos: videos(count)
+                `)
+                .eq('organization_id', orgId);
 
-                // Appliquer le signal d'annulation
-                const { data, error } = await query.abortSignal(abortControllerRef.current.signal);
+            // Tri côté Supabase si possible
+            if (filters.sortBy !== 'videoCount') {
+                query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
+            }
 
-                if (error) {
-                    if (error.name === 'AbortError') {
-                        console.log('🔄 Requête piliers annulée');
-                        return;
-                    }
-                    throw error;
-                }
+            // Exécuter la requête (sans signal)
+            const { data, error } = await query;
 
-                if (!isMounted.current) return;
+            if (error) {
+                throw error;
+            }
 
-                // Traiter les données
-                let pillarsWithStats = data?.map(pillar => ({
-                    ...pillar,
-                    videoCount: pillar.videos?.[0]?.count || 0,
-                    // Temporairement, on ne calcule pas le nombre d'étudiants
-                    // pour éviter l'erreur Supabase sur group_members.
-                    studentCount: 0,
-                    safeName: escapeText(untrusted(pillar.name)),
-                    safeDescription: escapeText(untrusted(pillar.description || ''))
-                })) || [];
+            if (!isMounted.current) {
+                fetchingRef.current = false;
+                return;
+            }
 
-                // Tri frontend quand on veut trier sur un champ dérivé
-                if (filters.sortBy === 'videoCount') {
-                    pillarsWithStats = [...pillarsWithStats].sort((a, b) => {
-                        return filters.sortOrder === 'asc'
-                            ? a.videoCount - b.videoCount
-                            : b.videoCount - a.videoCount;
-                    });
-                }
+            // Traiter les données
+            let pillarsWithStats = data?.map(pillar => ({
+                ...pillar,
+                videoCount: pillar.videos?.[0]?.count || 0,
+                studentCount: 0,
+                safeName: escapeText(untrusted(pillar.name)),
+                safeDescription: escapeText(untrusted(pillar.description || ''))
+            })) || [];
 
-                // Filtrer par recherche
-                const filtered = pillarsWithStats.filter(pillar =>
-                    pillar.safeName.toLowerCase().includes(filters.search.toLowerCase()) ||
-                    pillar.safeDescription.toLowerCase().includes(filters.search.toLowerCase())
-                );
-
-                setPillars(filtered);
-                
-                // Mettre à jour les stats
-                setStats({
-                    total: filtered.length,
-                    withVideos: filtered.filter(p => p.videoCount > 0).length,
-                    totalVideos: filtered.reduce((acc, p) => acc + p.videoCount, 0),
-                    totalStudents: filtered.reduce((acc, p) => acc + p.studentCount, 0)
+            // Tri sur videoCount (côté client)
+            if (filters.sortBy === 'videoCount') {
+                pillarsWithStats = [...pillarsWithStats].sort((a, b) => {
+                    return filters.sortOrder === 'asc'
+                        ? a.videoCount - b.videoCount
+                        : b.videoCount - a.videoCount;
                 });
+            }
 
-            } catch (err) {
-                // Certains environnements renvoient AbortError avec différents formats.
-                const isAbort =
-                    err?.name === 'AbortError' ||
-                    err?.message?.includes('AbortError') ||
-                    err?.message?.includes('Request was aborted') ||
-                    err?.message?.includes('signal is aborted');
+            // Filtrer par recherche
+            const filtered = pillarsWithStats.filter(pillar =>
+                pillar.safeName.toLowerCase().includes(filters.search.toLowerCase()) ||
+                pillar.safeDescription.toLowerCase().includes(filters.search.toLowerCase())
+            );
 
-                if (isAbort) {
-                    console.warn('🔄 Chargement piliers annulé (AbortError):', err);
-                    return;
-                }
+            setPillars(filtered);
+            
+            // Mettre à jour les stats
+            setStats({
+                total: filtered.length,
+                withVideos: filtered.filter(p => p.videoCount > 0).length,
+                totalVideos: filtered.reduce((acc, p) => acc + p.videoCount, 0),
+                totalStudents: filtered.reduce((acc, p) => acc + p.studentCount, 0)
+            });
 
-                console.error('❌ Erreur chargement piliers:', err);
-                if (isMounted.current) {
-                    setError(err.message || 'Impossible de charger les piliers');
-                    showError('Impossible de charger les piliers');
-                }
-            } finally {
-                if (isMounted.current) {
+            console.log('✅ Piliers chargés:', filtered.length);
+
+        } catch (err) {
+            console.error('❌ Erreur chargement piliers:', err);
+            if (isMounted.current) {
+                setError(err.message || 'Impossible de charger les piliers');
+                showError('Impossible de charger les piliers');
+            }
+        } finally {
+            if (isMounted.current) {
+                if (isRefresh) {
+                    setRefreshing(false);
+                } else {
                     setLoading(false);
                 }
-                abortControllerRef.current = null;
             }
-        }, 300); // Délai de 300ms
-
+            fetchingRef.current = false;
+        }
     }, [getOrgId, filters.sortBy, filters.sortOrder, filters.search, showError]);
 
     // ============================================
@@ -213,7 +233,11 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     useEffect(() => {
         isMounted.current = true;
         
-        fetchPillars();
+        // Charger les données UNE SEULE fois au montage
+        if (initialLoadRef.current) {
+            initialLoadRef.current = false;
+            fetchPillars(false);
+        }
 
         return () => {
             isMounted.current = false;
@@ -223,12 +247,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 clearTimeout(fetchTimeoutRef.current);
                 fetchTimeoutRef.current = null;
             }
-            
-            // Annuler les requêtes en cours
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
-                abortControllerRef.current = null;
-            }
         };
     }, [fetchPillars]);
 
@@ -236,9 +254,13 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     // HANDLERS
     // ============================================
     const handleRefresh = useCallback(() => {
-        fetchPillars();
+        if (refreshing || fetchingRef.current) {
+            console.log('⏳ Rafraîchissement déjà en cours');
+            return;
+        }
+        fetchPillars(true);
         success('Données mises à jour');
-    }, [fetchPillars, success]);
+    }, [fetchPillars, success, refreshing]);
 
     const handleCreate = useCallback(() => {
         if (isReadOnly) {
@@ -276,7 +298,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             if (error) throw error;
 
             success('Pilier supprimé avec succès');
-            fetchPillars();
+            fetchPillars(false);
         } catch (err) {
             console.error('❌ Erreur suppression:', err);
             showError('Impossible de supprimer le pilier');
@@ -312,7 +334,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     }
 
     // ============================================
-    // RENDU PRINCIPAL
+    // RENDU PRINCIPAL (inchangé)
     // ============================================
     return (
         <div className="space-y-6">
@@ -341,11 +363,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                        {/* Filtres */}
-                        <PillarFilters 
-                            filters={filters}
-                            onChange={handleFilterChange}
-                        />
+                        <PillarFilters filters={filters} onChange={handleFilterChange} />
 
                         {/* Switch vue */}
                         <div className="flex bg-gray-100 rounded-lg p-1">
@@ -373,16 +391,16 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             </button>
                         </div>
 
-                        {/* Rafraîchir */}
+                        {/* Rafraîchir - SIMPLIFIÉ */}
                         <motion.button
                             whileHover={{ rotate: 180 }}
                             transition={{ duration: 0.3 }}
                             onClick={handleRefresh}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                             title="Rafraîchir"
-                            disabled={loading}
+                            disabled={refreshing || loading}
                         >
-                            <RefreshCw className={`w-4 h-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-4 h-4 text-gray-600 ${(refreshing || loading) ? 'animate-spin' : ''}`} />
                         </motion.button>
 
                         {/* Nouveau pilier */}
@@ -456,7 +474,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             <CreatePillarModal
                 isOpen={showCreateModal}
                 onClose={() => setShowCreateModal(false)}
-                onSuccess={fetchPillars}
+                onSuccess={() => fetchPillars(false)}
                 orgId={propOrgId}
             />
 
@@ -467,7 +485,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                     setSelectedPillar(null);
                 }}
                 pillar={selectedPillar}
-                onSuccess={fetchPillars}
+                onSuccess={() => fetchPillars(false)}
             />
         </div>
     );
