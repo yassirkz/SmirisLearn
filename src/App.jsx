@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
 import { useUserRole } from "./hooks/useUserRole";
@@ -7,6 +8,7 @@ import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import AcceptInvitePage from './pages/AcceptInvitePage';
+
 // ============================================
 // SUPER ADMIN PAGES
 // ============================================
@@ -15,23 +17,17 @@ import SuperAdminCompanies from "./pages/super-admin/SuperAdminCompanies";
 import SuperAdminCompanyDetail from "./pages/super-admin/SuperAdminCompanyDetail";
 import SuperAdminUsers from "./pages/super-admin/SuperAdminUsers";
 import SuperAdminSettings from "./pages/super-admin/SuperAdminSettings";
+
 // ============================================
 // ADMIN ENTREPRISE PAGES
 // ============================================
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSettings from './pages/admin/AdminSettings';
 import PillarsPage from './pages/admin/PillarsPage';
-// ============================================
-// STUDENT PAGES
-// ============================================
-function StudentDashboard() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Espace Étudiant</h1>
-      <p className="text-gray-600">Vos formations</p>
-    </div>
-  );
-}
+// import PillarDetailPage from './pages/admin/PillarDetailPage';
+import VideosPage from './pages/admin/VideosPage';
+import VideoDetailPage from './pages/admin/VideoDetailPage';  
+
 
 function App() {
   const { user, loading } = useAuth();
@@ -39,10 +35,12 @@ function App() {
 
   if (loading || roleLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="text-center">
           <LoadingSpinner size="lg" color="primary" />
-          <p className="mt-4 text-gray-600">Chargement de votre session...</p>
+          <p className="mt-4 text-gray-600 animate-pulse">
+            Chargement de votre session...
+          </p>
         </div>
       </div>
     );
@@ -130,6 +128,7 @@ function App() {
         }
       />
 
+      {/* Routes Piliers */}
       <Route
         path="/admin/pillars"
         element={
@@ -139,15 +138,29 @@ function App() {
         }
       />
 
-      {/* ============================================
-          STUDENT ROUTES
-      ============================================ */}
-      <Route
-        path="/student"
+      {/* <Route
+        path="/admin/pillars/:id"
         element={
-          <ProtectedRoute allowedRoles={["super_admin", "org_admin", "student"]}>
-            <StudentDashboard />
+          <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
+            <PillarDetailPage />
           </ProtectedRoute>
+        }
+      /> */}
+
+      <Route
+        path="/admin/videos"
+        element={
+          <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
+            <VideosPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/videos/:id"
+        element={
+            <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
+                <VideoDetailPage />
+            </ProtectedRoute>
         }
       />
 
@@ -164,7 +177,7 @@ function App() {
           ) : role === "org_admin" ? (
             <Navigate to="/admin" replace />
           ) : (
-            <Navigate to="/student" replace />
+            <Navigate to="/admin" replace />
           )
         }
       />
