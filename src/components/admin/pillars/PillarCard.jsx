@@ -1,41 +1,14 @@
 // src/components/admin/pillars/PillarCard.jsx
 import { motion } from 'framer-motion';
 import {
-    MoreVertical, Edit, Trash2, Eye,
+    Edit, Trash2, Eye,
     Video, Users, Calendar, Sparkles
 } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom'; // AJOUTER
 import { useNavigate } from 'react-router-dom';
 import { untrusted, escapeText } from '../../../utils/security';
 
 export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly }) {
-    const [showActions, setShowActions] = useState(false);
-    const buttonRef = useRef(null);
-    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
     const navigate = useNavigate();
-
-    // Fermer le menu si on clique ailleurs
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (buttonRef.current && !buttonRef.current.contains(event.target)) {
-                setShowActions(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    // Calculer la position du menu
-    useEffect(() => {
-        if (showActions && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            setMenuPosition({
-                top: rect.bottom + window.scrollY + 8,
-                left: rect.right - 192, // 192px = largeur du menu
-            });
-        }
-    }, [showActions]);
 
     const getColorGradient = (color) => {
         const gradients = {
@@ -65,16 +38,34 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
         return bgs[color] || bgs.blue;
     };
 
+    // Gestion du clic sur la carte
     const handleCardClick = (e) => {
+        // Ne pas naviguer si on clique sur un bouton
         if (e.target.closest('button')) {
             return;
         }
         navigate(`/admin/pillars/${pillar.id}`);
     };
 
+    // Gestion du clic sur "Voir détails"
     const handleViewDetails = (e) => {
         e.stopPropagation();
+        e.preventDefault();
         navigate(`/admin/pillars/${pillar.id}`);
+    };
+
+    // Gestion du clic sur "Modifier"
+    const handleEditClick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onEdit(pillar);
+    };
+
+    // Gestion du clic sur "Supprimer"
+    const handleDeleteClick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onDelete(pillar);
     };
 
     return (
@@ -104,11 +95,11 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                 </div>
                 <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-800 mb-1">
-                        {pillar.safeName}
+                        {escapeText(untrusted(pillar.safeName))}
                     </h3>
                     {pillar.description && (
                         <p className="text-sm text-gray-500 line-clamp-2">
-                            {pillar.safeDescription}
+                            {escapeText(untrusted(pillar.safeDescription))}
                         </p>
                     )}
                 </div>
@@ -135,8 +126,9 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                 </div>
             </div>
 
-            {/* Actions */}
+            {/* Actions - SANS TROIS POINTS */}
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/50">
+                {/* Bouton Voir détails */}
                 <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -149,73 +141,27 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                 
                 {!isReadOnly && (
                     <>
+                        {/* Bouton Modifier */}
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onEdit(pillar);
-                            }}
+                            onClick={handleEditClick}
                             className="p-2 hover:bg-purple-100 rounded-lg transition-colors text-purple-600"
                             title="Modifier"
                         >
                             <Edit className="w-4 h-4" />
                         </motion.button>
                         
-                        {/* Bouton trois points avec menu en portal */}
-                        <div>
-                            <motion.button
-                                ref={buttonRef}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowActions(!showActions);
-                                }}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <MoreVertical className="w-4 h-4 text-gray-500" />
-                            </motion.button>
-                            
-                            {showActions && createPortal(
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    style={{
-                                        position: 'absolute',
-                                        top: menuPosition.top,
-                                        left: menuPosition.left,
-                                        zIndex: 999999,
-                                    }}
-                                    className="w-48 bg-white rounded-xl shadow-2xl border border-gray-100 py-1"
-                                >
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onEdit(pillar);
-                                            setShowActions(false);
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-2"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                        Modifier
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onDelete(pillar);
-                                            setShowActions(false);
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                        Supprimer
-                                    </button>
-                                </motion.div>,
-                                document.body
-                            )}
-                        </div>
+                        {/* Bouton Supprimer */}
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={handleDeleteClick}
+                            className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+                            title="Supprimer"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </motion.button>
                     </>
                 )}
             </div>
