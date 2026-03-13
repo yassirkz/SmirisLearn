@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Plus, RefreshCw, Sparkles, Film,
     LayoutGrid, Table as TableIcon,
-    X
+    X, Monitor
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
@@ -12,6 +12,7 @@ import { untrusted, escapeText } from '../../../utils/security';
 import VideoCard from './VideoCard';
 import VideoFilters from './VideoFilters';
 import VideoUploader from './VideoUploader';
+import ScreenRecorder from './ScreenRecorder';
 import VideoForm from './VideoForm';
 import PillarSkeleton from '../pillars/PillarSkeleton';
 
@@ -38,6 +39,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         sortOrder: 'desc'
     });
     const [showUploader, setShowUploader] = useState(false);
+    const [showRecorder, setShowRecorder] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [uploadedVideo, setUploadedVideo] = useState(null);
@@ -176,6 +178,14 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         setShowUploader(true);
     };
 
+    const handleOpenRecorder = () => {
+        if (!userOrgId) {
+            showError('Impossible de déterminer votre organisation');
+            return;
+        }
+        setShowRecorder(true);
+    };
+
     const handleUploadSuccess = (videoData) => {
         setUploadedVideo(videoData);
         setShowUploader(false);
@@ -282,13 +292,22 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         </button>
 
                         {!isReadOnly && (
-                            <button
-                                onClick={handleOpenUploader}
-                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Nouvelle vidéo
-                            </button>
+                            <>
+                                <button
+                                    onClick={handleOpenUploader}
+                                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Nouvelle vidéo
+                                </button>
+                                <button
+                                    onClick={handleOpenRecorder}
+                                    className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                >
+                                    <Monitor className="w-4 h-4" />
+                                    Enregistrer l'écran
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>
@@ -324,6 +343,45 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                 onUploadSuccess={handleUploadSuccess}
                                 onClose={() => setShowUploader(false)}
                                 orgId={userOrgId}
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Screen Recorder Modal */}
+            <AnimatePresence>
+                {showRecorder && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        onClick={() => setShowRecorder(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.9 }}
+                            className="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold">Enregistrer une vidéo d'écran</h2>
+                                <button
+                                    onClick={() => setShowRecorder(false)}
+                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <ScreenRecorder
+                                orgId={userOrgId}
+                                onRecordSuccess={(videoData) => {
+                                    setShowRecorder(false);
+                                    handleUploadSuccess(videoData);
+                                }}
+                                onClose={() => setShowRecorder(false)}
                             />
                         </motion.div>
                     </motion.div>

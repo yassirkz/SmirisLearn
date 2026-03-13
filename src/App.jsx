@@ -24,7 +24,7 @@ import SuperAdminSettings from "./pages/super-admin/SuperAdminSettings";
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSettings from './pages/admin/AdminSettings';
 import PillarsPage from './pages/admin/PillarsPage';
-// import PillarDetailPage from './pages/admin/PillarDetailPage';
+import PillarDetailPage from './pages/admin/PillarDetailPage';
 import VideosPage from './pages/admin/VideosPage';
 import VideoDetailPage from './pages/admin/VideoDetailPage';  
 
@@ -138,14 +138,14 @@ function App() {
         }
       />
 
-      {/* <Route
+      <Route
         path="/admin/pillars/:id"
         element={
           <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
             <PillarDetailPage />
           </ProtectedRoute>
         }
-      /> */}
+      />
 
       <Route
         path="/admin/videos"
