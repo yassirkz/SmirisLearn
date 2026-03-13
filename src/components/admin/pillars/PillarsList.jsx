@@ -145,9 +145,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 return;
             }
 
-            console.log('📦 Chargement des piliers pour org:', orgId);
-
-            // Construire la requête SANS AbortSignal
+            // Construire la requête principale pour les piliers
             let query = supabase
                 .from('pillars')
                 .select(`
@@ -161,7 +159,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
             }
 
-            // Exécuter la requête (sans signal)
+            // Exécuter la requête
             const { data, error } = await query;
 
             if (error) {
@@ -173,11 +171,44 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 return;
             }
 
+            // ============================================
+            // RÉCUPÉRER LE NOMBRE D'ÉTUDIANTS PAR PILIER
+            // ============================================
+            let studentCountsByPillar = {};
+
+            if (data && data.length) {
+                const pillarIds = data.map(p => p.id);
+
+                try {
+                    const { data: accessData, error: accessError } = await supabase
+                        .from('group_pillar_access')
+                        .select(`
+                            pillar_id,
+                            group:groups(
+                                group_members(count)
+                            )
+                        `)
+                        .in('pillar_id', pillarIds);
+
+                    if (!accessError && accessData) {
+                        accessData.forEach(row => {
+                            const count = row.group?.group_members?.[0]?.count || 0;
+                            studentCountsByPillar[row.pillar_id] =
+                                (studentCountsByPillar[row.pillar_id] || 0) + count;
+                        });
+                    } else if (accessError) {
+                        console.warn('⚠️ Impossible de charger les étudiants par pilier:', accessError);
+                    }
+                } catch (studentsErr) {
+                    console.warn('⚠️ Erreur lors du calcul des étudiants par pilier:', studentsErr);
+                }
+            }
+
             // Traiter les données
             let pillarsWithStats = data?.map(pillar => ({
                 ...pillar,
                 videoCount: pillar.videos?.[0]?.count || 0,
-                studentCount: 0,
+                studentCount: studentCountsByPillar[pillar.id] || 0,
                 safeName: escapeText(untrusted(pillar.name)),
                 safeDescription: escapeText(untrusted(pillar.description || ''))
             })) || [];
@@ -206,8 +237,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 totalVideos: filtered.reduce((acc, p) => acc + p.videoCount, 0),
                 totalStudents: filtered.reduce((acc, p) => acc + p.studentCount, 0)
             });
-
-            console.log('✅ Piliers chargés:', filtered.length);
 
         } catch (err) {
             console.error('❌ Erreur chargement piliers:', err);

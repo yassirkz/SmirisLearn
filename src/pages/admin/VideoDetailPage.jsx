@@ -190,13 +190,13 @@ export default function VideoDetailPage() {
                     <video
                         src={video.video_url}
                         controls
+                        controlsList="noplaybackrate"
                         className="w-full h-auto max-h-[70vh] object-contain"
                         poster={video.thumbnail_url}
                         onError={(e) => {
                             console.error('❌ Erreur chargement vidéo:', e);
                             console.log('URL tentative:', video.video_url);
                         }}
-                        onLoadedData={() => console.log('✅ Vidéo chargée avec succès')}
                     >
                         Votre navigateur ne supporte pas la lecture vidéo.
                     </video>

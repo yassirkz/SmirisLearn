@@ -7,12 +7,10 @@ import {
     BarChart3, PieChart, Target
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
-import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
 import { untrusted, escapeText } from '../../../utils/security';
 
-export default function PillarStats({ pillarId, pillarName }) {
-    const { user } = useAuth();
+export default function PillarStats({ pillarId, pillarName, videos: pillarVideos }) {
     const { error: showError } = useToast();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -44,32 +42,41 @@ export default function PillarStats({ pillarId, pillarName }) {
         if (pillarId) {
             fetchStats();
         }
-    }, [pillarId]);
+        // On veut recalculer si la liste de vidéos passée en props change
+    }, [pillarId, pillarVideos]);
 
     const fetchStats = async () => {
         setLoading(true);
         try {
             // ============================================
             // 1. Récupérer les vidéos du pilier
+            //    - Si le parent fournit déjà pillarVideos,
+            //      on les utilise directement pour éviter
+            //      les divergences entre requêtes.
             // ============================================
-            const { data: videos, error: videosError } = await supabase
-                .from('videos')
-                .select(`
-                    id,
-                    duration,
-                    quizzes (
-                        id,
-                        passing_score,
-                        user_progress (
-                            quiz_score,
-                            quiz_attempts,
-                            user_id
-                        )
-                    )
-                `)
-                .eq('pillar_id', pillarId);
+            let videos = pillarVideos;
 
-            if (videosError) throw videosError;
+            if (!videos) {
+                const { data: videosData, error: videosError } = await supabase
+                    .from('videos')
+                    .select(`
+                        id,
+                        duration,
+                        quizzes (
+                            id,
+                            passing_score,
+                            user_progress (
+                                quiz_score,
+                                quiz_attempts,
+                                user_id
+                            )
+                        )
+                    `)
+                    .eq('pillar_id', pillarId);
+
+                if (videosError) throw videosError;
+                videos = videosData || [];
+            }
 
             // ============================================
             // 2. Récupérer les statistiques des étudiants
