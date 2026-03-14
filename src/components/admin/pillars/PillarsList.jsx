@@ -173,31 +173,47 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
 
             // ============================================
             // RÉCUPÉRER LE NOMBRE D'ÉTUDIANTS PAR PILIER
+            // Deux requêtes plates pour éviter la récursion RLS (42P17)
             // ============================================
-            let studentCountsByPillar = {};
+            const studentCountsByPillar = {};
 
             if (data && data.length) {
                 const pillarIds = data.map(p => p.id);
 
                 try {
+                    // STEP 1 : récupérer les group_id liés aux piliers
                     const { data: accessData, error: accessError } = await supabase
                         .from('group_pillar_access')
-                        .select(`
-                            pillar_id,
-                            group:groups(
-                                group_members(count)
-                            )
-                        `)
+                        .select('pillar_id, group_id')
                         .in('pillar_id', pillarIds);
 
-                    if (!accessError && accessData) {
-                        accessData.forEach(row => {
-                            const count = row.group?.group_members?.[0]?.count || 0;
-                            studentCountsByPillar[row.pillar_id] =
-                                (studentCountsByPillar[row.pillar_id] || 0) + count;
-                        });
-                    } else if (accessError) {
-                        console.warn('⚠️ Impossible de charger les étudiants par pilier:', accessError);
+                    if (accessError) {
+                        console.warn('⚠️ Impossible de charger les accès groupe/pilier:', accessError);
+                    } else if (accessData && accessData.length > 0) {
+                        // STEP 2 : compter les membres dans ces groupes
+                        const groupIds = [...new Set(accessData.map(r => r.group_id))];
+
+                        const { data: membersData, error: membersError } = await supabase
+                            .from('group_members')
+                            .select('group_id')
+                            .in('group_id', groupIds);
+
+                        if (membersError) {
+                            console.warn('⚠️ Impossible de charger les membres des groupes:', membersError);
+                        } else if (membersData) {
+                            // Compter les membres par groupe
+                            const memberCountByGroup = {};
+                            membersData.forEach(m => {
+                                memberCountByGroup[m.group_id] = (memberCountByGroup[m.group_id] || 0) + 1;
+                            });
+
+                            // Agréger sur chaque pilier
+                            accessData.forEach(row => {
+                                const count = memberCountByGroup[row.group_id] || 0;
+                                studentCountsByPillar[row.pillar_id] =
+                                    (studentCountsByPillar[row.pillar_id] || 0) + count;
+                            });
+                        }
                     }
                 } catch (studentsErr) {
                     console.warn('⚠️ Erreur lors du calcul des étudiants par pilier:', studentsErr);

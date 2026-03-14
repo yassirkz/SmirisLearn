@@ -4,13 +4,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft, Edit, Trash2,
-    Clock, Film, Calendar
+    Clock, Film, Calendar, Award, Plus, X
 } from 'lucide-react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../components/ui/Toast';
 import { untrusted, escapeText } from '../../utils/security';
 import VideoForm from '../../components/admin/videos/VideoForm';
+import QuizCreator from '../../components/admin/quizzes/QuizCreator';
 
 export default function VideoDetailPage() {
     const { id } = useParams();
@@ -19,7 +20,9 @@ export default function VideoDetailPage() {
     const [loading, setLoading] = useState(true);
     const [video, setVideo] = useState(null);
     const [pillar, setPillar] = useState(null);
+    const [quiz, setQuiz] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showQuizModal, setShowQuizModal] = useState(false);
 
     useEffect(() => {
         if (id) fetchVideoDetails();
@@ -45,6 +48,14 @@ export default function VideoDetailPage() {
             
             setVideo(data);
             setPillar(data.pillar);
+
+            // Charger le quiz associé (sans max_attempts qui n'existe pas)
+            const { data: quizData } = await supabase
+                .from('quizzes')
+                .select('id, passing_score, timer_minutes, questions')
+                .eq('video_id', id)
+                .maybeSingle();
+            setQuiz(quizData || null);
         } catch (err) {
             console.error('Erreur chargement vidéo:', err);
             showError('Impossible de charger la vidéo');
@@ -201,6 +212,86 @@ export default function VideoDetailPage() {
                         Votre navigateur ne supporte pas la lecture vidéo.
                     </video>
                 </div>
+
+                {/* Section Quiz associé */}
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-indigo-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <Award className="w-5 h-5 text-indigo-600" />
+                            Quiz associé
+                        </h2>
+                        {!quiz && (
+                            <button
+                                onClick={() => setShowQuizModal(true)}
+                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm shadow hover:shadow-md transition-all flex items-center gap-2"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Créer un quiz
+                            </button>
+                        )}
+                    </div>
+
+                    {quiz ? (
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-6 text-sm text-gray-600">
+                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+                                    {quiz.questions?.length || 0} question{(quiz.questions?.length || 0) > 1 ? 's' : ''}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    Score minimum : <strong>{quiz.passing_score}%</strong>
+                                </span>
+                                {quiz.timer_minutes && (
+                                    <span className="flex items-center gap-1">
+                                        <Clock className="w-4 h-4" />
+                                        {quiz.timer_minutes} min
+                                    </span>
+                                )}
+                            </div>
+                            <button
+                                onClick={() => setShowQuizModal(true)}
+                                className="text-sm text-indigo-600 hover:text-indigo-700 underline"
+                            >
+                                Modifier le quiz
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-gray-500">
+                            Aucun quiz n'est associé à cette vidéo.
+                        </p>
+                    )}
+                </div>
+
+                {/* Modal Quiz */}
+                {showQuizModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            className="bg-white rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold">
+                                    {quiz ? 'Modifier le quiz' : 'Créer un quiz'}
+                                </h2>
+                                <button
+                                    onClick={() => setShowQuizModal(false)}
+                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <QuizCreator
+                                quiz={quiz}
+                                videoId={id}
+                                onSuccess={() => {
+                                    setShowQuizModal(false);
+                                    fetchVideoDetails();
+                                }}
+                                onCancel={() => setShowQuizModal(false)}
+                            />
+                        </motion.div>
+                    </div>
+                )}
 
                 {/* Modal d'édition */}
                 {showEditModal && (
