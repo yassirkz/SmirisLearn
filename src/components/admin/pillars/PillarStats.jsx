@@ -49,37 +49,30 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
         setLoading(true);
         try {
             // ============================================
-            // 1. Récupérer les vidéos du pilier
-            //    - Si le parent fournit déjà pillarVideos,
-            //      on les utilise directement pour éviter
-            //      les divergences entre requêtes.
+            // 1. Récupérer les vidéos du pilier AVEC quizzes
+            //    (pillarVideos du parent ne contient pas les quizzes)
             // ============================================
-            let videos = pillarVideos;
-
-            if (!videos) {
-                const { data: videosData, error: videosError } = await supabase
-                    .from('videos')
-                    .select(`
+            const { data: videosData, error: videosError } = await supabase
+                .from('videos')
+                .select(`
+                    id,
+                    duration,
+                    quizzes (
                         id,
-                        duration,
-                        quizzes (
-                            id,
-                            passing_score,
-                            user_progress (
-                                quiz_score,
-                                quiz_attempts,
-                                user_id
-                            )
-                        )
-                    `)
-                    .eq('pillar_id', pillarId);
+                        passing_score,
+                        timer_minutes,
+                        questions
+                    )
+                `)
+                .eq('pillar_id', pillarId);
 
-                if (videosError) throw videosError;
-                videos = videosData || [];
-            }
+            if (videosError) throw videosError;
+            const videos = videosData || [];
+            const videoIds = videos.map(v => v.id);
 
             // ============================================
             // 2. Récupérer les statistiques des étudiants
+            //    (2 requêtes plates pour éviter récursion RLS)
             // ============================================
             let studentCount = 0;
             let totalWatched = 0;
@@ -87,53 +80,30 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
             const uniqueStudents = new Set();
 
             try {
-                // Récupérer les étudiants via group_pillar_access
+                // STEP 1 : group_ids liés à ce pilier
                 const { data: accessData, error: accessError } = await supabase
                     .from('group_pillar_access')
-                    .select(`
-                        group:groups(
-                            group_members(
-                                user_id,
-                                user:user_progress!inner(
-                                    watched,
-                                    quiz_score,
-                                    completed_at,
-                                    video_id
-                                )
-                            )
-                        )
-                    `)
+                    .select('group_id')
                     .eq('pillar_id', pillarId);
 
-                if (!accessError && accessData) {
-                    // Parcourir les accès
-                    accessData.forEach(access => {
-                        access.group?.group_members?.forEach(member => {
-                            if (member.user_id) {
-                                uniqueStudents.add(member.user_id);
-                                
-                                // Compter les vidéos regardées
-                                if (member.user) {
-                                    // S'assurer que member.user est un tableau
-                                    const userProgress = Array.isArray(member.user) ? member.user : [member.user];
-                                    userProgress.forEach(progress => {
-                                        if (progress.watched) {
-                                            totalWatched++;
-                                        }
-                                        if (progress.completed_at) {
-                                            totalCompleted++;
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    });
-                    
-                    studentCount = uniqueStudents.size;
+                if (accessError) {
+                    console.warn('⚠️ group_pillar_access:', accessError);
+                } else if (accessData?.length) {
+                    const groupIds = [...new Set(accessData.map(r => r.group_id))];
+
+                    // STEP 2 : membres de ces groupes
+                    const { data: membersData, error: membersError } = await supabase
+                        .from('group_members')
+                        .select('user_id')
+                        .in('group_id', groupIds);
+
+                    if (!membersError && membersData) {
+                        membersData.forEach(m => uniqueStudents.add(m.user_id));
+                        studentCount = uniqueStudents.size;
+                    }
                 }
             } catch (studentErr) {
                 console.warn('⚠️ Impossible de charger les statistiques étudiants:', studentErr);
-                // On continue avec studentCount = 0
             }
 
             // ============================================
@@ -142,7 +112,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
             const videoStats = videos?.reduce((acc, video) => ({
                 total: acc.total + 1,
                 totalDuration: acc.totalDuration + (video.duration || 0),
-                quizzes: acc.quizzes + (video.quizzes ? 1 : 0)
+                quizzes: acc.quizzes + (video.quizzes?.length > 0 ? 1 : 0)
             }), { total: 0, totalDuration: 0, quizzes: 0 }) || { total: 0, totalDuration: 0, quizzes: 0 };
 
             // ============================================
@@ -153,23 +123,13 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
             let totalAttempts = 0;
             let scoreCount = 0;
 
+            // Compter uniquement le nombre de questions par quiz
+            // (les stats de réussite nécessitent une table user_progress)
             videos?.forEach(video => {
                 video.quizzes?.forEach(quiz => {
-                    // S'assurer que user_progress est un tableau
-                    const progressList = Array.isArray(quiz.user_progress) ? quiz.user_progress : [];
-                    
-                    progressList.forEach(progress => {
-                        if (progress.quiz_score) {
-                            totalScore += progress.quiz_score;
-                            scoreCount++;
-                            if (progress.quiz_score >= (quiz.passing_score || 70)) {
-                                totalPassed++;
-                            }
-                        }
-                        if (progress.quiz_attempts) {
-                            totalAttempts += progress.quiz_attempts;
-                        }
-                    });
+                    if (quiz.questions?.length > 0) {
+                        scoreCount++;
+                    }
                 });
             });
 

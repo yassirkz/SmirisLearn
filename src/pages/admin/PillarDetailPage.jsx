@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Sparkles, Video } from 'lucide-react';
+import { ArrowLeft, BookOpen, Sparkles, Video, Award } from 'lucide-react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -29,7 +29,8 @@ export default function PillarDetailPage() {
                         videos: videos (
                             id,
                             title,
-                            duration
+                            duration,
+                            quizzes (id)
                         )
                     `)
                     .eq('id', id)
@@ -141,12 +142,21 @@ export default function PillarDetailPage() {
                         {pillar.videos && pillar.videos.length > 0 ? (
                             <ul className="divide-y divide-gray-100">
                                 {pillar.videos.map((video) => (
-                                    <li key={video.id} className="py-3 flex items-center justify-between">
-                                        <span className="text-sm text-gray-800">
-                                            {escapeText(untrusted(video.title || 'Vidéo sans titre'))}
-                                        </span>
-                                        <span className="text-xs text-gray-500">
-                                            {video.duration ? Math.round(video.duration / 60) + ' min' : ''}
+                                    <li key={video.id} className="py-3 flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                            <Video className="w-4 h-4 text-indigo-400 shrink-0" />
+                                            <span className="text-sm text-gray-800 truncate">
+                                                {escapeText(untrusted(video.title || 'Vidéo sans titre'))}
+                                            </span>
+                                            {video.quizzes?.length > 0 && (
+                                                <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 flex items-center gap-1">
+                                                    <Award className="w-3 h-3" />
+                                                    Quiz
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="text-xs text-gray-400 shrink-0">
+                                            {video.duration ? Math.round(video.duration / 60) + ' min' : '—'}
                                         </span>
                                     </li>
                                 ))}
@@ -162,4 +172,3 @@ export default function PillarDetailPage() {
         </AdminLayout>
     );
 }
-

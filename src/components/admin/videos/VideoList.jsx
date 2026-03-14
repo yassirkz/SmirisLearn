@@ -28,6 +28,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
     const [videos, setVideos] = useState([]);
     const [pillars, setPillars] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [userOrgId, setUserOrgId] = useState(null);
     const [viewMode, setViewMode] = useState(() => {
         return localStorage.getItem('videoViewMode') || 'table';
@@ -107,10 +108,29 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         if (fetchingRef.current || !userOrgId) return;
         
         fetchingRef.current = true;
-        setLoading(true);
+        // Chargement initial = skeleton, refresh = spinner discret
+        if (videos.length > 0) {
+            setRefreshing(true);
+        } else {
+            setLoading(true);
+        }
 
         try {
             console.log('📦 Chargement des vidéos pour org:', userOrgId);
+
+            // Récupérer les vidéos via pillar_id de l'org (pas de filtre sur alias)
+            const { data: pillarRows } = await supabase
+                .from('pillars')
+                .select('id')
+                .eq('organization_id', userOrgId);
+
+            const pillarIds = (pillarRows || []).map(p => p.id);
+            if (!pillarIds.length) {
+                setVideos([]);
+                setLoading(false);
+                fetchingRef.current = false;
+                return;
+            }
 
             let query = supabase
                 .from('videos')
@@ -120,9 +140,10 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         id,
                         name,
                         color
-                    )
+                    ),
+                    quizzes (id)
                 `)
-                .eq('pillar.organization_id', userOrgId);
+                .in('pillar_id', pillarIds);
 
             if (filters.pillar_id !== 'all') {
                 query = query.eq('pillar_id', filters.pillar_id);
@@ -152,9 +173,10 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             showError('Impossible de charger les vidéos');
         } finally {
             setLoading(false);
+            setRefreshing(false);
             fetchingRef.current = false;
         }
-    }, [userOrgId, filters, showError]);
+    }, [userOrgId, filters, showError, videos.length]);
 
     // Charger les vidéos au montage
     useEffect(() => {

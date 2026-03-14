@@ -27,6 +27,7 @@ import PillarsPage from './pages/admin/PillarsPage';
 import PillarDetailPage from './pages/admin/PillarDetailPage';
 import VideosPage from './pages/admin/VideosPage';
 import VideoDetailPage from './pages/admin/VideoDetailPage';  
+import QuizPage from './pages/admin/QuizPage';  
 
 
 function App() {
@@ -160,6 +161,14 @@ function App() {
         element={
             <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
                 <VideoDetailPage />
+            </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/quizzes"
+        element={
+            <ProtectedRoute allowedRoles={["super_admin", "org_admin"]}>
+                <QuizPage />
             </ProtectedRoute>
         }
       />

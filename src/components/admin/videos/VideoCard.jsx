@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import {
     Play, Edit, Trash2, Eye,
-    Clock, Film, Sparkles
+    Clock, Film, Sparkles, Award
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { untrusted, escapeText } from '../../../utils/security';
@@ -91,9 +91,17 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                     </div>
                 </td>
                 <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillarColor}`}>
-                        {escapeText(untrusted(video.pillar?.name))}
-                    </span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillarColor}`}>
+                            {escapeText(untrusted(video.pillar?.name))}
+                        </span>
+                        {video.quizzes?.length > 0 && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 flex items-center gap-1">
+                                <Award className="w-3 h-3" />
+                                Quiz
+                            </span>
+                        )}
+                    </div>
                 </td>
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-gray-600">
@@ -184,10 +192,18 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                     )}
                 </div>
 
-                <div className="flex items-center justify-between">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillarColor}`}>
-                        {escapeText(untrusted(video.pillar?.name))}
-                    </span>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillarColor}`}>
+                            {escapeText(untrusted(video.pillar?.name))}
+                        </span>
+                        {video.quizzes?.length > 0 && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 flex items-center gap-1">
+                                <Award className="w-3 h-3" />
+                                Quiz
+                            </span>
+                        )}
+                    </div>
                     <span className="text-xs text-gray-400">
                         {formatDate(video.created_at)}
                     </span>
