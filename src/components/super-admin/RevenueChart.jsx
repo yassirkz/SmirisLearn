@@ -208,7 +208,7 @@ export default function RevenueChart() {
                 </div>
                 <div className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1">
                     <PieChartIcon className="w-3 h-3" />
-                    <span>Intégration Stripe (Semaine 5)</span>
+                    {/* <span>Intégration Stripe (Semaine 5)</span> */}
                 </div>
             </div>
 
