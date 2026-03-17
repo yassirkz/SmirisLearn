@@ -149,8 +149,8 @@ export default function RevenueChart() {
         }
 
         return (
-            <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+            <ResponsiveContainer width="100%" height="100%" minHeight={256}>
+                <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                     <Pie
                         data={data}
                         cx="50%"
@@ -224,7 +224,7 @@ export default function RevenueChart() {
             ) : (
                 <>
                     {/* Graphique */}
-                    <div className="h-64 w-full relative" style={{ minHeight: '256px' }}>
+                    <div className="h-64 w-full min-h-[256px] relative">
                         {renderChart()}
                     </div>
 

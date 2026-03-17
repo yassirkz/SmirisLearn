@@ -200,6 +200,7 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="space-y-8"
+                style={{ perspective: "1200px" }}
             >
                 {/* En-tête avec badge de rafraîchissement */}
                 <div className="relative">
@@ -261,12 +262,19 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                whileHover={{ y: -5 }}
+                                whileHover={{ 
+                                    rotateY: 5, 
+                                    rotateX: -5, 
+                                    scale: 1.05, 
+                                    z: 30,
+                                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
+                                }}
+                                style={{ transformStyle: "preserve-3d" }}
                                 className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                                 
-                                <div className="relative flex items-start justify-between">
+                                <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
                                     <div>
                                         <p className="text-sm text-gray-600 mb-1">{card.label}</p>
                                         <p className="text-3xl font-bold text-gray-800">{card.value}</p>
@@ -283,7 +291,7 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="mt-4 h-1.5 bg-gray-200/50 rounded-full overflow-hidden relative">
+                                <div className="mt-4 h-1.5 bg-gray-200/50 rounded-full overflow-hidden relative" style={{ transform: "translateZ(10px)" }}>
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${Math.min((card.value.toString().includes('%') ? parseInt(card.value) : card.value / 50) * 100, 100)}%` }}

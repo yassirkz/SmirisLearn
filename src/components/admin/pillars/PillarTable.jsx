@@ -64,6 +64,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 overflow-hidden"
+            style={{ perspective: "1200px" }}
         >
             <div className="overflow-x-auto">
                 <table className="w-full">
@@ -93,11 +94,24 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                             return (
                                 <motion.tr
                                     key={pillar.id || `pillar-${index}`}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
+                                    initial={{ opacity: 0, y: 10, rotateX: -2 }}
+                                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                                    transition={{ 
+                                        delay: index * 0.05,
+                                        type: "spring",
+                                        stiffness: 100
+                                    }}
+                                    whileHover={{ 
+                                        rotateY: 1, 
+                                        rotateX: -1, 
+                                        scale: 1.005,
+                                        z: 10,
+                                        backgroundColor: "rgba(238, 242, 255, 0.8)",
+                                        boxShadow: "0 10px 30px -10px rgba(79, 70, 229, 0.2)"
+                                    }}
+                                    style={{ transformStyle: "preserve-3d" }}
                                     onClick={() => handleRowClick(pillar.id)}
-                                    className="hover:bg-indigo-50/50 transition-colors group cursor-pointer"
+                                    className="transition-colors group cursor-pointer"
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">

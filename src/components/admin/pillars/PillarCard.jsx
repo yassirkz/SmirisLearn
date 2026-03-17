@@ -73,7 +73,14 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -5 }}
+            whileHover={{ 
+                rotateY: 5, 
+                rotateX: -5, 
+                scale: 1.05, 
+                z: 20,
+                boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
+            }}
+            style={{ transformStyle: "preserve-3d" }}
             onClick={handleCardClick}
             className={`${getBgLight(pillar.color)} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group cursor-pointer`}
         >
@@ -81,7 +88,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
             {/* Badge premium */}
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4" style={{ transform: "translateZ(30px)" }}>
                 <div className={`bg-gradient-to-r ${getColorGradient(pillar.color)} text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg flex items-center gap-1`}>
                     <Sparkles className="w-3 h-3" />
                     {pillar.videoCount} vidéo{pillar.videoCount > 1 ? 's' : ''}
@@ -89,7 +96,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* En-tête avec icône */}
-            <div className="flex items-start gap-4 mb-4">
+            <div className="flex items-start gap-4 mb-4" style={{ transform: "translateZ(40px)" }}>
                 <div className={`w-16 h-16 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-2xl flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform`}>
                     {pillar.icon || '📚'}
                 </div>
@@ -106,7 +113,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* Statistiques */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-3 gap-2 mb-4" style={{ transform: "translateZ(20px)" }}>
                 <div className="text-center p-2 bg-white/50 rounded-lg">
                     <Video className="w-4 h-4 mx-auto mb-1 text-indigo-600" />
                     <p className="text-xs text-gray-500">Vidéos</p>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Building, Mail, User, CheckCircle, AlertCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { useInvitation } from '../../hooks/useInvitation';
+import { useAuth } from '../../hooks/useAuth';
+import { sendNotification } from '../../utils/notifications';
 
 export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -15,6 +17,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
         adminName: false
     });
     const { createInvitation, loading, error } = useInvitation();
+    const { user } = useAuth();
 
     // Validation
     const validateName = (value) => {
@@ -60,6 +63,13 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
         const { data, error } = await createInvitation(formData);
         
         if (!error) {
+            await sendNotification(
+                user.id,
+                'Entreprise invitée 🏢',
+                `L'invitation pour "${formData.name}" a été envoyée avec succès à ${formData.adminEmail}.`,
+                'success',
+                '/super-admin/companies'
+            );
             onSuccess?.(data);
             resetForm();
             onClose();

@@ -78,14 +78,17 @@ export default function RecentActivity() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-white rounded-2xl p-6 shadow-xl border border-blue-100 h-full"
+      className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40 h-full overflow-hidden relative"
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 opacity-[0.03] rounded-bl-[5rem] -z-0" />
+      <div className="flex items-center justify-between mb-8 relative z-10">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Activité récente</h2>
-          <p className="text-sm text-gray-500">Les 5 dernières actions</p>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Activité Récente</h2>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Flux en temps réel</p>
         </div>
-        <Clock className="w-5 h-5 text-gray-400" />
+        <div className="p-2 bg-gray-50 rounded-xl">
+          <Clock className="w-5 h-5 text-gray-400" />
+        </div>
       </div>
 
       {loading ? (
@@ -115,14 +118,15 @@ export default function RecentActivity() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
+                className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-all group relative border border-transparent hover:border-gray-100"
               >
-                <div className={`w-10 h-10 ${activity.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  <Icon className={`w-5 h-5 ${activity.color}`} />
+                <div className={`w-12 h-12 ${activity.bg} rounded-xl flex items-center justify-center shadow-lg shadow-current/10 border border-white group-hover:scale-110 transition-transform`}>
+                  <Icon className={`w-6 h-6 ${activity.color}`} />
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-800">{activity.title}</p>
-                  <p className="text-xs text-gray-500">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate">{activity.title}</p>
+                  <p className="text-[11px] font-medium text-gray-400 mt-0.5 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
                     {formatDistanceToNow(new Date(activity.time), { addSuffix: true, locale: fr })}
                   </p>
                 </div>

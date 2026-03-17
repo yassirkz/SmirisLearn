@@ -67,7 +67,10 @@ export default function GrowthChart() {
     const renderChart = () => {
         if (chartType === 'area') {
             return (
-                <AreaChart data={data}>
+                <AreaChart 
+                    data={data}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
                     <defs>
                         <linearGradient id="colorEntreprises" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
@@ -158,8 +161,8 @@ export default function GrowthChart() {
             ) : (
                 <>
                     {/* Conteneur avec hauteur fixe */}
-                    <div className="h-80 w-full relative" style={{ minHeight: '320px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-80 w-full min-h-[320px] relative">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={320}>
                             {renderChart()}
                         </ResponsiveContainer>
                     </div>

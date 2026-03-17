@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../ui/Toast';
 import { untrusted, escapeText } from '../../utils/security';
+import { sendNotification } from '../../utils/notifications';
 
 export default function QuizView() {
     const { id } = useParams();
@@ -163,6 +164,12 @@ export default function QuizView() {
 
             if (passed) {
                 success('Félicitations ! Quiz réussi.');
+                await sendNotification(
+                    user.id,
+                    'Quiz réussi ! 🎓',
+                    `Félicitations ! Vous avez validé le quiz "${quiz.title}" avec un score de ${score}%.`,
+                    'success'
+                );
             } else {
                 info(`Quiz échoué. Score : ${score}% (minimum requis : ${quiz.passing_score}%)`);
             }

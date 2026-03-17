@@ -7,7 +7,8 @@ import {
     Users, 
     Settings,
     LogOut,
-    Sparkles
+    Sparkles,
+    BookOpen
     } from 'lucide-react'
     import { useAuth } from '../../hooks/useAuth'
     import { useUserRole } from '../../hooks/useUserRole'
@@ -16,12 +17,32 @@ import {
     const { signOut } = useAuth()
     const { role } = useUserRole()
 
-    const menuItems = [
-        { path: '/super-admin', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/super-admin/companies', icon: Building2, label: 'Entreprises' },
-        { path: '/super-admin/users', icon: Users, label: 'Utilisateurs' },
-        { path: '/super-admin/settings', icon: Settings, label: 'Paramètres' },
-    ]
+    const getMenuItems = () => {
+        if (role === 'super_admin') {
+            return [
+                { path: '/super-admin', icon: LayoutDashboard, label: 'Dashboard' },
+                { path: '/super-admin/companies', icon: Building2, label: 'Entreprises' },
+                { path: '/super-admin/users', icon: Users, label: 'Utilisateurs' },
+                { path: '/super-admin/settings', icon: Settings, label: 'Paramètres' },
+            ];
+        } else if (role === 'org_admin') {
+            return [
+                { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+                { path: '/admin/pillars', icon: Building2, label: 'Piliers' },
+                { path: '/admin/members', icon: Users, label: 'Membres' },
+                { path: '/admin/groups', icon: Users, label: 'Groupes' },
+                { path: '/admin/settings', icon: Settings, label: 'Paramètres' },
+            ];
+        } else {
+            // Student
+            return [
+                { path: '/student', icon: LayoutDashboard, label: 'Dashboard' },
+                { path: '/student/learning', icon: BookOpen, label: 'Formations' },
+            ];
+        }
+    };
+
+    const menuItems = getMenuItems();
 
     return (
         <motion.aside 
@@ -37,7 +58,9 @@ import {
             </div>
             <div>
                 <h2 className="font-bold text-gray-800">Smiris Learn</h2>
-                <p className="text-xs text-gray-500">Super Admin</p>
+                <p className="text-xs text-gray-500">
+                    {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Administration' : 'Espace Étudiant'}
+                </p>
             </div>
             </div>
         </div>
@@ -53,7 +76,7 @@ import {
             >
                 <NavLink
                 to={item.path}
-                end={item.path === '/super-admin'}
+                end={item.path === '/super-admin' || item.path === '/admin' || item.path === '/student'}
                 onClick={onClose}
                 className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group

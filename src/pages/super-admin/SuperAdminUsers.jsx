@@ -272,6 +272,7 @@ export default function SuperAdminUsers() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="space-y-8"
+                style={{ perspective: "1200px" }}
             >
                 {/* En-tête */}
                 <div className="relative">
@@ -310,12 +311,19 @@ export default function SuperAdminUsers() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            whileHover={{ y: -5 }}
+                            whileHover={{ 
+                                rotateY: 5, 
+                                rotateX: -5, 
+                                scale: 1.05, 
+                                z: 20,
+                                boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
+                            }}
+                            style={{ transformStyle: "preserve-3d" }}
                             className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                             
-                            <div className="relative flex items-start justify-between">
+                            <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">{card.label}</p>
                                     <p className="text-3xl font-bold text-gray-800">{card.value}</p>
@@ -501,10 +509,23 @@ export default function SuperAdminUsers() {
                                         return (
                                             <motion.tr
                                                 key={user.id}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: index * 0.05 }}
-                                                className="hover:bg-purple-50/50 transition-colors group"
+                                                initial={{ opacity: 0, y: 10, rotateX: -2 }}
+                                                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                                                transition={{ 
+                                                    delay: index * 0.05,
+                                                    type: "spring",
+                                                    stiffness: 100
+                                                }}
+                                                whileHover={{ 
+                                                    rotateY: 1, 
+                                                    rotateX: -1, 
+                                                    scale: 1.005,
+                                                    z: 10,
+                                                    backgroundColor: "rgba(250, 245, 255, 0.8)",
+                                                    boxShadow: "0 10px 30px -10px rgba(168, 85, 247, 0.2)"
+                                                }}
+                                                style={{ transformStyle: "preserve-3d" }}
+                                                className="transition-colors group"
                                             >
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">

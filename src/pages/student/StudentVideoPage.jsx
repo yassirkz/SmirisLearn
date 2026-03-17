@@ -1,208 +1,239 @@
+// src/pages/student/StudentVideoPage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Clock, Info, Lock, Award, ChevronRight } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, Info, Shield, ChevronRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import MainLayout from '../../components/layout/MainLayout';
 import StudentVideoPlayer from '../../components/student/StudentVideoPlayer';
 import { untrusted, escapeText } from '../../utils/security';
-import { useToast } from '../../components/ui/Toast';
 
 export default function StudentVideoPage() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const { error: showError } = useToast();
-    const [video, setVideo] = useState(null);
-    const [nextVideoId, setNextVideoId] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isCompleted, setIsCompleted] = useState(false);
-    const [quizId, setQuizId] = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { error: showError } = useToast();
+  const [video, setVideo] = useState(null);
+  const [nextVideoId, setNextVideoId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [quizId, setQuizId] = useState(null);
 
-    useEffect(() => {
-        const fetchVideoAndNext = async () => {
-            if (!user) return;
-            try {
-                // 0. Vérifier l'accès (Navigation Séquentielle Stricte)
-                const { data: canAccess, error: accessError } = await supabase
-                    .rpc('can_access_video', {
-                        p_student_id: user.id,
-                        p_video_id: id
-                    });
-                
-                if (accessError || !canAccess) {
-                    showError("Accès refusé. Terminez la vidéo précédente et son quiz.");
-                    navigate('/student/learning');
-                    return;
-                }
+  useEffect(() => {
+    const fetchVideoAndNext = async () => {
+      if (!user) return;
+      try {
+        const { data: canAccess, error: accessError } = await supabase
+          .rpc('can_access_video', {
+            p_student_id: user.id,
+            p_video_id: id
+          });
 
-                // 1. Récupérer la vidéo actuelle avec le pilier
-                const { data: videoData, error: videoError } = await supabase
-                    .from('videos')
-                    .select('*, pillars(id, name, icon)')
-                    .eq('id', id)
-                    .single();
+        if (accessError || !canAccess) {
+          showError("Accès refusé. Terminez la vidéo précédente et son quiz.");
+          navigate('/student/learning');
+          return;
+        }
 
-                if (videoError) throw videoError;
-                setVideo(videoData);
+        const { data: videoData, error: videoError } = await supabase
+          .from('videos')
+          .select('*, pillars(id, name, icon)')
+          .eq('id', id)
+          .single();
 
-                // 2. Vérifier si l'utilisateur a déjà terminé cette vidéo
-                const { data: progress } = await supabase
-                    .from('user_progress')
-                    .select('watched')
-                    .eq('user_id', user.id)
-                    .eq('video_id', id)
-                    .maybeSingle();
-                
-                setIsCompleted(progress?.watched || false);
+        if (videoError) throw videoError;
+        setVideo(videoData);
 
-                // 3. Récupérer la vidéo suivante dans le même pilier
-                const { data: nextVideo, error: nextError } = await supabase
-                    .from('videos')
-                    .select('id')
-                    .eq('pillar_id', videoData.pillar_id)
-                    .gt('sequence_order', videoData.sequence_order)
-                    .order('sequence_order', { ascending: true })
-                    .limit(1)
-                    .maybeSingle();
+        const { data: progress } = await supabase
+          .from('user_progress')
+          .select('watched')
+          .eq('user_id', user.id)
+          .eq('video_id', id)
+          .maybeSingle();
 
-                if (nextError) throw nextError;
-                setNextVideoId(nextVideo?.id || null);
+        setIsCompleted(progress?.watched || false);
 
-                // 4. Récupérer le quiz associé s'il existe
-                const { data: quizData } = await supabase
-                    .from('quizzes')
-                    .select('id')
-                    .eq('video_id', id)
-                    .maybeSingle();
-                setQuizId(quizData?.id || null);
-            } catch (err) {
-                console.error('Erreur chargement vidéo:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchVideoAndNext();
-    }, [id, user]);
+        const { data: nextVideo } = await supabase
+          .from('videos')
+          .select('id')
+          .eq('pillar_id', videoData.pillar_id)
+          .gt('sequence_order', videoData.sequence_order)
+          .order('sequence_order', { ascending: true })
+          .limit(1)
+          .maybeSingle();
 
-    const formatDuration = (seconds) => {
-        if (!seconds) return '--:--';
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
+        setNextVideoId(nextVideo?.id || null);
+
+        const { data: quizData } = await supabase
+          .from('quizzes')
+          .select('id')
+          .eq('video_id', id)
+          .maybeSingle();
+        setQuizId(quizData?.id || null);
+      } catch (err) {
+        console.error('Erreur chargement vidéo:', err);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchVideoAndNext();
+  }, [id, user, navigate, showError]);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-indigo-500/20 rounded-full border-t-indigo-500 animate-spin" />
-            </div>
-        );
-    }
-    
-    if (!video) return <div className="min-h-screen bg-gray-950 flex items-center justify-center text-white text-xl">Vidéo introuvable</div>;
+  const formatDuration = (seconds) => {
+    if (!seconds) return '--:--';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
 
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-950 text-white">
-            <div className="max-w-6xl mx-auto p-4 md:p-8">
-                <button
-                    onClick={() => navigate('/student/learning')}
-                    className="mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
-                >
-                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                    <span>Retour vers mes formations</span>
-                </button>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Information sur le visionnage linéaire */}
-                        <motion.div 
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-start gap-4"
-                        >
-                            <Info className="w-5 h-5 text-indigo-400 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-indigo-200 leading-relaxed">
-                                <span className="font-bold text-indigo-300">Note :</span> Pour garantir un apprentissage progressif, le visionnage est linéaire. Vous ne pouvez pas naviguer librement entre les différentes parties de la vidéo.
-                            </p>
-                        </motion.div>
-
-                        <StudentVideoPlayer
-                            video={video}
-                            nextVideoId={nextVideoId}
-                            onComplete={() => setIsCompleted(true)}
-                        />
-                        
-                        <div className="space-y-4">
-                            <h1 className="text-2xl md:text-3xl font-bold">
-                                {escapeText(untrusted(video.title))}
-                            </h1>
-                            <div className="flex flex-wrap items-center gap-6 text-gray-400 text-sm">
-                                <span className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-                                    <BookOpen className="w-4 h-4 text-indigo-400" />
-                                    {video.pillars?.name}
-                                </span>
-                                <span className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-                                    <Clock className="w-4 h-4 text-purple-400" />
-                                    {formatDuration(video.duration)}
-                                </span>
-                            </div>
-                            <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
-                                <h3 className="text-gray-300 font-semibold mb-2">Description</h3>
-                                <p className="text-gray-400 leading-relaxed">
-                                    {escapeText(untrusted(video.description)) || "Aucune description disponible."}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        {/* Sidebar can contain course progress or related videos */}
-                        <div className="bg-white/5 rounded-3xl p-6 border border-white/10">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="text-xl">{video.pillars?.icon || '📚'}</span>
-                                {video.pillars?.name}
-                            </h3>
-                            <p className="text-sm text-gray-400 mb-6 font-medium">
-                                Suivez l'ordre des vidéos pour une meilleure progression.
-                                {!isCompleted && (
-                                    <span className="block mt-2 text-indigo-400 text-xs italic">
-                                        Terminez le visionnage actuel pour débloquer la suite.
-                                    </span>
-                                )}
-                            </p>
-                            
-                            {isCompleted && (
-                                nextVideoId || quizId ? (
-                                    <button
-                                        onClick={() => {
-                                            if (quizId) {
-                                                navigate(`/student/quiz/${quizId}`, { state: { nextVideoId } });
-                                            } else {
-                                                navigate(`/student/video/${nextVideoId}`);
-                                            }
-                                        }}
-                                        className="w-full py-5 rounded-3xl font-black text-lg flex items-center justify-center gap-3 transition-all shadow-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-indigo-500/30 hover:scale-[1.02] active:scale-95"
-                                    >
-                                        <span>Suivant</span>
-                                        <ChevronRight className="w-6 h-6" />
-                                    </button>
-                                ) : (
-                                    <div className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-3xl text-center shadow-inner">
-                                        <p className="text-green-400 font-bold text-lg">✨ Parcours terminé !</p>
-                                        <button 
-                                            onClick={() => navigate('/student/learning')}
-                                            className="mt-4 text-sm text-green-500 hover:underline font-semibold"
-                                        >
-                                            Retour aux formations
-                                        </button>
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-indigo-200 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
         </div>
+      </div>
     );
-}
+  }
+
+  if (!video) return null;
+
+  return (
+    <MainLayout>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-6xl mx-auto space-y-6"
+        style={{ perspective: "1200px" }}
+      >
+        <button
+          onClick={() => navigate('/student/learning')}
+          className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors group"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          <span>Retour aux formations</span>
+        </button>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="p-4 bg-indigo-50/80 backdrop-blur-sm border border-indigo-200 rounded-xl flex items-start gap-3"
+            >
+              <Info className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-indigo-800">
+                <span className="font-semibold">Visionnage linéaire :</span> Pour garantir un apprentissage progressif, vous ne pouvez pas avancer rapidement.
+              </p>
+            </motion.div>
+
+            <motion.div
+                whileHover={{ 
+                    rotateY: 2, 
+                    rotateX: -1, 
+                    scale: 1.01,
+                    boxShadow: "0 50px 100px -20px rgba(79, 70, 229, 0.2)"
+                }}
+                style={{ transformStyle: "preserve-3d" }}
+            >
+                <StudentVideoPlayer
+                    video={video}
+                    nextVideoId={nextVideoId}
+                    onComplete={() => setIsCompleted(true)}
+                />
+            </motion.div>
+
+            <motion.div 
+                whileHover={{ z: 30, y: -5 }}
+                style={{ transformStyle: "preserve-3d" }}
+                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100"
+            >
+              <h1 className="text-2xl font-bold text-gray-800 mb-3" style={{ transform: "translateZ(20px)" }}>
+                {escapeText(untrusted(video.title))}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600" style={{ transform: "translateZ(10px)" }}>
+                <span className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full">
+                  <BookOpen className="w-4 h-4 text-indigo-600" />
+                  {video.pillars?.name}
+                </span>
+                <span className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-full">
+                  <Clock className="w-4 h-4 text-purple-600" />
+                  {formatDuration(video.duration)}
+                </span>
+              </div>
+              {video.description && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg" style={{ transform: "translateZ(5px)" }}>
+                  <p className="text-gray-700 whitespace-pre-line">
+                    {escapeText(untrusted(video.description))}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </div>
+
+          <div className="space-y-6">
+            <motion.div 
+                whileHover={{ rotateY: -5, scale: 1.02 }}
+                style={{ transformStyle: "preserve-3d" }}
+                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100 sticky top-24"
+            >
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2" style={{ transform: "translateZ(20px)" }}>
+                <span className="text-xl">{video.pillars?.icon || '📚'}</span>
+                {video.pillars?.name}
+              </h3>
+
+              <div style={{ transform: "translateZ(10px)" }}>
+                {isCompleted ? (
+                  nextVideoId || quizId ? (
+                    <button
+                      onClick={() => {
+                        if (quizId) {
+                          navigate(`/student/quiz/${quizId}`, { state: { nextVideoId } });
+                        } else {
+                          navigate(`/student/video/${nextVideoId}`);
+                        }
+                      }}
+                      className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
+                    >
+                      <span>Suivant</span>
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  ) : (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-center">
+                      <p className="text-green-700 font-semibold">✨ Parcours terminé !</p>
+                      <button
+                        onClick={() => navigate('/student/learning')}
+                        className="mt-2 text-sm text-green-600 hover:underline"
+                      >
+                        Retour aux formations
+                      </button>
+                    </div>
+                  )
+                ) : (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <p className="text-amber-700 text-sm">
+                      Terminez le visionnage pour débloquer la suite.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-center text-xs text-gray-400 flex items-center justify-center gap-1"
+        >
+          <Shield className="w-3 h-3" />
+          <span>Progression enregistrée automatiquement</span>
+        </motion.div>
+      </motion.div>
+    </MainLayout>
+  );
+}

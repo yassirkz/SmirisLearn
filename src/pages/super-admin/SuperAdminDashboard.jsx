@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
     Building2, Users, Video, Award, AlertCircle,
-    Shield, TrendingUp, Clock, Zap, Sparkles
+    Shield, TrendingUp, Clock, Zap, Sparkles, Calendar
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import CompaniesTable from '../../components/super-admin/CompaniesTable';
 import RecentActivity from '../../components/super-admin/RecentActivity';
+import GrowthChart from '../../components/super-admin/GrowthChart';
+import RevenueChart from '../../components/super-admin/RevenueChart';
 import { supabase } from '../../lib/supabase';
 
 export default function SuperAdminDashboard() {
@@ -107,26 +109,49 @@ export default function SuperAdminDashboard() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="space-y-8"
+                style={{ perspective: "1200px" }}
             >
-                {/* En-tête */}
-                <div className="flex items-center justify-between">
+                {/* En-tête Control Center */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Dashboard Super Admin</h1>
-                        <p className="text-gray-500 mt-1 flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            Dernière mise à jour: {lastUpdate.toLocaleTimeString()}
+                        <div className="flex items-center gap-3 mb-1">
+                            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+                                Control <span className="text-blue-600">Center</span>
+                            </h1>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-100 rounded-full h-fit">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                                <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">Système Opérationnel</span>
+                            </div>
+                        </div>
+                        <p className="text-gray-500 font-medium flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-blue-500" />
+                            Vue d'ensemble de la plateforme • {lastUpdate.toLocaleTimeString()}
                         </p>
                     </div>
                     
-                    <button
-                        onClick={fetchDashboardData}
-                        className="px-4 py-2 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-300 transition-all flex items-center gap-2 text-sm"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Rafraîchir
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={fetchDashboardData}
+                            className="p-3 bg-white border-2 border-gray-100 rounded-2xl hover:border-blue-200 hover:shadow-lg transition-all text-gray-600"
+                            title="Rafraîchir les données"
+                        >
+                            <Zap className="w-5 h-5" />
+                        </motion.button>
+                        
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 flex items-center gap-2"
+                        >
+                            <Sparkles className="w-5 h-5" />
+                            Quick Actions
+                        </motion.button>
+                    </div>
                 </div>
 
                 {/* Alertes système */}
@@ -145,44 +170,44 @@ export default function SuperAdminDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             { 
-                                label: 'Entreprises', 
+                                label: 'Entreprises Approuvées', 
                                 value: global_stats.total_organizations, 
                                 growth: dashboardData.growth?.orgs || 0,
                                 icon: Building2, 
-                                color: 'from-blue-500 to-blue-600',
-                                bg: 'bg-blue-50',
-                                description: 'Total actif'
+                                color: 'from-blue-600 to-indigo-600',
+                                shadow: 'shadow-blue-200',
+                                description: 'Organisations actives'
                             },
                             { 
-                                label: 'Utilisateurs', 
+                                label: 'Membres Plateforme', 
                                 value: global_stats.total_users, 
                                 growth: dashboardData.growth?.users || 0,
                                 icon: Users, 
-                                color: 'from-purple-500 to-purple-600',
-                                bg: 'bg-purple-50',
-                                description: `Dont ${global_stats.active_trials} en essai`
+                                color: 'from-purple-600 to-fuchsia-600',
+                                shadow: 'shadow-purple-200',
+                                description: `${global_stats.active_trials} comptes en essai`
                             },
                             { 
-                                label: 'Vidéos', 
+                                label: 'Vidéos Hébergées', 
                                 value: global_stats.total_videos, 
                                 growth: dashboardData.growth?.videos || 0,
                                 icon: Video, 
-                                color: 'from-green-500 to-green-600',
-                                bg: 'bg-green-50',
-                                description: `${global_stats.storage_used_mb} Mo utilisés`
+                                color: 'from-emerald-500 to-teal-600',
+                                shadow: 'shadow-emerald-200',
+                                description: `${global_stats.storage_used_mb} Mo de stockage`
                             },
                             { 
-                                label: 'Taux complétion', 
+                                label: 'Score d\'Engagement', 
                                 value: `${global_stats.avg_completion_rate || 0}%`, 
                                 growth: dashboardData.growth?.completion || 0,
-                                icon: TrendingUp, 
-                                color: 'from-orange-500 to-orange-600',
-                                bg: 'bg-orange-50',
-                                description: 'Moyenne plateforme'
+                                icon: Award, 
+                                color: 'from-orange-500 to-rose-500',
+                                shadow: 'shadow-orange-200',
+                                description: 'Moyenne de complétion'
                             }
                         ].map((card, index) => {
                             const isPositive = card.growth >= 0;
-                            const progress = card.label === 'Taux complétion' 
+                            const progress = card.label.includes('Score') 
                                 ? parseInt(card.value) 
                                 : Math.min((parseInt(card.value) / 100) * 100, 100);
 
@@ -192,35 +217,41 @@ export default function SuperAdminDashboard() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    whileHover={{ y: -5 }}
-                                    className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
+                                    whileHover={{ 
+                                        y: -8,
+                                        transition: { duration: 0.2 }
+                                    }}
+                                    className="relative group bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${card.color} opacity-[0.03] rounded-bl-[5rem] -z-0`} />
                                     
-                                    <div className="relative flex items-start justify-between">
-                                        <div>
-                                            <p className="text-sm text-gray-500 mb-1">{card.label}</p>
-                                            <p className="text-3xl font-bold text-gray-800">{card.value}</p>
-                                            <p className={`text-xs mt-2 flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                                    <div className="relative z-10">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className={`p-4 bg-gradient-to-br ${card.color} rounded-2xl shadow-xl ${card.shadow} text-white`}>
+                                                <card.icon className="w-6 h-6" />
+                                            </div>
+                                            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold ${isPositive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                                                 {isPositive ? '↑' : '↓'} {Math.abs(card.growth)}%
-                                                <span className="text-gray-400 font-normal ml-1">vs mois dernier</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">{card.label}</p>
+                                            <p className="text-4xl font-bold text-gray-900 tracking-tight">{card.value}</p>
+                                            <p className="text-[11px] font-bold text-gray-500 pt-2 flex items-center gap-1">
+                                                <Zap className="w-3 h-3 text-blue-500" />
+                                                {card.description}
                                             </p>
-                                            <p className="text-xs text-gray-500 mt-2">{card.description}</p>
                                         </div>
-                                        <div className={`p-3 bg-gradient-to-br ${card.color} rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                                            <card.icon className="w-6 h-6 text-white" />
-                                        </div>
-                                    </div>
 
-                                    <div className="mt-4 h-1.5 bg-gray-200/50 rounded-full overflow-hidden relative">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${progress}%` }}
-                                            transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
-                                            className={`h-full bg-gradient-to-r ${card.color} rounded-full relative`}
-                                        >
-                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white border border-current rounded-full shadow-sm" style={{ color: card.color.split(' ')[1].replace('to-', '') }} />
-                                        </motion.div>
+                                        <div className="mt-6 h-2 bg-gray-50 rounded-full overflow-hidden">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${progress}%` }}
+                                                transition={{ delay: 0.5 + index * 0.1, duration: 1.5, ease: "circOut" }}
+                                                className={`h-full bg-gradient-to-r ${card.color} rounded-full`}
+                                            />
+                                        </div>
                                     </div>
                                 </motion.div>
                             );
@@ -228,50 +259,64 @@ export default function SuperAdminDashboard() {
                     </div>
                 )}
 
-                {/* Dernières entreprises */}
+                {/* Graphiques d'analyse */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <GrowthChart />
+                    <RevenueChart />
+                </div>
+
+                {/* Dernières entreprises - Style Modernisé */}
                 {recent_organizations?.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-100"
-                    >
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                                <Building2 className="w-5 h-5 text-blue-600" />
-                                Dernières entreprises
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <Building2 className="w-6 h-6 text-blue-600" />
+                                Onboarding Récent
                             </h2>
-                            <span className="text-xs text-gray-400">
-                                {recent_organizations.length} nouvelles
-                            </span>
+                            <button className="text-sm font-bold text-blue-600 hover:text-blue-700">Voir tout</button>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {recent_organizations.map((org, index) => (
                                 <motion.div
                                     key={org.id}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.6 + index * 0.1 }}
-                                    className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-md transition-all"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    whileHover={{ y: -5 }}
+                                    className="relative group bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-100/50 overflow-hidden"
                                 >
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                                            {org.name?.charAt(0).toUpperCase()}
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-[4rem] group-hover:bg-blue-600 transition-colors duration-500 -z-0 opacity-20 group-hover:opacity-10" />
+                                    
+                                    <div className="relative z-10 flex flex-col gap-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-200">
+                                                {org.name?.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                                {org.plan}
+                                            </div>
                                         </div>
+                                        
                                         <div>
-                                            <p className="font-medium text-gray-800">{org.name}</p>
-                                            <p className="text-xs text-gray-500">Plan: {org.plan}</p>
+                                            <h3 className="font-bold text-gray-900 text-lg leading-tight truncate">{org.name}</h3>
+                                            <div className="flex items-center gap-3 mt-2 text-xs font-medium text-gray-500">
+                                                <span className="flex items-center gap-1">
+                                                    <Users className="w-3 h-3" />
+                                                    {org.member_count} membres
+                                                </span>
+                                                <span className="w-1 h-1 bg-gray-300 rounded-full" />
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(org.created_at).toLocaleDateString()}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex justify-between text-xs text-gray-500">
-                                        <span>Membres: {org.member_count}</span>
-                                        <span>{new Date(org.created_at).toLocaleDateString()}</span>
                                     </div>
                                 </motion.div>
                             ))}
                         </div>
-                    </motion.div>
+                    </section>
                 )}
 
                 {/* Tableau des entreprises et activités */}

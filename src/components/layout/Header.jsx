@@ -1,12 +1,54 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, User, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import SearchComponent from '../../pages/SearchComponent';
+import NotificationDropdown from './NotificationDropdown';
+import { supabase } from '../../lib/supabase';
 
 export default function Header() {
     const { user } = useAuth();
     const { role, isSuperAdmin } = useUserRole();
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchUnreadCount = async () => {
+            const { count, error } = await supabase
+                .from('notifications')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id)
+                .eq('read', false);
+            
+            if (!error) setUnreadCount(count || 0);
+        };
+
+        fetchUnreadCount();
+
+        // Realtime subscription for unread count
+        const channel = supabase
+            .channel('unread-count')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'notifications',
+                    filter: `user_id=eq.${user.id}`
+                },
+                () => {
+                    fetchUnreadCount();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user]);
 
     return (
         <motion.header 
@@ -26,14 +68,30 @@ export default function Header() {
                 {/* Actions utilisateur */}
                 <div className="flex items-center gap-3 ml-auto">
                     {/* Notifications */}
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="relative p-2.5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                    >
-                        <Bell size={20} className="text-gray-600" />
-                        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </motion.button>
+                    <div className="relative">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            className={`relative p-2.5 rounded-xl transition-all duration-300 ${
+                                showNotifications 
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                            }`}
+                        >
+                            <Bell size={20} />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white animate-bounce-subtle">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </motion.button>
+                        
+                        <NotificationDropdown 
+                            isOpen={showNotifications} 
+                            onClose={() => setShowNotifications(false)} 
+                        />
+                    </div>
 
                     {/* Profil */}
                     <motion.div

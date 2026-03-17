@@ -97,9 +97,9 @@ export default function CompaniesTable() {
             return 'bg-green-100 text-green-600 border border-green-200';
         }
         const plans = {
-            free: 'bg-gray-100 text-gray-600',
-            starter: 'bg-blue-100 text-blue-600',
-            business: 'bg-purple-100 text-purple-600'
+            free: 'bg-slate-100 text-slate-600 border border-slate-200',
+            starter: 'bg-blue-50 text-blue-600 border border-blue-200',
+            business: 'bg-indigo-50 text-indigo-600 border border-indigo-200'
         };
         return plans[plan] || plans.free;
     };
@@ -123,30 +123,33 @@ export default function CompaniesTable() {
 
     return (
         <>
-            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+            <div 
+                className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden relative"
+            >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 opacity-[0.03] rounded-bl-[5rem] -z-0" />
                 {/* En-tête */}
-                <div className="p-6 border-b border-blue-100">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="p-0 mb-8 relative z-10">
+                    <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
                         <div>
-                            <h2 className="text-xl font-bold text-gray-800">Entreprises clientes</h2>
-                            <p className="text-sm text-gray-500 mt-1">
-                                {companies.length} entreprise{companies.length > 1 ? 's' : ''} affichée{companies.length > 1 ? 's' : ''}
+                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Entreprises Plateforme</h2>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                                {companies.length} organisations actives au total
                             </p>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                             {/* Barre de recherche */}
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <div className="relative group/search">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within/search:text-blue-500 transition-colors" size={18} />
                                 <input
                                     type="text"
-                                    placeholder="Rechercher..."
+                                    placeholder="Rechercher une entité..."
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
                                     }}
-                                    className="pl-10 pr-10 py-2 border border-blue-200 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 w-full sm:w-64"
+                                    className="pl-12 pr-10 py-3 bg-gray-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-100 focus:bg-white w-full sm:w-72 font-medium transition-all text-sm"
                                 />
                                 {searchTerm && (
                                     <button
@@ -154,7 +157,7 @@ export default function CompaniesTable() {
                                             setSearchTerm('');
                                             setPage(1);
                                         }}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                     >
                                         <X size={16} />
                                     </button>
@@ -168,9 +171,9 @@ export default function CompaniesTable() {
                                     setSelectedPlan(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 bg-white"
+                                className="px-6 py-3 bg-gray-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-100 focus:bg-white font-bold text-xs text-gray-600 transition-all appearance-none cursor-pointer"
                             >
-                                <option value="all">Tous les plans</option>
+                                <option value="all">Filtre par abonnement</option>
                                 <option value="free">Gratuit</option>
                                 <option value="starter">Starter</option>
                                 <option value="business">Business</option>
@@ -181,35 +184,24 @@ export default function CompaniesTable() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsModalOpen(true)}
-                                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium shadow-lg whitespace-nowrap"
+                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 whitespace-nowrap text-sm flex items-center gap-2"
                             >
-                                + Nouvelle entreprise
-                            </motion.button>
-
-                            {/* Bouton rafraîchir */}
-                            <motion.button
-                                whileHover={{ rotate: 180 }}
-                                transition={{ duration: 0.3 }}
-                                onClick={fetchCompanies}
-                                className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                                title="Rafraîchir"
-                            >
-                                <RefreshCw className="w-5 h-5 text-gray-600" />
+                                <Building2 size={18} />
+                                Déployer Entreprise
                             </motion.button>
                         </div>
                     </div>
                 </div>
 
-                {/* Tableau */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto relative z-10">
                     <table className="w-full">
-                        <thead className="bg-gray-50/50">
+                        <thead className="bg-transparent border-b border-gray-100">
                             <tr>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Entreprise</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Plan</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Utilisateurs</th>
-                                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Date création</th>
-                                <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">Actions</th>
+                                <th className="px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Identification</th>
+                                <th className="px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Licence</th>
+                                <th className="px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Usage</th>
+                                <th className="px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Registré le</th>
+                                <th className="px-6 py-5 text-right text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Gestion</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-blue-100">
@@ -251,59 +243,59 @@ export default function CompaniesTable() {
                                 companies.map((company, index) => (
                                     <motion.tr
                                         key={company.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                        initial={{ opacity: 0, scale: 0.98 }}
+                                        animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="hover:bg-blue-50/50 transition-colors group"
+                                        className="transition-all hover:bg-blue-50/30 group/row"
                                     >
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-6">
                                             <div 
-                                                className="flex items-center gap-3 cursor-pointer group/name"
+                                                className="flex items-center gap-4 cursor-pointer group/data"
                                                 onClick={() => navigate(`/super-admin/companies/${company.id}`)}
                                             >
-                                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm group-hover/name:scale-110 transition-transform">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-200 group-hover/data:scale-110 transition-transform">
                                                     {company.name?.charAt(0).toUpperCase() || '?'}
                                                 </div>
-                                                <span className="font-medium text-gray-800 group-hover/name:text-blue-600 transition-colors">
-                                                    {company.name}
-                                                </span>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-gray-900 group-hover/data:text-blue-600 transition-colors">
+                                                        {company.name}
+                                                    </span>
+                                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">ID: {company.id.slice(0, 8)}</span>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPlanBadge(company.plan_type)}`}>
+                                        <td className="px-6 py-6 font-bold">
+                                            <span className={`px-4 py-1.5 rounded-full text-[10px] uppercase font-black tracking-widest ${getPlanBadge(company.plan_type)} shadow-sm`}>
                                                 {getPlanLabel(company.plan_type)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-gray-400" />
-                                                <span className="text-sm text-gray-600">{company.userCount || 0}</span>
+                                        <td className="px-6 py-6">
+                                            <div className="flex items-center gap-3 bg-gray-50/50 p-2 py-1.5 rounded-2xl w-fit">
+                                                <Users className="w-4 h-4 text-blue-500" />
+                                                <span className="text-sm font-bold text-gray-700">{company.userCount || 0}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-gray-400" />
-                                                <span className="text-sm text-gray-600">{formatDate(company.created_at)}</span>
+                                        <td className="px-6 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-gray-700">{formatDate(company.created_at)}</span>
+                                                {company.subscription_status === 'trial' && (
+                                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-1 animate-pulse">
+                                                        ⏳ Trial Active
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            {company.subscription_status === 'trial' && (
-                                                <span className="text-xs text-green-600">
-                                                    ⏳ Essai: {new Date(company.trial_ends_at).toLocaleDateString()}
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-6 py-6">
+                                            <div className="flex items-center justify-end gap-3 translate-x-4 opacity-0 group-hover/row:opacity-100 group-hover/row:translate-x-0 transition-all duration-300">
                                                 <motion.button
-                                                    whileHover={{ scale: 1.1 }}
+                                                    whileHover={{ scale: 1.1, backgroundColor: '#EFF6FF' }}
                                                     whileTap={{ scale: 0.9 }}
-                                                    onClick={() => navigate(`/super-admin/companies/${company.id}`)}  // ← CORRIGÉ
-                                                    className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600 opacity-0 group-hover:opacity-100"
-                                                    title="Voir détails"
+                                                    onClick={() => navigate(`/super-admin/companies/${company.id}`)}
+                                                    className="p-3 text-blue-600 rounded-xl transition-colors bg-white shadow-sm border border-gray-100"
+                                                    title="Explorer"
                                                 >
                                                     <Eye size={18} />
-                                                </motion.button>    
+                                                </motion.button>
                                                 <motion.button
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}

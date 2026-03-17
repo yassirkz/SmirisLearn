@@ -5,6 +5,7 @@ import { generateInvitationToken, getExpirationDate } from '../utils/tokenGenera
 import { checkRateLimit } from '../utils/rateLimit';
 import { untrusted, validateEmail } from '../utils/security';
 import { sendInvitationEmail } from '../lib/email';
+import { sendNotification } from '../utils/notifications';
 
 export function useMemberInvitation() {
   const [loading, setLoading] = useState(false);
@@ -129,6 +130,17 @@ export function useMemberInvitation() {
 
       // Supprimer l'invitation
       await supabase.from('member_invitations').delete().eq('token', token);
+
+      // Notifier l'inviteur
+      if (invitation.invited_by) {
+        await sendNotification(
+            invitation.invited_by,
+            'Invitation acceptée ! 🤝',
+            `${invitation.email} a rejoint votre organisation.`,
+            'success',
+            '/admin/members'
+        );
+      }
 
       return invitation;
     } catch (err) {
