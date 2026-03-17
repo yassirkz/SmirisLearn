@@ -550,7 +550,6 @@ export default function SuperAdminCompanyDetail() {
                                         transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
                                         className={`h-full bg-gradient-to-r ${card.color} rounded-full relative`}
                                     >
-                                        {/* Indicateur pointu à la fin */}
                                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white border border-current rounded-full shadow-sm" style={{ color: card.color.split(' ')[1].replace('to-', '') }} />
                                     </motion.div>
                                 </div>
