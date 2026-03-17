@@ -5,16 +5,22 @@ import {
     Building2, Mail, Calendar, MoreVertical, Eye,
     Edit, Trash2, Shield, Award, UserPlus, Download,
     RefreshCw, Sparkles, AlertCircle, CheckCircle,
-    UserCog, UserX, UserCheck, Clock, Zap
+    UserCog, UserX, UserCheck, Clock, Zap, Ban
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import { useMemberInvitation } from '../../hooks/useMemberInvitation';
 import { untrusted, escapeText } from '../../utils/security';
 import UserActionModal from '../../components/super-admin/UserActionModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 export default function SuperAdminUsers() {
     const { user } = useAuth();
+    const { success, error: showError } = useToast();
+    const { createInvitation, loading: inviting } = useMemberInvitation();
+
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [organizations, setOrganizations] = useState([]);
@@ -38,11 +44,21 @@ export default function SuperAdminUsers() {
     const [showFilters, setShowFilters] = useState(false);
     const [showActions, setShowActions] = useState(null);
 
-    // Modal
+    // Modals
     const [showUserModal, setShowUserModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [modalAction, setModalAction] = useState('view'); // 'view', 'edit', 'delete'
+    const [modalAction, setModalAction] = useState('view');
     const [exporting, setExporting] = useState(false);
+
+    // Invitation modal
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteRole, setInviteRole] = useState('student');
+    const [inviteOrg, setInviteOrg] = useState('');
+
+    // Confirmation modal for suspend/delete
+    const [actionUser, setActionUser] = useState(null);
+    const [actionType, setActionType] = useState(null); // 'suspend', 'unsuspend', 'delete'
 
     useEffect(() => {
         fetchUsers();
@@ -50,7 +66,7 @@ export default function SuperAdminUsers() {
     }, [page, searchTerm, selectedOrg, selectedRole]);
 
     // ============================================
-    // Récupérer les organisations (pour le filtre)
+    // Récupérer les organisations (pour le filtre et l'invitation)
     // ============================================
     const fetchOrganizations = async () => {
         try {
@@ -58,9 +74,9 @@ export default function SuperAdminUsers() {
                 .from('organizations')
                 .select('id, name')
                 .order('name');
-
             if (error) throw error;
             setOrganizations(data || []);
+            if (data?.length > 0) setInviteOrg(data[0].id);
         } catch (error) {
             console.error('Erreur chargement organisations:', error);
         }
@@ -72,7 +88,6 @@ export default function SuperAdminUsers() {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            // Requête pour le comptage total
             let countQuery = supabase
                 .from('profiles')
                 .select('*', { count: 'exact', head: true });
@@ -93,14 +108,11 @@ export default function SuperAdminUsers() {
             setTotalCount(count || 0);
             setTotalPages(Math.ceil((count || 0) / itemsPerPage));
 
-            // Requête pour les données
             let dataQuery = supabase
                 .from('profiles')
                 .select(`
                     *,
-                    organizations (
-                        name
-                    )
+                    organizations (name)
                 `)
                 .order('created_at', { ascending: false });
 
@@ -114,7 +126,6 @@ export default function SuperAdminUsers() {
                 dataQuery = dataQuery.eq('role', selectedRole);
             }
 
-            // Pagination
             const from = (page - 1) * itemsPerPage;
             const to = from + itemsPerPage - 1;
             dataQuery = dataQuery.range(from, to);
@@ -122,7 +133,6 @@ export default function SuperAdminUsers() {
             const { data, error } = await dataQuery;
             if (error) throw error;
 
-            // Calculer les stats globales
             const { data: allUsers } = await supabase
                 .from('profiles')
                 .select('role, created_at');
@@ -130,7 +140,6 @@ export default function SuperAdminUsers() {
             if (allUsers) {
                 const now = new Date();
                 const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
                 setStats({
                     total: allUsers.length,
                     admins: allUsers.filter(u => u.role === 'org_admin').length,
@@ -175,19 +184,75 @@ export default function SuperAdminUsers() {
     };
 
     // ============================================
-    // Gérer les actions sur un utilisateur
+    // Actions utilisateur
     // ============================================
     const handleUserAction = (user, action) => {
-        if (action === 'suspend') {
-            alert('La suspension de compte sera bientôt disponible.');
+        if (action === 'view' || action === 'edit') {
+            setSelectedUser(user);
+            setModalAction(action);
+            setShowUserModal(true);
             setShowActions(null);
+        } else if (action === 'suspend' || action === 'delete' || action === 'unsuspend') {
+            setActionUser(user);
+            setActionType(action);
+            setShowActions(null);
+        }
+    };
+
+    const handleSuspend = async () => {
+        if (!actionUser) return;
+        const suspend = actionType === 'suspend';
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ suspended: suspend })
+                .eq('id', actionUser.id);
+            if (error) throw error;
+            success(suspend ? 'Utilisateur suspendu' : 'Utilisateur réactivé');
+            setActionUser(null);
+            fetchUsers();
+        } catch (err) {
+            showError(err.message);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!actionUser) return;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .delete()
+                .eq('id', actionUser.id);
+            if (error) throw error;
+            success('Utilisateur supprimé');
+            setActionUser(null);
+            fetchUsers();
+        } catch (err) {
+            showError(err.message);
+        }
+    };
+
+    const handleInvite = async (e) => {
+        e.preventDefault();
+        if (!inviteOrg) {
+            showError('Veuillez sélectionner une organisation');
             return;
         }
-
-        setSelectedUser(user);
-        setModalAction(action);
-        setShowUserModal(true);
-        setShowActions(null);
+        try {
+            await createInvitation({
+                email: inviteEmail,
+                role: inviteRole,
+                organization_id: inviteOrg,
+                invited_by: user.id,
+            });
+            success('Invitation envoyée');
+            setShowInviteModal(false);
+            setInviteEmail('');
+            setInviteRole('student');
+            setInviteOrg(organizations[0]?.id || '');
+        } catch (err) {
+            showError(err.message);
+        }
     };
 
     // ============================================
@@ -272,7 +337,6 @@ export default function SuperAdminUsers() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="space-y-8"
-                style={{ perspective: "1200px" }}
             >
                 {/* En-tête */}
                 <div className="relative">
@@ -311,19 +375,12 @@ export default function SuperAdminUsers() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            whileHover={{ 
-                                rotateY: 5, 
-                                rotateX: -5, 
-                                scale: 1.05, 
-                                z: 20,
-                                boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
-                            }}
-                            style={{ transformStyle: "preserve-3d" }}
+                            whileHover={{ y: -5 }}
                             className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                             
-                            <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
+                            <div className="relative flex items-start justify-between">
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">{card.label}</p>
                                     <p className="text-3xl font-bold text-gray-800">{card.value}</p>
@@ -440,6 +497,17 @@ export default function SuperAdminUsers() {
                                 )}
                                 <span>{exporting ? 'Exportation...' : 'Exporter'}</span>
                             </motion.button>
+
+                            {/* Bouton inviter */}
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setShowInviteModal(true)}
+                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                            >
+                                <UserPlus className="w-4 h-4" />
+                                <span>Inviter</span>
+                            </motion.button>
                         </div>
                     </div>
                 </motion.div>
@@ -509,23 +577,10 @@ export default function SuperAdminUsers() {
                                         return (
                                             <motion.tr
                                                 key={user.id}
-                                                initial={{ opacity: 0, y: 10, rotateX: -2 }}
-                                                animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                                                transition={{ 
-                                                    delay: index * 0.05,
-                                                    type: "spring",
-                                                    stiffness: 100
-                                                }}
-                                                whileHover={{ 
-                                                    rotateY: 1, 
-                                                    rotateX: -1, 
-                                                    scale: 1.005,
-                                                    z: 10,
-                                                    backgroundColor: "rgba(250, 245, 255, 0.8)",
-                                                    boxShadow: "0 10px 30px -10px rgba(168, 85, 247, 0.2)"
-                                                }}
-                                                style={{ transformStyle: "preserve-3d" }}
-                                                className="transition-colors group"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.05 }}
+                                                className="hover:bg-purple-50/50 transition-colors group"
                                             >
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
@@ -702,6 +757,114 @@ export default function SuperAdminUsers() {
                     <span>Données protégées par RLS • Actions journalisées</span>
                 </motion.div>
             </motion.div>
+
+            {/* Modal d'invitation */}
+            <AnimatePresence>
+                {showInviteModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        onClick={(e) => e.target === e.currentTarget && setShowInviteModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white rounded-2xl p-6 max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Inviter un utilisateur</h3>
+                            <form onSubmit={handleInvite} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={inviteEmail}
+                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none"
+                                        placeholder="email@exemple.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                                    <select
+                                        value={inviteRole}
+                                        onChange={(e) => setInviteRole(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none"
+                                    >
+                                        <option value="student">Étudiant</option>
+                                        <option value="org_admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Organisation</label>
+                                    <select
+                                        value={inviteOrg}
+                                        onChange={(e) => setInviteOrg(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none"
+                                        required
+                                    >
+                                        <option value="">Sélectionner une organisation</option>
+                                        {organizations.map(org => (
+                                            <option key={org.id} value={org.id}>
+                                                {escapeText(untrusted(org.name))}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInviteModal(false)}
+                                        className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={inviting}
+                                        className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                    >
+                                        {inviting ? 'Envoi...' : 'Inviter'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Modal de confirmation pour suspension/suppression */}
+            <AnimatePresence>
+                {actionUser && actionType && (
+                    <ConfirmationModal
+                        isOpen={!!actionUser}
+                        onClose={() => setActionUser(null)}
+                        onConfirm={actionType === 'delete' ? handleDelete : handleSuspend}
+                        title={
+                            actionType === 'suspend' ? 'Suspendre l\'utilisateur' :
+                            actionType === 'unsuspend' ? 'Réactiver l\'utilisateur' :
+                            'Supprimer l\'utilisateur'
+                        }
+                        message={
+                            actionType === 'delete'
+                                ? 'Cette action est irréversible. L\'utilisateur sera définitivement supprimé et ne pourra plus se connecter.'
+                                : actionType === 'suspend'
+                                ? 'L\'utilisateur ne pourra plus se connecter jusqu\'à sa réactivation.'
+                                : 'L\'utilisateur pourra à nouveau se connecter.'
+                        }
+                        confirmText={
+                            actionType === 'suspend' ? 'Suspendre' :
+                            actionType === 'unsuspend' ? 'Réactiver' : 'Supprimer'
+                        }
+                        cancelText="Annuler"
+                        type={actionType === 'delete' ? 'danger' : 'warning'}
+                    />
+                )}
+            </AnimatePresence>
 
             <UserActionModal
                 isOpen={showUserModal}
