@@ -123,7 +123,6 @@ export default function SuperAdminDashboard() {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                 </span>
-                                <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">Système Opérationnel</span>
                             </div>
                         </div>
                         <p className="text-gray-500 font-medium flex items-center gap-2">
@@ -143,14 +142,14 @@ export default function SuperAdminDashboard() {
                             <Zap className="w-5 h-5" />
                         </motion.button>
                         
-                        <motion.button
+                        {/* <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 flex items-center gap-2"
                         >
                             <Sparkles className="w-5 h-5" />
                             Quick Actions
-                        </motion.button>
+                        </motion.button> */}
                     </div>
                 </div>
 
