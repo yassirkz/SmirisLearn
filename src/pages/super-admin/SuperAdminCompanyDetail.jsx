@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Building2, Users, Video, Award, TrendingUp,
+import { 
+    Building2, Users, Video, Award, TrendingUp, 
     Calendar, ArrowLeft, Edit, Mail, MoreVertical,
     CheckCircle, AlertCircle, Clock, Shield,
     Download, Filter, Search, X, Sparkles,
@@ -25,7 +25,7 @@ export default function SuperAdminCompanyDetail() {
     const { user } = useAuth();
     const { success, error: showError } = useToast();
     const { createInvitation, loading: inviting } = useMemberInvitation();
-
+    
     const [loading, setLoading] = useState(true);
     const [company, setCompany] = useState(null);
     const [users, setUsers] = useState([]);
@@ -45,6 +45,9 @@ export default function SuperAdminCompanyDetail() {
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState('student');
     const [actionUser, setActionUser] = useState(null); // pour confirmation de retrait
+    const [roleChangeUser, setRoleChangeUser] = useState(null); // pour modal de changement de rôle
+    const [newRole, setNewRole] = useState('student');
+    const [viewUser, setViewUser] = useState(null); // pour modal de détails
 
     useEffect(() => {
         if (id) {
@@ -59,7 +62,6 @@ export default function SuperAdminCompanyDetail() {
                 .rpc('check_organization_limits_full', {
                     p_org_id: id
                 });
-
             if (error) throw error;
             setLimits(data);
         } catch (error) {
@@ -187,7 +189,7 @@ export default function SuperAdminCompanyDetail() {
             }
 
             // ============================================
-            // 7. Calculer le taux de complétion moyen
+            // 7. Calculer le taux de complétion moyen (Fix 400 error by splitting queries)
             // ============================================
             const { data: profiles } = await supabase
                 .from('profiles')
@@ -254,26 +256,29 @@ export default function SuperAdminCompanyDetail() {
     // ============================================
     // Actions utilisateur
     // ============================================
-    const handleRoleChange = async (userId, newRole) => {
+    const handleRoleChange = async () => {
+        if (!roleChangeUser) return;
         try {
             const { error } = await supabase
                 .from('profiles')
                 .update({ role: newRole })
-                .eq('id', userId);
+                .eq('id', roleChangeUser.id);
             if (error) throw error;
             success('Rôle mis à jour');
-            fetchCompanyDetails(); // rafraîchir la liste
+            setRoleChangeUser(null);
+            fetchCompanyDetails();
         } catch (err) {
             showError(err.message);
         }
     };
 
-    const handleRemoveFromOrg = async (userId) => {
+    const handleRemoveFromOrg = async () => {
+        if (!actionUser) return;
         try {
             const { error } = await supabase
                 .from('profiles')
                 .update({ organization_id: null, role: 'student' })
-                .eq('id', userId);
+                .eq('id', actionUser.id);
             if (error) throw error;
             success('Utilisateur retiré de l\'organisation');
             setActionUser(null);
@@ -306,7 +311,7 @@ export default function SuperAdminCompanyDetail() {
     // Filtrer les utilisateurs
     // ============================================
     const filteredUsers = users.filter(user => {
-        const matchesSearch =
+        const matchesSearch = 
             user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesRole = filterRole === 'all' || user.role === filterRole;
@@ -370,7 +375,7 @@ export default function SuperAdminCompanyDetail() {
     }
 
     const planBadge = getPlanBadge(company.plan_type);
-    const daysLeft = company.trial_ends_at
+    const daysLeft = company.trial_ends_at 
         ? Math.max(0, Math.ceil((new Date(company.trial_ends_at) - new Date()) / (1000 * 60 * 60 * 24)))
         : 0;
 
@@ -438,7 +443,7 @@ export default function SuperAdminCompanyDetail() {
                     {/* Éléments décoratifs */}
                     <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-green-400 to-emerald-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
-
+                    
                     {/* Badge premium */}
                     <div className="absolute top-4 right-4">
                         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
@@ -471,7 +476,7 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 )}
                             </div>
-
+                            
                             <div className="flex flex-wrap gap-6 text-sm text-gray-600">
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-4 h-4 text-blue-600" />
@@ -527,7 +532,7 @@ export default function SuperAdminCompanyDetail() {
                                 className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
+                                
                                 <div className="relative flex items-start justify-between">
                                     <div>
                                         <p className="text-sm text-gray-500 mb-1">{card.label}</p>
@@ -550,6 +555,7 @@ export default function SuperAdminCompanyDetail() {
                                         transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
                                         className={`h-full bg-gradient-to-r ${card.color} rounded-full relative`}
                                     >
+                                        {/* Indicateur pointu à la fin */}
                                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white border border-current rounded-full shadow-sm" style={{ color: card.color.split(' ')[1].replace('to-', '') }} />
                                     </motion.div>
                                 </div>
@@ -614,7 +620,6 @@ export default function SuperAdminCompanyDetail() {
                         )}
                     </motion.div>
                 </div>
-
                 {limits && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -626,7 +631,7 @@ export default function SuperAdminCompanyDetail() {
                             <Gauge className="w-5 h-5 text-purple-600" />
                             Limites du plan {limits.plan_type}
                         </h2>
-
+                        
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Utilisateurs */}
                             <div className="space-y-2">
@@ -641,12 +646,12 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 </div>
                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div
+                                    <div 
                                         className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                                        style={{
-                                            width: limits.limits?.users === -1
-                                                ? '100%'
-                                                : `${(limits.current_usage.users / limits.limits?.users) * 100}%`
+                                        style={{ 
+                                            width: limits.limits?.users === -1 
+                                                ? '100%' 
+                                                : `${(limits.current_usage.users / limits.limits?.users) * 100}%` 
                                         }}
                                     />
                                 </div>
@@ -665,12 +670,12 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 </div>
                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div
+                                    <div 
                                         className="h-full bg-purple-600 rounded-full transition-all duration-500"
-                                        style={{
-                                            width: limits.limits?.videos === -1
-                                                ? '100%'
-                                                : `${(limits.current_usage.videos / limits.limits?.videos) * 100}%`
+                                        style={{ 
+                                            width: limits.limits?.videos === -1 
+                                                ? '100%' 
+                                                : `${(limits.current_usage.videos / limits.limits?.videos) * 100}%` 
                                         }}
                                     />
                                 </div>
@@ -689,8 +694,10 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 </div>
                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full rounded-full transition-all duration-500 ${limits.storage_percent_used > 80 ? 'bg-red-600' : 'bg-green-600'}`}
+                                    <div 
+                                        className={`h-full rounded-full transition-all duration-500 ${
+                                            limits.storage_percent_used > 80 ? 'bg-red-600' : 'bg-green-600'
+                                        }`}
                                         style={{ width: `${Math.min(limits.storage_percent_used, 100)}%` }}
                                     />
                                 </div>
@@ -822,22 +829,28 @@ export default function SuperAdminCompanyDetail() {
                                                 {new Date(user.created_at).toLocaleDateString('fr-FR')}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    {/* Sélecteur de rôle */}
-                                                    <select
-                                                        value={user.role}
-                                                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                                        className="text-xs border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-blue-400"
+                                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button 
+                                                        onClick={() => setViewUser(user)}
+                                                        className="p-1 hover:bg-blue-100 rounded-lg transition-colors text-blue-600" 
+                                                        title="Voir"
                                                     >
-                                                        <option value="student">Étudiant</option>
-                                                        <option value="org_admin">Admin</option>
-                                                    </select>
-
-                                                    {/* Bouton Retirer */}
-                                                    <button
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => {
+                                                            setRoleChangeUser(user);
+                                                            setNewRole(user.role);
+                                                        }}
+                                                        className="p-1 hover:bg-purple-100 rounded-lg transition-colors text-purple-600" 
+                                                        title="Modifier rôle"
+                                                    >
+                                                        <Award className="w-4 h-4" />
+                                                    </button>
+                                                    <button 
                                                         onClick={() => setActionUser(user)}
-                                                        className="p-1 hover:bg-red-100 rounded-lg transition-colors text-red-600"
-                                                        title="Retirer de l'organisation"
+                                                        className="p-1 hover:bg-red-100 rounded-lg transition-colors text-red-600" 
+                                                        title="Supprimer"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -933,11 +946,115 @@ export default function SuperAdminCompanyDetail() {
                 )}
             </AnimatePresence>
 
+            {/* Modal de changement de rôle */}
+            <AnimatePresence>
+                {roleChangeUser && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        onClick={(e) => e.target === e.currentTarget && setRoleChangeUser(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white rounded-2xl p-6 max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Changer le rôle</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Utilisateur : <span className="font-medium">{roleChangeUser.full_name || roleChangeUser.email}</span>
+                            </p>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau rôle</label>
+                                    <select
+                                        value={newRole}
+                                        onChange={(e) => setNewRole(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+                                        <option value="student">Étudiant</option>
+                                        <option value="org_admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRoleChangeUser(null)}
+                                        className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button
+                                        onClick={handleRoleChange}
+                                        className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-colors"
+                                    >
+                                        Confirmer
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Modal de détails utilisateur */}
+            <AnimatePresence>
+                {viewUser && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        onClick={(e) => e.target === e.currentTarget && setViewUser(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white rounded-2xl p-6 max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Détails de l'utilisateur</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                        {viewUser.full_name?.charAt(0).toUpperCase() || viewUser.email?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-gray-800">{viewUser.full_name || 'Sans nom'}</p>
+                                        <p className="text-sm text-gray-600">{viewUser.email}</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <span className="text-gray-500">Rôle :</span>
+                                    <span className="font-medium">{viewUser.role === 'org_admin' ? 'Admin' : viewUser.role === 'super_admin' ? 'Super Admin' : 'Étudiant'}</span>
+                                    <span className="text-gray-500">Inscription :</span>
+                                    <span className="font-medium">{new Date(viewUser.created_at).toLocaleDateString('fr-FR')}</span>
+                                    <span className="text-gray-500">ID :</span>
+                                    <span className="font-medium text-xs">{viewUser.id}</span>
+                                </div>
+                            </div>
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    onClick={() => setViewUser(null)}
+                                    className="px-6 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                                >
+                                    Fermer
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Modal de confirmation pour retrait */}
             <ConfirmationModal
                 isOpen={!!actionUser}
                 onClose={() => setActionUser(null)}
-                onConfirm={() => handleRemoveFromOrg(actionUser.id)}
+                onConfirm={handleRemoveFromOrg}
                 title="Retirer l'utilisateur"
                 message={`Êtes-vous sûr de vouloir retirer ${actionUser?.full_name || actionUser?.email} de l'organisation ? Il perdra l'accès à toutes les données.`}
                 confirmText="Retirer"
