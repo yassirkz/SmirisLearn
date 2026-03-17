@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Building2, Users, Video, Award, TrendingUp, 
+import {
+    Building2, Users, Video, Award, TrendingUp,
     Calendar, ArrowLeft, Edit, Mail, MoreVertical,
     CheckCircle, AlertCircle, Clock, Shield,
     Download, Filter, Search, X, Sparkles,
@@ -13,16 +13,19 @@ import {
 import MainLayout from '../../components/layout/MainLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import { useMemberInvitation } from '../../hooks/useMemberInvitation';
 import { untrusted, escapeText } from '../../utils/security';
 import EditCompanyModal from '../../components/super-admin/EditCompanyModal';
-
-
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 export default function SuperAdminCompanyDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    
+    const { success, error: showError } = useToast();
+    const { createInvitation, loading: inviting } = useMemberInvitation();
+
     const [loading, setLoading] = useState(true);
     const [company, setCompany] = useState(null);
     const [users, setUsers] = useState([]);
@@ -38,14 +41,18 @@ export default function SuperAdminCompanyDetail() {
     const [showActions, setShowActions] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [limits, setLimits] = useState(null);
-
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [inviteRole, setInviteRole] = useState('student');
+    const [actionUser, setActionUser] = useState(null); // pour confirmation de retrait
 
     useEffect(() => {
-    if (id) {
-        fetchCompanyDetails();
-        fetchOrganizationLimits();
-    }
-}, [id]);
+        if (id) {
+            fetchCompanyDetails();
+            fetchOrganizationLimits();
+        }
+    }, [id]);
+
     const fetchOrganizationLimits = async () => {
         try {
             const { data, error } = await supabase
@@ -180,7 +187,7 @@ export default function SuperAdminCompanyDetail() {
             }
 
             // ============================================
-            // 7. Calculer le taux de complétion moyen (Fix 400 error by splitting queries)
+            // 7. Calculer le taux de complétion moyen
             // ============================================
             const { data: profiles } = await supabase
                 .from('profiles')
@@ -245,10 +252,61 @@ export default function SuperAdminCompanyDetail() {
     };
 
     // ============================================
+    // Actions utilisateur
+    // ============================================
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ role: newRole })
+                .eq('id', userId);
+            if (error) throw error;
+            success('Rôle mis à jour');
+            fetchCompanyDetails(); // rafraîchir la liste
+        } catch (err) {
+            showError(err.message);
+        }
+    };
+
+    const handleRemoveFromOrg = async (userId) => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ organization_id: null, role: 'student' })
+                .eq('id', userId);
+            if (error) throw error;
+            success('Utilisateur retiré de l\'organisation');
+            setActionUser(null);
+            fetchCompanyDetails();
+        } catch (err) {
+            showError(err.message);
+        }
+    };
+
+    const handleInvite = async (e) => {
+        e.preventDefault();
+        if (!company) return;
+        try {
+            await createInvitation({
+                email: inviteEmail,
+                role: inviteRole,
+                organization_id: company.id,
+                invited_by: user.id,
+            });
+            success('Invitation envoyée');
+            setShowInviteModal(false);
+            setInviteEmail('');
+            setInviteRole('student');
+        } catch (err) {
+            showError(err.message);
+        }
+    };
+
+    // ============================================
     // Filtrer les utilisateurs
     // ============================================
     const filteredUsers = users.filter(user => {
-        const matchesSearch = 
+        const matchesSearch =
             user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesRole = filterRole === 'all' || user.role === filterRole;
@@ -312,7 +370,7 @@ export default function SuperAdminCompanyDetail() {
     }
 
     const planBadge = getPlanBadge(company.plan_type);
-    const daysLeft = company.trial_ends_at 
+    const daysLeft = company.trial_ends_at
         ? Math.max(0, Math.ceil((new Date(company.trial_ends_at) - new Date()) / (1000 * 60 * 60 * 24)))
         : 0;
 
@@ -380,7 +438,7 @@ export default function SuperAdminCompanyDetail() {
                     {/* Éléments décoratifs */}
                     <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-green-400 to-emerald-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
-                    
+
                     {/* Badge premium */}
                     <div className="absolute top-4 right-4">
                         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
@@ -413,7 +471,7 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 )}
                             </div>
-                            
+
                             <div className="flex flex-wrap gap-6 text-sm text-gray-600">
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-4 h-4 text-blue-600" />
@@ -469,7 +527,7 @@ export default function SuperAdminCompanyDetail() {
                                 className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                                
+
                                 <div className="relative flex items-start justify-between">
                                     <div>
                                         <p className="text-sm text-gray-500 mb-1">{card.label}</p>
@@ -557,6 +615,7 @@ export default function SuperAdminCompanyDetail() {
                         )}
                     </motion.div>
                 </div>
+
                 {limits && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -568,7 +627,7 @@ export default function SuperAdminCompanyDetail() {
                             <Gauge className="w-5 h-5 text-purple-600" />
                             Limites du plan {limits.plan_type}
                         </h2>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Utilisateurs */}
                             <div className="space-y-2">
@@ -583,12 +642,12 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 </div>
                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div 
+                                    <div
                                         className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                                        style={{ 
-                                            width: limits.limits?.users === -1 
-                                                ? '100%' 
-                                                : `${(limits.current_usage.users / limits.limits?.users) * 100}%` 
+                                        style={{
+                                            width: limits.limits?.users === -1
+                                                ? '100%'
+                                                : `${(limits.current_usage.users / limits.limits?.users) * 100}%`
                                         }}
                                     />
                                 </div>
@@ -607,12 +666,12 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 </div>
                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div 
+                                    <div
                                         className="h-full bg-purple-600 rounded-full transition-all duration-500"
-                                        style={{ 
-                                            width: limits.limits?.videos === -1 
-                                                ? '100%' 
-                                                : `${(limits.current_usage.videos / limits.limits?.videos) * 100}%` 
+                                        style={{
+                                            width: limits.limits?.videos === -1
+                                                ? '100%'
+                                                : `${(limits.current_usage.videos / limits.limits?.videos) * 100}%`
                                         }}
                                     />
                                 </div>
@@ -631,10 +690,8 @@ export default function SuperAdminCompanyDetail() {
                                     </span>
                                 </div>
                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div 
-                                        className={`h-full rounded-full transition-all duration-500 ${
-                                            limits.storage_percent_used > 80 ? 'bg-red-600' : 'bg-green-600'
-                                        }`}
+                                    <div
+                                        className={`h-full rounded-full transition-all duration-500 ${limits.storage_percent_used > 80 ? 'bg-red-600' : 'bg-green-600'}`}
                                         style={{ width: `${Math.min(limits.storage_percent_used, 100)}%` }}
                                     />
                                 </div>
@@ -663,7 +720,7 @@ export default function SuperAdminCompanyDetail() {
                             </div>
                         )}
                     </motion.div>
-)}
+                )}
 
                 {/* Liste des utilisateurs */}
                 <motion.div
@@ -714,6 +771,7 @@ export default function SuperAdminCompanyDetail() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
+                                onClick={() => setShowInviteModal(true)}
                                 className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2"
                             >
                                 <UserPlus className="w-4 h-4" />
@@ -765,14 +823,23 @@ export default function SuperAdminCompanyDetail() {
                                                 {new Date(user.created_at).toLocaleDateString('fr-FR')}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button className="p-1 hover:bg-blue-100 rounded-lg transition-colors text-blue-600" title="Voir">
-                                                        <Eye className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="p-1 hover:bg-purple-100 rounded-lg transition-colors text-purple-600" title="Modifier rôle">
-                                                        <Award className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="p-1 hover:bg-red-100 rounded-lg transition-colors text-red-600" title="Supprimer">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {/* Sélecteur de rôle */}
+                                                    <select
+                                                        value={user.role}
+                                                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                                        className="text-xs border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:border-blue-400"
+                                                    >
+                                                        <option value="student">Étudiant</option>
+                                                        <option value="org_admin">Admin</option>
+                                                    </select>
+
+                                                    {/* Bouton Retirer */}
+                                                    <button
+                                                        onClick={() => setActionUser(user)}
+                                                        className="p-1 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+                                                        title="Retirer de l'organisation"
+                                                    >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
@@ -803,6 +870,80 @@ export default function SuperAdminCompanyDetail() {
                     </div>
                 </motion.div>
             </motion.div>
+
+            {/* Modal d'invitation */}
+            <AnimatePresence>
+                {showInviteModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        onClick={(e) => e.target === e.currentTarget && setShowInviteModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white rounded-2xl p-6 max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Inviter un membre</h3>
+                            <form onSubmit={handleInvite} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={inviteEmail}
+                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                        placeholder="email@exemple.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                                    <select
+                                        value={inviteRole}
+                                        onChange={(e) => setInviteRole(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+                                        <option value="student">Étudiant</option>
+                                        <option value="org_admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div className="flex gap-3 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInviteModal(false)}
+                                        className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Annuler
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={inviting}
+                                        className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                                    >
+                                        {inviting ? 'Envoi...' : 'Inviter'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Modal de confirmation pour retrait */}
+            <ConfirmationModal
+                isOpen={!!actionUser}
+                onClose={() => setActionUser(null)}
+                onConfirm={() => handleRemoveFromOrg(actionUser.id)}
+                title="Retirer l'utilisateur"
+                message={`Êtes-vous sûr de vouloir retirer ${actionUser?.full_name || actionUser?.email} de l'organisation ? Il perdra l'accès à toutes les données.`}
+                confirmText="Retirer"
+                type="warning"
+            />
 
             <EditCompanyModal
                 isOpen={showEditModal}
