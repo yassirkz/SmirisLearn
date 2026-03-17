@@ -23,6 +23,7 @@ export function useInvitation() {
 
             // Validation email
             const validatedEmail = validateEmail(untrusted(email));
+            console.log('📨 Email validé :', validatedEmail);
 
             // Vérification doublons
             const { data: existingInvite, error: checkError } = await supabase
@@ -54,7 +55,7 @@ export function useInvitation() {
             const token = generateInvitationToken();
             const expiresAt = getExpirationDate();
 
-            // Insertion
+            // Insertion dans pending_companies
             const { data, error } = await supabase
                 .from('pending_companies')
                 .insert({
@@ -69,21 +70,22 @@ export function useInvitation() {
 
             if (error) throw error;
 
-            // --- LOGS AJOUTÉS ---
-            console.log('📨 Email destinataire (validatedEmail) :', validatedEmail);
-            console.log('📦 Données envoyées à sendInvitationEmail :', {
+            // Préparer les données pour l'email
+            const emailData = {
                 to: validatedEmail,
                 organizationName: companyData.name.trim(),
                 adminName: companyData.adminName.trim(),
                 token: data.token
-            });
-            // ---------------------
+            };
 
-            // Envoi email
+            console.log('📦 Données préparées pour l\'email :', emailData);
+
+            // Récupérer l'utilisateur connecté (super admin)
             const { data: { user: superAdmin } } = await supabase.auth.getUser();
             const fromEmail = superAdmin?.email || "kezziyassir005@gmail.com";
 
-            await sendInvitationEmail({
+            // Envoyer l'email
+            const emailResult = await sendInvitationEmail({
                 fromEmail,
                 to: validatedEmail,
                 fromName: "Super Admin Smiris Learn",
@@ -91,6 +93,14 @@ export function useInvitation() {
                 adminName: companyData.adminName.trim(),
                 token: data.token
             });
+
+            if (!emailResult.success) {
+                // Si l'email échoue, on peut décider de supprimer l'invitation ou simplement logger
+                console.warn("L'email n'a pas pu être envoyé, mais l'invitation a été créée.");
+                // Optionnel : supprimer l'invitation ?
+                // await supabase.from('pending_companies').delete().eq('token', token);
+                throw new Error(emailResult.error);
+            }
 
             return { data, error: null };
 
@@ -170,7 +180,7 @@ export function useInvitation() {
         }
     }, []);
 
-    // ✅ Vérifier les limites avant d'ajouter
+    // Vérifier les limites avant d'ajouter
     const checkOrganizationLimits = useCallback(async (orgId, resourceType = 'users') => {
         try {
             const { data, error } = await supabase

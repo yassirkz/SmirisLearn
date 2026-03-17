@@ -15,11 +15,23 @@ export const sendInvitationEmail = async ({
   try {
     console.log('📧 Envoi email de type', type, 'via EmailJS...', { to, organizationName, adminName });
 
+    // Vérification des variables d'environnement
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    const templateIdCompany = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const templateIdMember = import.meta.env.VITE_EMAILJS_MEMBER_TEMPLATE_ID;
+
+    console.log('🔍 Variables d\'environnement lues :', {
+      serviceId,
+      publicKey: publicKey ? '***' : undefined,
+      templateIdCompany,
+      templateIdMember
+    });
+
     if (!serviceId) throw new Error('VITE_EMAILJS_SERVICE_ID manquant');
     if (!publicKey) throw new Error('VITE_EMAILJS_PUBLIC_KEY manquant');
 
+    // Construction du lien d'invitation
     const inviteLink = type === 'member'
       ? `${window.location.origin}/accept-member-invite?token=${token}`
       : `${window.location.origin}/accept-invite?token=${token}`;
@@ -30,7 +42,8 @@ export const sendInvitationEmail = async ({
     let templateId;
 
     if (type === 'member') {
-      templateId = import.meta.env.VITE_EMAILJS_MEMBER_TEMPLATE_ID;
+      if (!templateIdMember) throw new Error('VITE_EMAILJS_MEMBER_TEMPLATE_ID manquant');
+      templateId = templateIdMember;
       templateParams = {
         to_email: to,
         organization_name: organizationName,
@@ -38,7 +51,8 @@ export const sendInvitationEmail = async ({
         invite_link: inviteLink,
       };
     } else {
-      templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      if (!templateIdCompany) throw new Error('VITE_EMAILJS_TEMPLATE_ID manquant');
+      templateId = templateIdCompany;
       templateParams = {
         from_name: fromName || 'Smiris Learn',
         from_email: fromEmail,
@@ -50,15 +64,18 @@ export const sendInvitationEmail = async ({
       };
     }
 
-    if (!templateId) {
-      throw new Error(`Template ID manquant pour le type "${type}"`);
-    }
-
+    // Vérification que tous les paramètres sont définis
     console.log('🔑 Service ID :', serviceId);
     console.log('📋 Template ID :', templateId);
-    console.log('📤 Paramètres du template :', templateParams);
+    console.log('📤 Paramètres complets :', templateParams);
     console.log('📧 to_email =', templateParams.to_email);
 
+    // Vérification que to_email n'est pas vide
+    if (!templateParams.to_email) {
+      throw new Error('Le paramètre to_email est vide avant l\'envoi');
+    }
+
+    // Envoi effectif
     const response = await emailjs.send(serviceId, templateId, templateParams);
 
     console.log('✅ Réponse EmailJS :', response.status, response.text);
