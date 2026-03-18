@@ -291,7 +291,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
             >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 dark:bg-gray-800/50 dark:border-gray-500 dark:text-white">
                     <div className="flex items-center gap-4 text-sm dark:text-white dark:bg-gray-800/50 dark:border-gray-500 dark:text-white">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
