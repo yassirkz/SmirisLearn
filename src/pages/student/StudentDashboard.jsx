@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   BookOpen, PlayCircle, Award, Clock, ChevronRight, 
-  TrendingUp, Sparkles, Shield, Users, Video, RefreshCw 
+  TrendingUp, Sparkles, Shield, Users, Video, RefreshCw,
+  Flame, Hourglass, Zap
 } from 'lucide-react';
 import { Cell, RadialBar, RadialBarChart, PolarAngleAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useAuth } from '../../hooks/useAuth';
@@ -29,6 +30,9 @@ export default function StudentDashboard() {
   const [recentVideos, setRecentVideos] = useState([]);
   const [upcomingQuizzes, setUpcomingQuizzes] = useState([]);
   const [progressByPillar, setProgressByPillar] = useState([]);
+  const [recommendations, setRecommendations] = useState([]); // prochaines vidéos par pilier
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0); // en secondes
+  const [streak, setStreak] = useState(0); // jours consécutifs
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -42,9 +46,6 @@ export default function StudentDashboard() {
           .select('id, organization_id')
           .eq('id', user.id)
           .single();
-        
-        console.log('User Auth ID:', user.id);
-        console.log('Profile ID from DB:', profile?.id);
 
         if (profile?.organization_id) {
           const { data: org } = await supabase
@@ -71,34 +72,40 @@ export default function StudentDashboard() {
             .in('group_id', groupIds);
           pillarIds = [...new Set(pillarAccess?.map(p => p.pillar_id) || [])];
         }
-        console.log('Pillar IDs accessible:', pillarIds);
 
-        // 3. Récupérer toutes les vidéos accessibles
+        // 3. Récupérer toutes les vidéos accessibles avec leur durée
         let totalVideos = 0;
         let videosByPillar = [];
         let pillarsWithVideosData = [];
+        let allVideos = []; // pour calculer le temps total
         if (pillarIds.length > 0) {
-          // Récupérer les vidéos par pilier pour le graphique
           const { data: pillarsWithVideos } = await supabase
             .from('pillars')
             .select(`
               id,
               name,
-              videos ( id )
+              videos ( id, duration, sequence_order )
             `)
             .in('id', pillarIds);
           
           pillarsWithVideosData = pillarsWithVideos || [];
 
+          // Récupérer toutes les vidéos pour calculs
+          const { data: videos } = await supabase
+            .from('videos')
+            .select('id, duration, pillar_id, sequence_order')
+            .in('pillar_id', pillarIds);
+          allVideos = videos || [];
+
           if (pillarsWithVideos) {
             videosByPillar = pillarsWithVideos.map(p => ({
               id: p.id,
               name: p.name,
-              total: p.videos?.length || 0
+              total: p.videos?.length || 0,
+              videos: p.videos || []
             }));
           }
 
-          // Compter toutes les vidéos
           const { count } = await supabase
             .from('videos')
             .select('*', { count: 'exact', head: true })
@@ -117,14 +124,8 @@ export default function StudentDashboard() {
         }
         
         const progressData = progress || [];
-        console.log('DEBUG - User ID:', user.id);
-        console.log('DEBUG - Progress Count:', progressData.length);
-        console.log('DEBUG - Data:', progressData);
-
-        const watchedVideoIds = progressData
-          .filter(p => p.watched === true || p.watched === 1)
-          .map(p => p.video_id);
-          
+        const watchedVideos = progressData.filter(p => p.watched === true || p.watched === 1);
+        const watchedVideoIds = watchedVideos.map(p => p.video_id);
         const completedVideos = watchedVideoIds.length;
         const passedQuizzes = progressData.filter(p => p.quiz_passed === true || p.quiz_passed === 1).length;
 
@@ -145,7 +146,7 @@ export default function StudentDashboard() {
           }
         }
 
-        // Quiz en attente (vidéo regardée mais quiz non réussi)
+        // Quiz en attente
         const pendingQuizVideoIds = progressData
           .filter(p => (p.watched === true || p.watched === 1) && !(p.quiz_passed === true || p.quiz_passed === 1))
           .map(p => p.video_id);
@@ -159,15 +160,12 @@ export default function StudentDashboard() {
           pendingQuizzes = count || 0;
         }
 
-        // 5. Progression par pilier pour le graphique (Optimisé)
+        // 5. Progression par pilier
         const pillarProgress = videosByPillar.map((pillar) => {
-          const pData = pillarsWithVideosData?.find(p => p.id === pillar.id);
-          const pillarVideoIds = pData?.videos?.map(v => v.id) || [];
-          
-          const watchedInPillar = progressData.filter(p =>
-            pillarVideoIds.includes(p.video_id) && (p.watched === true || p.watched === 1)
+          const pillarVideoIds = pillar.videos.map(v => v.id);
+          const watchedInPillar = watchedVideos.filter(p =>
+            pillarVideoIds.includes(p.video_id)
           ).length;
-          
           return {
             id: pillar.id,
             name: pillar.name,
@@ -177,12 +175,10 @@ export default function StudentDashboard() {
           };
         });
         setProgressByPillar(pillarProgress);
-        console.log('Pillar Progress calculated:', pillarProgress);
 
         // 6. Vidéos récentes
         if (watchedVideoIds.length > 0) {
-          const recent = progressData
-            .filter(p => p.watched)
+          const recent = watchedVideos
             .sort((a, b) => {
               const dateA = a.completed_at ? new Date(a.completed_at) : new Date(0);
               const dateB = b.completed_at ? new Date(b.completed_at) : new Date(0);
@@ -220,6 +216,80 @@ export default function StudentDashboard() {
           setUpcomingQuizzes(quizzesData || []);
         }
 
+        // 8. Calcul des recommandations (prochaine vidéo à regarder par pilier)
+        const recs = [];
+        for (const pillar of videosByPillar) {
+          // Trier les vidéos du pilier par ordre séquentiel
+          const sortedVideos = pillar.videos.sort((a, b) => a.sequence_order - b.sequence_order);
+          // Trouver la première vidéo non regardée
+          const nextVideo = sortedVideos.find(v => !watchedVideoIds.includes(v.id));
+          if (nextVideo) {
+            // Récupérer les infos de la vidéo (titre, etc.)
+            const videoInfo = allVideos.find(v => v.id === nextVideo.id);
+            recs.push({
+              pillarId: pillar.id,
+              pillarName: pillar.name,
+              videoId: nextVideo.id,
+              title: videoInfo?.title || 'Vidéo sans titre',
+              sequence: nextVideo.sequence_order,
+              duration: videoInfo?.duration
+            });
+          }
+        }
+        setRecommendations(recs);
+
+        // 9. Calcul du temps total passé (somme des durées des vidéos regardées)
+        let totalTime = 0;
+        for (const vid of watchedVideos) {
+          const videoInfo = allVideos.find(v => v.id === vid.video_id);
+          if (videoInfo?.duration) {
+            totalTime += videoInfo.duration;
+          }
+        }
+        setTotalTimeSpent(totalTime);
+
+        // 10. Calcul du streak (jours consécutifs)
+        const dates = watchedVideos
+          .map(p => p.completed_at ? new Date(p.completed_at).toDateString() : null)
+          .filter(d => d !== null);
+        const uniqueDates = [...new Set(dates)]; // jours distincts
+        uniqueDates.sort((a, b) => new Date(b) - new Date(a)); // décroissant
+        let currentStreak = 0;
+        const today = new Date().toDateString();
+        if (uniqueDates.includes(today)) {
+          currentStreak = 1;
+          let previousDate = new Date(today);
+          for (let i = 1; i < uniqueDates.length; i++) {
+            const prevDay = new Date(previousDate);
+            prevDay.setDate(prevDay.getDate() - 1);
+            if (uniqueDates[i] === prevDay.toDateString()) {
+              currentStreak++;
+              previousDate = prevDay;
+            } else {
+              break;
+            }
+          }
+        } else {
+          // regarder si hier est dans la liste
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (uniqueDates.includes(yesterday.toDateString())) {
+            currentStreak = 1;
+            let previousDate = yesterday;
+            for (let i = 1; i < uniqueDates.length; i++) {
+              const prevDay = new Date(previousDate);
+              prevDay.setDate(prevDay.getDate() - 1);
+              if (uniqueDates[i] === prevDay.toDateString()) {
+                currentStreak++;
+                previousDate = prevDay;
+              } else {
+                break;
+              }
+            }
+          }
+        }
+        setStreak(currentStreak);
+
         setStats({
           pillarsCount: pillarIds.length,
           completedVideos,
@@ -237,8 +307,8 @@ export default function StudentDashboard() {
       }
     };
     fetchDashboardData();
- 
-    // 8. Abonnement en temps réel
+
+    // Abonnement en temps réel
     const channel = supabase
       .channel('dashboard-updates')
       .on(
@@ -254,7 +324,7 @@ export default function StudentDashboard() {
         }
       )
       .subscribe();
- 
+
     return () => {
       supabase.removeChannel(channel);
     };
@@ -276,6 +346,13 @@ export default function StudentDashboard() {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const formatTimeSpent = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) return `${hours}h ${minutes}min`;
+    return `${minutes} min`;
   };
 
   const COLORS = ['#4f46e5', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#6366f1'];
@@ -323,7 +400,7 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {/* Progression globale avec cercle (comme SuperAdmin) */}
+            {/* Progression globale avec cercle */}
             <div className="bg-white/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-indigo-100 flex items-center gap-4">
               <div className="text-right">
                 <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Progression Totale</p>
@@ -360,130 +437,65 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Cartes de statistiques (style glassmorphisme) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Carte Piliers */}
+        {/* Cartes de statistiques supplémentaires */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
+          >
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <Flame className="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Série actuelle</p>
+              <p className="text-xl font-bold text-gray-800">{streak} jour{streak > 1 ? 's' : ''}</p>
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            whileHover={{ 
-              rotateY: 8, 
-              rotateX: -4, 
-              scale: 1.05,
-              z: 50,
-              boxShadow: "0 25px 50px -12px rgba(79, 70, 229, 0.2)"
-            }}
-            style={{ transformStyle: "preserve-3d" }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 relative overflow-hidden group cursor-pointer"
-            onClick={() => navigate('/student/learning')}
+            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Mes piliers</p>
-                <p className="text-3xl font-bold text-gray-800">{stats.pillarsCount}</p>
-                <p className="text-xs text-gray-400 mt-2">Accédez à vos formations</p>
-              </div>
-              <motion.div 
-                whileHover={{ translateZ: 40, scale: 1.2, rotate: 10 }}
-                className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg transition-transform"
-              >
-                <BookOpen className="w-6 h-6 text-white" />
-              </motion.div>
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Hourglass className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Temps total</p>
+              <p className="text-xl font-bold text-gray-800">{formatTimeSpent(totalTimeSpent)}</p>
             </div>
           </motion.div>
 
-          {/* Carte Vidéos vues */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
+          >
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Zap className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Quiz réussis</p>
+              <p className="text-xl font-bold text-gray-800">{stats.passedQuizzes}/{stats.totalQuizzes}</p>
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            whileHover={{ 
-              rotateY: -8, 
-              rotateX: -4, 
-              scale: 1.05,
-              z: 50,
-              boxShadow: "0 25px 50px -12px rgba(139, 92, 246, 0.2)"
-            }}
-            style={{ transformStyle: "preserve-3d" }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 relative overflow-hidden group"
+            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Vidéos vues</p>
-                <p className="text-3xl font-bold text-gray-800">{stats.completedVideos} <span className="text-lg text-gray-400">/ {stats.totalVideos}</span></p>
-                <p className="text-xs text-gray-400 mt-2">Continuez sur votre lancée</p>
-              </div>
-              <motion.div 
-                whileHover={{ translateZ: 40, scale: 1.2, rotate: -10 }}
-                className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg transition-transform"
-              >
-                <PlayCircle className="w-6 h-6 text-white" />
-              </motion.div>
+            <div className="p-2 bg-green-100 rounded-lg">
+              <PlayCircle className="w-5 h-5 text-green-600" />
             </div>
-          </motion.div>
-
-          {/* Carte Quiz réussis */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ 
-              rotateY: 8, 
-              rotateX: 4, 
-              scale: 1.05,
-              z: 50,
-              boxShadow: "0 25px 50px -12px rgba(16, 185, 129, 0.2)"
-            }}
-            style={{ transformStyle: "preserve-3d" }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Quiz réussis</p>
-                <p className="text-3xl font-bold text-gray-800">{stats.passedQuizzes} <span className="text-lg text-gray-400">/ {stats.totalQuizzes}</span></p>
-                <p className="text-xs text-gray-400 mt-2">{stats.pendingQuizzes > 0 ? `${stats.pendingQuizzes} en attente` : 'Bravo !'}</p>
-              </div>
-              <motion.div 
-                whileHover={{ translateZ: 40, scale: 1.2, rotate: 10 }}
-                className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg transition-transform"
-              >
-                <Award className="w-6 h-6 text-white" />
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Carte Prochain quiz */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            whileHover={{ 
-              rotateY: -8, 
-              rotateX: 4, 
-              scale: 1.05,
-              z: 50,
-              boxShadow: "0 25px 50px -12px rgba(245, 158, 11, 0.2)"
-            }}
-            style={{ transformStyle: "preserve-3d" }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <div className="relative flex items-start justify-between" style={{ transform: "translateZ(30px)" }}>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Prochain quiz</p>
-                <p className="text-3xl font-bold text-gray-800">{upcomingQuizzes.length > 0 ? upcomingQuizzes.length : '0'}</p>
-                <p className="text-xs text-gray-400 mt-2">{upcomingQuizzes.length > 0 ? 'À passer' : 'Tous terminés'}</p>
-              </div>
-              <motion.div 
-                whileHover={{ translateZ: 40, scale: 1.2, rotate: -10 }}
-                className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg transition-transform"
-              >
-                <Clock className="w-6 h-6 text-white" />
-              </motion.div>
+            <div>
+              <p className="text-xs text-gray-500">Vidéos vues</p>
+              <p className="text-xl font-bold text-gray-800">{stats.completedVideos}/{stats.totalVideos}</p>
             </div>
           </motion.div>
         </div>
@@ -563,13 +575,47 @@ export default function StudentDashboard() {
           </motion.div>
         )}
 
+        {/* Section Recommandations (prochaines vidéos) */}
+        {recommendations.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+          >
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+              <PlayCircle className="w-5 h-5 text-indigo-600" />
+              Recommandé pour vous
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recommendations.map(rec => (
+                <motion.div
+                  key={rec.videoId}
+                  whileHover={{ scale: 1.02 }}
+                  className="flex items-center gap-3 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => navigate(`/student/video/${rec.videoId}`)}
+                >
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                    <PlayCircle className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-800 truncate">{escapeText(untrusted(rec.title))}</p>
+                    <p className="text-xs text-gray-500">{rec.pillarName} • {formatDuration(rec.duration)}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Deux colonnes : vidéos récentes et quiz à venir */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Vidéos récentes */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.7 }}
             className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
           >
             <div className="flex items-center justify-between mb-4">
@@ -621,7 +667,7 @@ export default function StudentDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.8 }}
             className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
           >
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
@@ -664,7 +710,7 @@ export default function StudentDashboard() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.9 }}
           className="text-center text-xs text-gray-400 flex flex-col items-center justify-center gap-1"
         >
           <div className="flex items-center gap-1">
