@@ -106,7 +106,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* Statistiques */}
-            <div className="grid grid-cols-3 gap-2 mb-4" style={{ transform: "translateZ(20px)" }}>
+            <div className="grid grid-cols-3 gap-2 mb-4 dark:bg-gray-800/50 dark:border-gray-500 dark:text-white"  style={{ transform: "translateZ(20px)" }}>
                 <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                     <Video className="w-4 h-4 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
                     <p className="text-xs text-gray-500 dark:text-gray-400">Vidéos</p>
