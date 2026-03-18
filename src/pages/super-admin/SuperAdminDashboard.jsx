@@ -19,13 +19,12 @@ export default function SuperAdminDashboard() {
 
     useEffect(() => {
         fetchDashboardData();
-        const interval = setInterval(fetchDashboardData, 60000); // Rafraîchir toutes les minutes
+        const interval = setInterval(fetchDashboardData, 60000);
         return () => clearInterval(interval);
     }, []);
 
     const fetchDashboardData = async () => {
         try {
-            // ✅ Utilisation de la fonction RPC super admin
             const { data, error } = await supabase
                 .rpc('get_super_admin_dashboard');
 
@@ -33,7 +32,6 @@ export default function SuperAdminDashboard() {
             
             setDashboardData(data);
 
-            // Calculer la croissance réelle (Super Admin)
             const lastMonth = new Date();
             lastMonth.setMonth(lastMonth.getMonth() - 1);
 
@@ -73,9 +71,9 @@ export default function SuperAdminDashboard() {
             <MainLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-20 h-20 border-4 border-blue-200 rounded-full"></div>
+                        <div className="w-20 h-20 border-4 border-blue-200 dark:border-blue-800 rounded-full"></div>
                         <div className="absolute top-0 left-0 w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                        <p className="mt-4 text-gray-500">Chargement du dashboard...</p>
+                        <p className="mt-4 text-gray-500 dark:text-gray-400">Chargement du dashboard...</p>
                     </div>
                 </div>
             </MainLayout>
@@ -85,14 +83,14 @@ export default function SuperAdminDashboard() {
     if (error || !dashboardData) {
         return (
             <MainLayout>
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg">
                     <div className="flex items-center gap-3">
-                        <AlertCircle className="w-5 h-5 text-red-600" />
-                        <p className="text-sm text-red-700">Erreur de chargement: {error || "Données non disponibles"}</p>
+                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                        <p className="text-sm text-red-700 dark:text-red-300">Erreur de chargement: {error || "Données non disponibles"}</p>
                     </div>
                     <button
                         onClick={fetchDashboardData}
-                        className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+                        className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"
                     >
                         Réessayer
                     </button>
@@ -115,18 +113,18 @@ export default function SuperAdminDashboard() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-1">
-                            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-                                Control <span className="text-blue-600">Center</span>
+                            <h1 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+                                Control <span className="text-blue-600 dark:text-blue-400">Center</span>
                             </h1>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-100 rounded-full h-fit">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800 rounded-full h-fit">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                 </span>
                             </div>
                         </div>
-                        <p className="text-gray-500 font-medium flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-blue-500" />
+                        <p className="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                             Vue d'ensemble de la plateforme • {lastUpdate.toLocaleTimeString()}
                         </p>
                     </div>
@@ -136,30 +134,21 @@ export default function SuperAdminDashboard() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={fetchDashboardData}
-                            className="p-3 bg-white border-2 border-gray-100 rounded-2xl hover:border-blue-200 hover:shadow-lg transition-all text-gray-600"
+                            className="p-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-lg dark:hover:shadow-gray-900 transition-all text-gray-600 dark:text-gray-300"
                             title="Rafraîchir les données"
                         >
                             <Zap className="w-5 h-5" />
                         </motion.button>
-                        
-                        {/* <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 flex items-center gap-2"
-                        >
-                            <Sparkles className="w-5 h-5" />
-                            Quick Actions
-                        </motion.button> */}
                     </div>
                 </div>
 
                 {/* Alertes système */}
                 {system_status?.maintenance_mode && (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg flex items-center gap-3">
-                        <AlertCircle className="w-5 h-5 text-yellow-600" />
+                    <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 p-4 rounded-lg flex items-center gap-3">
+                        <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-yellow-800">Mode maintenance activé</p>
-                            <p className="text-xs text-yellow-600">La plateforme est en maintenance. Les inscriptions sont {system_status.allow_registration ? 'autorisées' : 'désactivées'}.</p>
+                            <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300">Mode maintenance activé</p>
+                            <p className="text-xs text-yellow-600 dark:text-yellow-400">La plateforme est en maintenance. Les inscriptions sont {system_status.allow_registration ? 'autorisées' : 'désactivées'}.</p>
                         </div>
                     </div>
                 )}
@@ -174,7 +163,7 @@ export default function SuperAdminDashboard() {
                                 growth: dashboardData.growth?.orgs || 0,
                                 icon: Building2, 
                                 color: 'from-blue-600 to-indigo-600',
-                                shadow: 'shadow-blue-200',
+                                shadow: 'shadow-blue-200 dark:shadow-blue-900/30',
                                 description: 'Organisations actives'
                             },
                             { 
@@ -183,7 +172,7 @@ export default function SuperAdminDashboard() {
                                 growth: dashboardData.growth?.users || 0,
                                 icon: Users, 
                                 color: 'from-purple-600 to-fuchsia-600',
-                                shadow: 'shadow-purple-200',
+                                shadow: 'shadow-purple-200 dark:shadow-purple-900/30',
                                 description: `${global_stats.active_trials} comptes en essai`
                             },
                             { 
@@ -192,16 +181,16 @@ export default function SuperAdminDashboard() {
                                 growth: dashboardData.growth?.videos || 0,
                                 icon: Video, 
                                 color: 'from-emerald-500 to-teal-600',
-                                shadow: 'shadow-emerald-200',
+                                shadow: 'shadow-emerald-200 dark:shadow-emerald-900/30',
                                 description: `${global_stats.storage_used_mb} Mo de stockage`
                             },
                             { 
-                                label: 'Score d\'Engagement', 
+                                label: "Score d'Engagement", 
                                 value: `${global_stats.avg_completion_rate || 0}%`, 
                                 growth: dashboardData.growth?.completion || 0,
                                 icon: Award, 
                                 color: 'from-orange-500 to-rose-500',
-                                shadow: 'shadow-orange-200',
+                                shadow: 'shadow-orange-200 dark:shadow-orange-900/30',
                                 description: 'Moyenne de complétion'
                             }
                         ].map((card, index) => {
@@ -220,7 +209,7 @@ export default function SuperAdminDashboard() {
                                         y: -8,
                                         transition: { duration: 0.2 }
                                     }}
-                                    className="relative group bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden"
+                                    className="relative group bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/40 dark:shadow-gray-900/40 overflow-hidden"
                                 >
                                     <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${card.color} opacity-[0.03] rounded-bl-[5rem] -z-0`} />
                                     
@@ -229,21 +218,21 @@ export default function SuperAdminDashboard() {
                                             <div className={`p-4 bg-gradient-to-br ${card.color} rounded-2xl shadow-xl ${card.shadow} text-white`}>
                                                 <card.icon className="w-6 h-6" />
                                             </div>
-                                            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold ${isPositive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold ${isPositive ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
                                                 {isPositive ? '↑' : '↓'} {Math.abs(card.growth)}%
                                             </div>
                                         </div>
                                         
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">{card.label}</p>
-                                            <p className="text-4xl font-bold text-gray-900 tracking-tight">{card.value}</p>
-                                            <p className="text-[11px] font-bold text-gray-500 pt-2 flex items-center gap-1">
-                                                <Zap className="w-3 h-3 text-blue-500" />
+                                            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">{card.label}</p>
+                                            <p className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">{card.value}</p>
+                                            <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 pt-2 flex items-center gap-1">
+                                                <Zap className="w-3 h-3 text-blue-500 dark:text-blue-400" />
                                                 {card.description}
                                             </p>
                                         </div>
 
-                                        <div className="mt-6 h-2 bg-gray-50 rounded-full overflow-hidden">
+                                        <div className="mt-6 h-2 bg-gray-50 dark:bg-gray-700 rounded-full overflow-hidden">
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${progress}%` }}
@@ -264,15 +253,15 @@ export default function SuperAdminDashboard() {
                     <RevenueChart />
                 </div>
 
-                {/* Dernières entreprises - Style Modernisé */}
+                {/* Dernières entreprises */}
                 {recent_organizations?.length > 0 && (
                     <section className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <Building2 className="w-6 h-6 text-blue-600" />
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                 Onboarding Récent
                             </h2>
-                            <button className="text-sm font-bold text-blue-600 hover:text-blue-700">Voir tout</button>
+                            <button className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">Voir tout</button>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -283,28 +272,28 @@ export default function SuperAdminDashboard() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: index * 0.1 }}
                                     whileHover={{ y: -5 }}
-                                    className="relative group bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-100/50 overflow-hidden"
+                                    className="relative group bg-white dark:bg-gray-800 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-100/50 dark:shadow-gray-900/50 overflow-hidden"
                                 >
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-[4rem] group-hover:bg-blue-600 transition-colors duration-500 -z-0 opacity-20 group-hover:opacity-10" />
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-bl-[4rem] group-hover:bg-blue-600 transition-colors duration-500 -z-0 opacity-20 group-hover:opacity-10" />
                                     
                                     <div className="relative z-10 flex flex-col gap-4">
                                         <div className="flex items-center justify-between">
-                                            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-200">
+                                            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-200 dark:shadow-blue-900/30">
                                                 {org.name?.charAt(0).toUpperCase()}
                                             </div>
-                                            <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                            <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
                                                 {org.plan}
                                             </div>
                                         </div>
                                         
                                         <div>
-                                            <h3 className="font-bold text-gray-900 text-lg leading-tight truncate">{org.name}</h3>
-                                            <div className="flex items-center gap-3 mt-2 text-xs font-medium text-gray-500">
+                                            <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight truncate">{org.name}</h3>
+                                            <div className="flex items-center gap-3 mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
                                                 <span className="flex items-center gap-1">
                                                     <Users className="w-3 h-3" />
                                                     {org.member_count} membres
                                                 </span>
-                                                <span className="w-1 h-1 bg-gray-300 rounded-full" />
+                                                <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
                                                 <span className="flex items-center gap-1">
                                                     <Calendar className="w-3 h-3" />
                                                     {new Date(org.created_at).toLocaleDateString()}
@@ -333,7 +322,7 @@ export default function SuperAdminDashboard() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
-                    className="text-center text-xs text-gray-400 flex items-center justify-center gap-1"
+                    className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1"
                 >
                     <Shield className="w-3 h-3" />
                     <span>Données temps réel via RPC • Dernière mise à jour: {lastUpdate.toLocaleTimeString()}</span>

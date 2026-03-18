@@ -26,42 +26,35 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
 
     const getBgLight = (color) => {
         const bgs = {
-            blue: 'bg-blue-50',
-            purple: 'bg-purple-50',
-            green: 'bg-green-50',
-            red: 'bg-red-50',
-            yellow: 'bg-yellow-50',
-            indigo: 'bg-indigo-50',
-            pink: 'bg-pink-50',
-            orange: 'bg-orange-50'
+            blue: 'bg-blue-50 dark:bg-blue-900/30',
+            purple: 'bg-purple-50 dark:bg-purple-900/30',
+            green: 'bg-green-50 dark:bg-green-900/30',
+            red: 'bg-red-50 dark:bg-red-900/30',
+            yellow: 'bg-yellow-50 dark:bg-yellow-900/30',
+            indigo: 'bg-indigo-50 dark:bg-indigo-900/30',
+            pink: 'bg-pink-50 dark:bg-pink-900/30',
+            orange: 'bg-orange-50 dark:bg-orange-900/30'
         };
         return bgs[color] || bgs.blue;
     };
 
-    // Gestion du clic sur la carte
     const handleCardClick = (e) => {
-        // Ne pas naviguer si on clique sur un bouton
-        if (e.target.closest('button')) {
-            return;
-        }
+        if (e.target.closest('button')) return;
         navigate(`/admin/pillars/${pillar.id}`);
     };
 
-    // Gestion du clic sur "Voir détails"
     const handleViewDetails = (e) => {
         e.stopPropagation();
         e.preventDefault();
         navigate(`/admin/pillars/${pillar.id}`);
     };
 
-    // Gestion du clic sur "Modifier"
     const handleEditClick = (e) => {
         e.stopPropagation();
         e.preventDefault();
         onEdit(pillar);
     };
 
-    // Gestion du clic sur "Supprimer"
     const handleDeleteClick = (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -82,10 +75,10 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             }}
             style={{ transformStyle: "preserve-3d" }}
             onClick={handleCardClick}
-            className={`${getBgLight(pillar.color)} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group cursor-pointer`}
+            className={`${getBgLight(pillar.color)} rounded-2xl p-6 shadow-lg border border-white/50 dark:border-gray-700 backdrop-blur-sm relative overflow-hidden group cursor-pointer`}
         >
             {/* Effet de shine */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
             {/* Badge premium */}
             <div className="absolute top-4 right-4" style={{ transform: "translateZ(30px)" }}>
@@ -101,11 +94,11 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                     {pillar.icon || '📚'}
                 </div>
                 <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
                         {escapeText(untrusted(pillar.safeName))}
                     </h3>
                     {pillar.description && (
-                        <p className="text-sm text-gray-500 line-clamp-2">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
                             {escapeText(untrusted(pillar.safeDescription))}
                         </p>
                     )}
@@ -114,33 +107,33 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
 
             {/* Statistiques */}
             <div className="grid grid-cols-3 gap-2 mb-4" style={{ transform: "translateZ(20px)" }}>
-                <div className="text-center p-2 bg-white/50 rounded-lg">
-                    <Video className="w-4 h-4 mx-auto mb-1 text-indigo-600" />
-                    <p className="text-xs text-gray-500">Vidéos</p>
-                    <p className="text-lg font-bold text-gray-800">{pillar.videoCount}</p>
+                <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <Video className="w-4 h-4 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Vidéos</p>
+                    <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.videoCount}</p>
                 </div>
-                <div className="text-center p-2 bg-white/50 rounded-lg">
-                    <Users className="w-4 h-4 mx-auto mb-1 text-purple-600" />
-                    <p className="text-xs text-gray-500">Étudiants</p>
-                    <p className="text-lg font-bold text-gray-800">{pillar.studentCount}</p>
+                <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <Users className="w-4 h-4 mx-auto mb-1 text-purple-600 dark:text-purple-400" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Étudiants</p>
+                    <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.studentCount}</p>
                 </div>
-                <div className="text-center p-2 bg-white/50 rounded-lg">
-                    <Calendar className="w-4 h-4 mx-auto mb-1 text-green-600" />
-                    <p className="text-xs text-gray-500">Création</p>
-                    <p className="text-sm font-bold text-gray-800">
+                <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <Calendar className="w-4 h-4 mx-auto mb-1 text-green-600 dark:text-green-400" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Création</p>
+                    <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
                         {new Date(pillar.created_at).toLocaleDateString('fr-FR')}
                     </p>
                 </div>
             </div>
 
-            {/* Actions - SANS TROIS POINTS */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/50">
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/50 dark:border-gray-700">
                 {/* Bouton Voir détails */}
                 <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={handleViewDetails}
-                    className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
+                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400"
                     title="Voir détails"
                 >
                     <Eye className="w-4 h-4" />
@@ -153,7 +146,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleEditClick}
-                            className="p-2 hover:bg-purple-100 rounded-lg transition-colors text-purple-600"
+                            className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400"
                             title="Modifier"
                         >
                             <Edit className="w-4 h-4" />
@@ -164,7 +157,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleDeleteClick}
-                            className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+                            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400"
                             title="Supprimer"
                         >
                             <Trash2 className="w-4 h-4" />

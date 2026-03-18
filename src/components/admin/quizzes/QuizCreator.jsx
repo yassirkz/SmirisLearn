@@ -28,14 +28,13 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
     const [form, setForm] = useState({
         video_id: videoId || quiz?.video_id || '',
         passing_score: quiz?.passing_score ?? 70,
-        max_attempts: quiz?.max_attempts ?? 2,   // ← AJOUT
+        max_attempts: quiz?.max_attempts ?? 2,
         timer_minutes: quiz?.timer_minutes ?? '',
         questions: quiz?.questions?.length
             ? quiz.questions.map(q => ({ ...q, id: q.id || crypto.randomUUID() }))
             : [DEFAULT_QUESTION()]
     });
 
-    // Charger les vidéos disponibles
     useEffect(() => {
         const fetchVideos = async () => {
             try {
@@ -63,7 +62,6 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
         fetchVideos();
     }, [user]);
 
-    // Validation
     const validate = () => {
         const newErrors = {};
 
@@ -116,7 +114,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             const payload = {
                 video_id: form.video_id,
                 passing_score: Number(form.passing_score),
-                max_attempts: parseInt(form.max_attempts) || 2,   
+                max_attempts: parseInt(form.max_attempts) || 2,
                 timer_minutes: form.timer_minutes ? Number(form.timer_minutes) : null,
                 questions: cleanQuestions
             };
@@ -180,14 +178,14 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
         <div className="space-y-6">
             {/* Erreurs globales */}
             {errorList.length > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                        <AlertCircle className="w-4 h-4 text-red-600" />
-                        <span className="text-sm font-medium text-red-700">Corrigez les erreurs suivantes :</span>
+                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                        <span className="text-sm font-medium text-red-700 dark:text-red-300">Corrigez les erreurs suivantes :</span>
                     </div>
                     <ul className="list-disc list-inside space-y-1">
                         {errorList.map((e, i) => (
-                            <li key={i} className="text-sm text-red-600">{e}</li>
+                            <li key={i} className="text-sm text-red-600 dark:text-red-400">{e}</li>
                         ))}
                     </ul>
                 </div>
@@ -195,11 +193,11 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
 
             {/* Sélection vidéo */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Vidéo associée <span className="text-red-500">*</span>
                 </label>
                 {loadingVideos ? (
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
                         <Loader className="w-4 h-4 animate-spin" />
                         Chargement des vidéos...
                     </div>
@@ -207,8 +205,8 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     <select
                         value={form.video_id}
                         onChange={(e) => setForm(f => ({ ...f, video_id: e.target.value }))}
-                        className={`w-full p-2 border rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none ${
-                            errors.video_id ? 'border-red-400' : 'border-gray-200'
+                        className={`w-full p-2 border rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white ${
+                            errors.video_id ? 'border-red-400 dark:border-red-600' : 'border-gray-200 dark:border-gray-700'
                         }`}
                     >
                         <option value="">-- Sélectionnez une vidéo --</option>
@@ -221,14 +219,14 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     </select>
                 )}
                 {errors.video_id && (
-                    <p className="text-xs text-red-500 mt-1">{errors.video_id}</p>
+                    <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.video_id}</p>
                 )}
             </div>
 
             {/* Paramètres */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Score minimum (%)
                     </label>
                     <input
@@ -237,14 +235,14 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         max="100"
                         value={form.passing_score}
                         onChange={(e) => setForm(f => ({ ...f, passing_score: e.target.value }))}
-                        className="w-full p-2 border border-gray-200 rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none"
+                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                     {errors.passing_score && (
-                        <p className="text-xs text-red-500 mt-1">{errors.passing_score}</p>
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.passing_score}</p>
                     )}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Timer (minutes, optionnel)
                     </label>
                     <input
@@ -253,13 +251,12 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         value={form.timer_minutes}
                         onChange={(e) => setForm(f => ({ ...f, timer_minutes: e.target.value }))}
                         placeholder="Pas de limite"
-                        className="w-full p-2 border border-gray-200 rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none"
+                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                 </div>
-                {/* NOUVEAU : Tentatives max */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tentatives max <span className="text-xs text-gray-400">(-1 = illimité)</span>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Tentatives max <span className="text-xs text-gray-400 dark:text-gray-500">(-1 = illimité)</span>
                     </label>
                     <input
                         type="number"
@@ -267,10 +264,10 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         step="1"
                         value={form.max_attempts}
                         onChange={(e) => setForm(f => ({ ...f, max_attempts: e.target.value }))}
-                        className="w-full p-2 border border-gray-200 rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none"
+                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                     {errors.max_attempts && (
-                        <p className="text-xs text-red-500 mt-1">{errors.max_attempts}</p>
+                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.max_attempts}</p>
                     )}
                 </div>
             </div>
@@ -278,13 +275,13 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             {/* Questions */}
             <div>
                 <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold text-gray-700">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                         Questions ({form.questions.length})
                     </h3>
                     <button
                         type="button"
                         onClick={addQuestion}
-                        className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
                     >
                         <Plus className="w-4 h-4" />
                         Ajouter une question
@@ -292,7 +289,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                 </div>
 
                 {errors.questions && (
-                    <p className="text-xs text-red-500 mb-2">{errors.questions}</p>
+                    <p className="text-xs text-red-500 dark:text-red-400 mb-2">{errors.questions}</p>
                 )}
 
                 <AnimatePresence>
@@ -312,11 +309,11 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
+                    className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
                 >
                     Annuler
                 </button>

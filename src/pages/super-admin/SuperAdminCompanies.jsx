@@ -25,11 +25,11 @@ export default function SuperAdminCompanies() {
                     </motion.div>
 
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                            <Building2 className="w-8 h-8 text-blue-600" />
+                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <Building2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                             Entreprises
                         </h1>
-                        <p className="text-gray-500 mt-1">
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">
                             Gérez toutes les entreprises clientes de la plateforme
                         </p>
                     </div>
@@ -38,14 +38,14 @@ export default function SuperAdminCompanies() {
                 {/* Tableau des entreprises */}
                 <CompaniesTable />
 
-                {/* Note de bas de page ou stats rapides si nécessaire */}
+                {/* Note de bas de page */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-center text-xs text-gray-400 flex items-center justify-center gap-1"
+                    className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1"
                 >
-                    <Sparkles className="w-3 h-3 text-purple-400" />
+                    <Sparkles className="w-3 h-3 text-purple-400 dark:text-purple-500" />
                     <span>Propulsé par Smiris Learn Admin Engine</span>
                 </motion.div>
             </motion.div>

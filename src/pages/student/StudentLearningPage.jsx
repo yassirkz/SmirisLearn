@@ -25,7 +25,6 @@ export default function StudentLearningPage() {
 
   const fetchAccessibleContent = async () => {
     try {
-      // 1. Récupérer les groupes de l'étudiant
       const { data: memberships, error: membersError } = await supabase
         .from('group_members')
         .select('group_id')
@@ -37,7 +36,6 @@ export default function StudentLearningPage() {
         return;
       }
 
-      // 2. Récupérer les piliers accessibles via ces groupes
       const { data: pillarAccess, error: accessError } = await supabase
         .from('group_pillar_access')
         .select('pillar_id')
@@ -49,7 +47,6 @@ export default function StudentLearningPage() {
         return;
       }
 
-      // 3. Récupérer les piliers avec leurs vidéos
       const { data: pillarsData, error: pillarsError } = await supabase
         .from('pillars')
         .select(`
@@ -72,7 +69,6 @@ export default function StudentLearningPage() {
 
       if (pillarsError) throw pillarsError;
 
-      // 4. Vérifier l'accès séquentiel pour chaque vidéo
       const pillarsWithAccess = await Promise.all(
         (pillarsData || []).map(async (pillar) => {
           const videosWithAccess = await Promise.all(
@@ -108,10 +104,10 @@ export default function StudentLearningPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-indigo-200 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -126,7 +122,7 @@ export default function StudentLearningPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -5 }}
-          className="flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700 transition-colors group"
+          className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           Retour au Dashboard
@@ -145,11 +141,11 @@ export default function StudentLearningPage() {
           </motion.div>
 
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <BookOpen className="w-8 h-8 text-indigo-600" />
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <BookOpen className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               Formations disponibles
             </h1>
-            <p className="text-gray-500 mt-1 flex items-center gap-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
               <Shield className="w-4 h-4" />
               Accédez aux piliers qui vous sont assignés
             </p>
@@ -157,10 +153,10 @@ export default function StudentLearningPage() {
         </div>
 
         {pillars.length === 0 ? (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 text-center">
-            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Aucune formation disponible</h3>
-            <p className="text-gray-500">Vous n'avez pas encore accès à des piliers.</p>
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
+            <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Aucune formation disponible</h3>
+            <p className="text-gray-500 dark:text-gray-400">Vous n'avez pas encore accès à des piliers.</p>
           </div>
         ) : (
           <div className="space-y-8">
@@ -177,10 +173,10 @@ export default function StudentLearningPage() {
                   boxShadow: "0 40px 80px -20px rgba(79, 70, 229, 0.15)"
                 }}
                 style={{ transformStyle: "preserve-3d" }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 relative overflow-hidden group"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700 relative overflow-hidden group"
               >
                 {/* Effet de shine */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
                 {/* En-tête du pilier */}
                 <div className="flex items-center gap-4 mb-6" style={{ transform: "translateZ(40px)" }}>
@@ -188,11 +184,11 @@ export default function StudentLearningPage() {
                     {pillar.icon || '📚'}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">
                       {escapeText(untrusted(pillar.name))}
                     </h2>
                     {pillar.description && (
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         {escapeText(untrusted(pillar.description))}
                       </p>
                     )}
@@ -207,27 +203,27 @@ export default function StudentLearningPage() {
                       whileHover={{ 
                         z: 20, 
                         scale: 1.02,
-                        backgroundColor: "rgba(255, 255, 255, 1)"
+                        backgroundColor: "rgba(255, 255, 255, 1) dark:rgba(31, 41, 55, 1)"
                       }}
                       className={`relative group flex items-center justify-between p-4 rounded-xl transition-all duration-300 border-2 ${
                         video.canAccess
-                          ? 'bg-white border-indigo-100 hover:border-indigo-300 hover:shadow-lg'
-                          : 'bg-gray-50 border-gray-200 opacity-75'
+                          ? 'bg-white dark:bg-gray-800 border-indigo-100 dark:border-indigo-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-lg'
+                          : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-75'
                       }`}
                       onMouseEnter={() => setHoveredVideo(video.id)}
                       onMouseLeave={() => setHoveredVideo(null)}
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm transition-transform group-hover:scale-110 ${
-                          video.canAccess ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'
+                          video.canAccess ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                         }`}>
                           {video.canAccess ? <PlayCircle className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className={`font-medium truncate ${video.canAccess ? 'text-gray-800' : 'text-gray-500'}`}>
+                          <p className={`font-medium truncate ${video.canAccess ? 'text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
                             {escapeText(untrusted(video.title))}
                           </p>
-                          <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mt-1">
                             <Clock className="w-3 h-3" />
                             <span>{formatDuration(video.duration)}</span>
                           </div>
@@ -237,13 +233,13 @@ export default function StudentLearningPage() {
                       {video.canAccess ? (
                         <Link
                           to={`/student/video/${video.id}`}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
+                          className="px-4 py-2 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 dark:hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
                         >
                           Voir
                         </Link>
                       ) : (
                         <div className="relative">
-                          <div className="p-2 bg-gray-200 rounded-lg text-gray-400 cursor-not-allowed">
+                          <div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-400 dark:text-gray-500 cursor-not-allowed">
                             <Lock className="w-4 h-4" />
                           </div>
 
@@ -253,13 +249,13 @@ export default function StudentLearningPage() {
                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                className="absolute bottom-full right-0 mb-2 z-10 w-48 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl"
+                                className="absolute bottom-full right-0 mb-2 z-10 w-48 p-3 bg-gray-900 dark:bg-gray-800 text-white dark:text-gray-200 text-xs rounded-lg shadow-xl"
                               >
                                 <div className="flex items-start gap-2">
-                                  <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                                  <AlertCircle className="w-4 h-4 text-amber-400 dark:text-amber-400 flex-shrink-0" />
                                   <p>Terminez la vidéo précédente et réussissez le quiz pour débloquer.</p>
                                 </div>
-                                <div className="absolute top-full right-6 w-3 h-3 bg-gray-900 rotate-45 -translate-y-1.5" />
+                                <div className="absolute top-full right-6 w-3 h-3 bg-gray-900 dark:bg-gray-800 rotate-45 -translate-y-1.5" />
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -278,7 +274,7 @@ export default function StudentLearningPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-center text-xs text-gray-400 flex items-center justify-center gap-1"
+          className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1"
         >
           <Shield className="w-3 h-3" />
           <span>Accès séquentiel • Progression sauvegardée automatiquement</span>

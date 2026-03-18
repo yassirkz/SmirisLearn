@@ -19,7 +19,6 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
 
     const handleTypeChange = (type) => {
         let newQuestion = { ...question, type };
-        // Réinitialiser les options/réponses selon le type
         if (type === 'single' || type === 'multiple') {
             newQuestion.options = question.options && question.options.length >= 2 ? question.options : ['', ''];
             newQuestion.answer = type === 'single' ? null : [];
@@ -75,40 +74,40 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white rounded-2xl p-5 shadow-md border border-gray-200 relative group"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-gray-200 dark:border-gray-700 relative group"
         >
             {/* En-tête avec numéro et actions */}
             <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
                     Question {index + 1}
                 </span>
                 <div className="flex gap-1">
                     <button
                         type="button"
                         onClick={onDuplicate}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         title="Dupliquer"
                     >
-                        <Copy className="w-4 h-4 text-gray-500" />
+                        <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     </button>
                     <button
                         type="button"
                         onClick={onRemove}
-                        className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors"
                         title="Supprimer"
                     >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
                     </button>
                 </div>
             </div>
 
             {/* Type de question */}
             <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
                 <select
                     value={question.type}
                     onChange={(e) => handleTypeChange(e.target.value)}
-                    className="w-full p-2 border border-gray-200 rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none"
+                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                 >
                     {QUESTION_TYPES.map(t => (
                         <option key={t.value} value={t.value}>{t.label}</option>
@@ -131,7 +130,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
             {/* Options pour QCM */}
             {(question.type === 'single' || question.type === 'multiple') && (
                 <div className="space-y-3 mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Options</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Options</label>
                     {question.options?.map((opt, optIdx) => (
                         <div key={optIdx} className="flex items-center gap-2">
                             <input
@@ -145,29 +144,29 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                                     ? handleAnswerChange(optIdx)
                                     : handleMultipleAnswerChange(optIdx)
                                 }
-                                className="w-4 h-4 text-indigo-600"
+                                className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                             />
                             <input
                                 type="text"
                                 value={opt}
                                 onChange={(e) => handleOptionChange(optIdx, e.target.value)}
                                 placeholder={`Option ${optIdx + 1}`}
-                                className="flex-1 p-2 border border-gray-200 rounded-lg focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none"
+                                className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                             />
                             <button
                                 type="button"
                                 onClick={() => removeOption(optIdx)}
                                 disabled={question.options.length <= 2}
-                                className="p-1 hover:bg-gray-100 rounded disabled:opacity-30"
+                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30"
                             >
-                                <X className="w-4 h-4 text-gray-500" />
+                                <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                             </button>
                         </div>
                     ))}
                     <button
                         type="button"
                         onClick={addOption}
-                        className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
                     >
                         <Plus className="w-4 h-4" /> Ajouter une option
                     </button>
@@ -184,9 +183,9 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                             value="true"
                             checked={question.answer === true}
                             onChange={() => handleAnswerChange(true)}
-                            className="w-4 h-4 text-indigo-600"
+                            className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                         />
-                        <span>Vrai</span>
+                        <span className="text-gray-700 dark:text-gray-300">Vrai</span>
                     </label>
                     <label className="flex items-center gap-2">
                         <input
@@ -195,9 +194,9 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                             value="false"
                             checked={question.answer === false}
                             onChange={() => handleAnswerChange(false)}
-                            className="w-4 h-4 text-indigo-600"
+                            className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                         />
-                        <span>Faux</span>
+                        <span className="text-gray-700 dark:text-gray-300">Faux</span>
                     </label>
                 </div>
             )}
@@ -207,13 +206,13 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                 <button
                     type="button"
                     onClick={() => setShowAnswerHelp(!showAnswerHelp)}
-                    className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-1"
                 >
                     <AlertCircle className="w-3 h-3" />
                     {showAnswerHelp ? 'Masquer' : 'Afficher'} l'aide
                 </button>
                 {showAnswerHelp && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {question.type === 'single' && "Sélectionnez la bonne réponse en cochant le radio correspondant."}
                         {question.type === 'multiple' && "Sélectionnez une ou plusieurs bonnes réponses en cochant les cases."}
                         {question.type === 'truefalse' && "Choisissez Vrai ou Faux."}

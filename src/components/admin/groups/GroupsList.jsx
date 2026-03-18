@@ -16,7 +16,6 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
 import { useDebounce } from '../../../hooks/useDebounce';
 import LoadingSpinner from '../../ui/LoadingSpinner';
-import SearchComponent from '../../../pages/SearchComponent';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 import GroupForm from './GroupForm';
 import GroupMembers from './GroupMembers';
@@ -64,12 +63,10 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
           if (profile?.organization_id) {
             setOrganizationId(profile.organization_id);
           } else {
-            setLoading(false); // Stop loading if no org found after fetch
+            setLoading(false);
           }
         } else {
-           // If no user, we might want to stop loading too, 
-           // although protected route should handle this
-           setLoading(false);
+          setLoading(false);
         }
       } catch (err) {
         console.error("Error fetching orgId:", err);
@@ -171,14 +168,14 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Groupes</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Groupes</h1>
         <div className="flex items-center gap-3">
           <button
             onClick={handleRefresh}
-            className="p-2 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+            className="p-2 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             aria-label="Rafraîchir"
           >
-            <RefreshCw className="w-5 h-5 text-gray-600" />
+            <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           {!isReadOnly && (
             <button
@@ -194,31 +191,31 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
 
       {/* Search Input */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Rechercher un groupe..."
-          className="w-full pl-10 pr-4 py-2 bg-white border-2 border-gray-100 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membres</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Piliers</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nom</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Membres</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Piliers</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Créé le</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {loading ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12">
@@ -229,40 +226,40 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 </tr>
               ) : groups.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                     {debouncedSearch ? 'Aucun groupe ne correspond à votre recherche' : 'Aucun groupe créé'}
                   </td>
                 </tr>
               ) : (
                 groups.map((group, idx) => (
                   <motion.tr
-                    key={group.id || `group-${idx}`}
+                    key={group.id || idx}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                   >
                     <td className="px-6 py-4">
-                      <span className="text-gray-800 font-medium">
+                      <span className="text-gray-800 dark:text-gray-200 font-medium">
                         {escapeText(untrusted(group.name))}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500 max-w-xs truncate">
+                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-xs truncate">
                       {group.description ? escapeText(untrusted(group.description)) : '-'}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-indigo-400" />
-                        <span className="text-gray-700">{group.group_members?.[0]?.count || 0}</span>
+                        <Users className="w-4 h-4 text-indigo-400 dark:text-indigo-400" />
+                        <span className="text-gray-700 dark:text-gray-300">{group.group_members?.[0]?.count || 0}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-purple-400" />
-                        <span className="text-gray-700">{group.group_pillar_access?.[0]?.count || 0}</span>
+                        <BookOpen className="w-4 h-4 text-purple-400 dark:text-purple-400" />
+                        <span className="text-gray-700 dark:text-gray-300">{group.group_pillar_access?.[0]?.count || 0}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                       {new Date(group.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-6 py-4">
@@ -271,28 +268,28 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                           <>
                             <button
                               onClick={() => setShowMembers(group)}
-                              className="p-2 hover:bg-indigo-50 rounded-lg transition-colors text-indigo-600"
+                              className="p-2 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-indigo-600 dark:text-indigo-400"
                               title="Gérer les membres"
                             >
                               <UserPlus className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setShowPillarAccess(group)}
-                              className="p-2 hover:bg-purple-50 rounded-lg transition-colors text-purple-600"
+                              className="p-2 hover:bg-purple-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-purple-600 dark:text-purple-400"
                               title="Gérer l'accès aux piliers"
                             >
                               <Shield className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleEdit(group)}
-                              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+                              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-600 dark:text-gray-300"
                               title="Modifier"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setShowDeleteConfirm(group)}
-                              className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500"
+                              className="p-2 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-500 dark:text-red-400"
                               title="Supprimer"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -310,8 +307,8 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-            <div className="text-sm text-gray-500">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               {Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, totalCount)} -{' '}
               {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} sur {totalCount}
             </div>
@@ -319,14 +316,14 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-700 dark:text-gray-300"
               >
                 Précédent
               </button>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-700 dark:text-gray-300"
               >
                 Suivant
               </button>
@@ -339,7 +336,6 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
       <AnimatePresence>
         {showForm && (
           <GroupForm
-            key="group-form-modal"
             isOpen={showForm}
             onClose={handleFormClose}
             onSuccess={handleFormSuccess}
@@ -349,7 +345,6 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
 
         {showMembers && (
           <GroupMembers
-            key="group-members-modal"
             isOpen={!!showMembers}
             onClose={() => setShowMembers(null)}
             group={showMembers}
@@ -360,7 +355,6 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
 
         {showPillarAccess && (
           <GroupPillarAccess
-            key="group-pillar-access-modal"
             isOpen={!!showPillarAccess}
             onClose={() => setShowPillarAccess(null)}
             group={showPillarAccess}
@@ -371,7 +365,6 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
 
         {showDeleteConfirm && (
           <ConfirmationModal
-            key="group-delete-modal"
             isOpen={!!showDeleteConfirm}
             onClose={() => setShowDeleteConfirm(null)}
             onConfirm={() => handleDelete(showDeleteConfirm.id)}

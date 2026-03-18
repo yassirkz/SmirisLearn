@@ -22,18 +22,11 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     const { user } = useAuth();
     const { success, error: showError } = useToast();
     
-    // ============================================
-    // RÉFS SIMPLIFIÉES (SANS AbortController)
-    // ============================================
     const isMounted = useRef(true);
     const fetchTimeoutRef = useRef(null);
     const initialLoadRef = useRef(true);
-    const renderCountRef = useRef(0);
     const fetchingRef = useRef(false);
     
-    // ============================================
-    // ÉTATS
-    // ============================================
     const [pillars, setPillars] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -56,41 +49,23 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     });
     const [error, setError] = useState(null);
 
-    // ============================================
-    // DEBUG - COMPTER LES RENDUS (optionnel)
-    // ============================================
-    useEffect(() => {
-        renderCountRef.current += 1;
-        console.log('🔄 PillarsList render #', renderCountRef.current);
-    });
-
-    // ============================================
-    // SAUVEGARDER LA PRÉFÉRENCE DE VUE
-    // ============================================
     useEffect(() => {
         localStorage.setItem('pillarViewMode', viewMode);
     }, [viewMode]);
 
-    // ============================================
-    // RÉCUPÉRER L'ORGANIZATION ID
-    // ============================================
     const getOrgId = useCallback(async () => {
         if (propOrgId) return propOrgId;
-        
         if (!user?.id) return null;
-        
         try {
             const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('organization_id')
                 .eq('id', user.id)
                 .maybeSingle();
-
             if (error) {
                 console.error('Erreur récupération orgId:', error);
                 return null;
             }
-            
             return profile?.organization_id;
         } catch (err) {
             console.error('Exception récupération orgId:', err);
@@ -98,25 +73,13 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
         }
     }, [user?.id, propOrgId]);
 
-    // ============================================
-    // CHARGER LES PILIERS (SANS AbortController)
-    // ============================================
     const fetchPillars = useCallback(async (isRefresh = false) => {
-        // Éviter les appels simultanés
-        if (fetchingRef.current) {
-            console.log('⏳ Fetch déjà en cours, ignoré');
-            return;
-        }
-
-        // Nettoyer les timeouts précédents
+        if (fetchingRef.current) return;
         if (fetchTimeoutRef.current) {
             clearTimeout(fetchTimeoutRef.current);
             fetchTimeoutRef.current = null;
         }
-
         fetchingRef.current = true;
-
-        // Gérer l'état de chargement
         if (isRefresh) {
             setRefreshing(true);
         } else {
@@ -126,15 +89,10 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
 
         try {
             const orgId = await getOrgId();
-            
             if (!orgId) {
                 if (isMounted.current) {
                     setError('Organisation non trouvée');
-                    if (isRefresh) {
-                        setRefreshing(false);
-                    } else {
-                        setLoading(false);
-                    }
+                    if (isRefresh) setRefreshing(false); else setLoading(false);
                 }
                 fetchingRef.current = false;
                 return;
@@ -145,7 +103,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 return;
             }
 
-            // Construire la requête principale pour les piliers
             let query = supabase
                 .from('pillars')
                 .select(`
@@ -154,61 +111,37 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 `)
                 .eq('organization_id', orgId);
 
-            // Tri côté Supabase si possible
             if (filters.sortBy !== 'videoCount') {
                 query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
             }
 
-            // Exécuter la requête
             const { data, error } = await query;
-
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
             if (!isMounted.current) {
                 fetchingRef.current = false;
                 return;
             }
 
-            // ============================================
-            // RÉCUPÉRER LE NOMBRE D'ÉTUDIANTS PAR PILIER
-            // Deux requêtes plates pour éviter la récursion RLS (42P17)
-            // ============================================
             const studentCountsByPillar = {};
-
             if (data && data.length) {
                 const pillarIds = data.map(p => p.id);
-
                 try {
-                    // récupérer les group_id liés aux piliers
                     const { data: accessData, error: accessError } = await supabase
                         .from('group_pillar_access')
                         .select('pillar_id, group_id')
                         .in('pillar_id', pillarIds);
-
-                    if (accessError) {
-                        console.warn('Impossible de charger les accès groupe/pilier:', accessError);
-                    } else if (accessData && accessData.length > 0) {
-                        // STEP 2 : compter les membres dans ces groupes
+                    if (!accessError && accessData?.length) {
                         const groupIds = [...new Set(accessData.map(r => r.group_id))];
-
                         const { data: membersData, error: membersError } = await supabase
                             .from('group_members')
                             .select('group_id')
                             .in('group_id', groupIds);
-
-                        if (membersError) {
-                            console.warn('Impossible de charger les membres des groupes:', membersError);
-                           
-                        } else if (membersData) {
-                            // Compter les membres par groupe
+                        if (!membersError && membersData) {
                             const memberCountByGroup = {};
                             membersData.forEach(m => {
                                 memberCountByGroup[m.group_id] = (memberCountByGroup[m.group_id] || 0) + 1;
                             });
-
-                            // Agréger sur chaque pilier
                             accessData.forEach(row => {
                                 const count = memberCountByGroup[row.group_id] || 0;
                                 studentCountsByPillar[row.pillar_id] =
@@ -221,7 +154,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 }
             }
 
-            // Traiter les données
             let pillarsWithStats = data?.map(pillar => ({
                 ...pillar,
                 videoCount: pillar.videos?.[0]?.count || 0,
@@ -230,7 +162,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 safeDescription: escapeText(untrusted(pillar.description || ''))
             })) || [];
 
-            // Tri sur videoCount (côté client)
             if (filters.sortBy === 'videoCount') {
                 pillarsWithStats = [...pillarsWithStats].sort((a, b) => {
                     return filters.sortOrder === 'asc'
@@ -239,15 +170,12 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 });
             }
 
-            // Filtrer par recherche
             const filtered = pillarsWithStats.filter(pillar =>
                 pillar.safeName.toLowerCase().includes(filters.search.toLowerCase()) ||
                 pillar.safeDescription.toLowerCase().includes(filters.search.toLowerCase())
             );
 
             setPillars(filtered);
-            
-            // Mettre à jour les stats
             setStats({
                 total: filtered.length,
                 withVideos: filtered.filter(p => p.videoCount > 0).length,
@@ -263,47 +191,26 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             }
         } finally {
             if (isMounted.current) {
-                if (isRefresh) {
-                    setRefreshing(false);
-                } else {
-                    setLoading(false);
-                }
+                if (isRefresh) setRefreshing(false); else setLoading(false);
             }
             fetchingRef.current = false;
         }
     }, [getOrgId, filters.sortBy, filters.sortOrder, filters.search, showError]);
 
-    // ============================================
-    // CLEANUP AU DÉMONTAGE
-    // ============================================
     useEffect(() => {
         isMounted.current = true;
-        
-        // Charger les données UNE SEULE fois au montage
         if (initialLoadRef.current) {
             initialLoadRef.current = false;
             fetchPillars(false);
         }
-
         return () => {
             isMounted.current = false;
-            
-            // Nettoyer les timeouts
-            if (fetchTimeoutRef.current) {
-                clearTimeout(fetchTimeoutRef.current);
-                fetchTimeoutRef.current = null;
-            }
+            if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
         };
     }, [fetchPillars]);
 
-    // ============================================
-    // HANDLERS
-    // ============================================
     const handleRefresh = useCallback(() => {
-        if (refreshing || fetchingRef.current) {
-            console.log('⏳ Rafraîchissement déjà en cours');
-            return;
-        }
+        if (refreshing || fetchingRef.current) return;
         fetchPillars(true);
         success('Données mises à jour');
     }, [fetchPillars, success, refreshing]);
@@ -330,19 +237,13 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             showError('Mode lecture seule');
             return;
         }
-
-        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${pillar.safeName}" ?`)) {
-            return;
-        }
-
+        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${pillar.safeName}" ?`)) return;
         try {
             const { error } = await supabase
                 .from('pillars')
                 .delete()
                 .eq('id', pillar.id);
-
             if (error) throw error;
-
             success('Pilier supprimé avec succès');
             fetchPillars(false);
         } catch (err) {
@@ -359,18 +260,15 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
         setFilters(newFilters);
     }, []);
 
-    // ============================================
-    // AFFICHAGE DES ERREURS
-    // ============================================
     if (error) {
         return (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+            <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg">
                 <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-red-600" />
+                    <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
                     <div>
-                        <p className="text-sm text-red-700">{error}</p>
+                        <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                         {error.includes('infinite recursion') && (
-                            <p className="text-xs text-red-500 mt-1 font-medium">
+                            <p className="text-xs text-red-500 dark:text-red-400 mt-1 font-medium">
                                 💡 Conseil : Un problème de sécurité (RLS) récursif est détecté sur la table group_members.
                             </p>
                         )}
@@ -378,7 +276,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 </div>
                 <button
                     onClick={handleRefresh}
-                    className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+                    className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"
                 >
                     Réessayer
                 </button>
@@ -386,46 +284,39 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
         );
     }
 
-    // ============================================
-    // RENDU PRINCIPAL (inchangé)
-    // ============================================
     return (
         <div className="space-y-6">
-            {/* Barre d'outils premium */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
             >
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    {/* Stats rapides */}
                     <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                            <span className="text-gray-600">{stats.total} piliers</span>
+                            <span className="text-gray-600 dark:text-gray-300">{stats.total} piliers</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                            <span className="text-gray-600">{stats.totalVideos} vidéos</span>
+                            <span className="text-gray-600 dark:text-gray-300">{stats.totalVideos} vidéos</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span className="text-gray-600">{stats.totalStudents} étudiants</span>
+                            <span className="text-gray-600 dark:text-gray-300">{stats.totalStudents} étudiants</span>
                         </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center gap-2">
                         <PillarFilters filters={filters} onChange={handleFilterChange} />
 
-                        {/* Switch vue */}
-                        <div className="flex bg-gray-100 rounded-lg p-1">
+                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                             <button
                                 onClick={() => handleViewChange('table')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'table'
-                                        ? 'bg-white text-indigo-600 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                                 title="Vue tableau"
                             >
@@ -435,8 +326,8 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => handleViewChange('cards')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'cards'
-                                        ? 'bg-white text-indigo-600 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                                 title="Vue cartes"
                             >
@@ -444,19 +335,17 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             </button>
                         </div>
 
-                        {/* Rafraîchir - SIMPLIFIÉ */}
                         <motion.button
                             whileHover={{ rotate: 180 }}
                             transition={{ duration: 0.3 }}
                             onClick={handleRefresh}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             title="Rafraîchir"
                             disabled={refreshing || loading}
                         >
-                            <RefreshCw className={`w-4 h-4 text-gray-600 ${(refreshing || loading) ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${(refreshing || loading) ? 'animate-spin' : ''}`} />
                         </motion.button>
 
-                        {/* Nouveau pilier */}
                         {!isReadOnly && (
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
@@ -473,22 +362,21 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 </div>
             </motion.div>
 
-            {/* Liste des piliers */}
             {loading && pillars.length === 0 ? (
                 <PillarSkeleton viewMode={viewMode} />
             ) : pillars.length === 0 ? (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 text-center"
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center"
                 >
-                    <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg className="w-10 h-10 text-indigo-400 dark:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Aucun pilier</h3>
-                    <p className="text-gray-500 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Aucun pilier</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">
                         Commencez par créer votre premier pilier de formation
                     </p>
                     {!isReadOnly && (
@@ -523,7 +411,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 </div>
             )}
 
-            {/* Modals */}
             <CreatePillarModal
                 isOpen={showCreateModal}
                 onClose={() => setShowCreateModal(false)}

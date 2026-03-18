@@ -30,15 +30,13 @@ export default function StudentDashboard() {
   const [recentVideos, setRecentVideos] = useState([]);
   const [upcomingQuizzes, setUpcomingQuizzes] = useState([]);
   const [progressByPillar, setProgressByPillar] = useState([]);
-  const [recommendations, setRecommendations] = useState([]); // prochaines vidéos par pilier
-  const [totalTimeSpent, setTotalTimeSpent] = useState(0); // en secondes
-  const [streak, setStreak] = useState(0); // jours consécutifs
+  const [recommendations, setRecommendations] = useState([]);
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!user) return;
-      console.log('--- Fetching Dashboard Data ---');
-      console.log('User ID:', user.id);
       try {
         // 1. Récupérer le nom de l'organisation
         const { data: profile } = await supabase
@@ -77,7 +75,7 @@ export default function StudentDashboard() {
         let totalVideos = 0;
         let videosByPillar = [];
         let pillarsWithVideosData = [];
-        let allVideos = []; // pour calculer le temps total
+        let allVideos = [];
         if (pillarIds.length > 0) {
           const { data: pillarsWithVideos } = await supabase
             .from('pillars')
@@ -90,7 +88,6 @@ export default function StudentDashboard() {
           
           pillarsWithVideosData = pillarsWithVideos || [];
 
-          // Récupérer toutes les vidéos pour calculs
           const { data: videos } = await supabase
             .from('videos')
             .select('id, duration, pillar_id, sequence_order')
@@ -216,15 +213,12 @@ export default function StudentDashboard() {
           setUpcomingQuizzes(quizzesData || []);
         }
 
-        // 8. Calcul des recommandations (prochaine vidéo à regarder par pilier)
+        // 8. Calcul des recommandations
         const recs = [];
         for (const pillar of videosByPillar) {
-          // Trier les vidéos du pilier par ordre séquentiel
           const sortedVideos = pillar.videos.sort((a, b) => a.sequence_order - b.sequence_order);
-          // Trouver la première vidéo non regardée
           const nextVideo = sortedVideos.find(v => !watchedVideoIds.includes(v.id));
           if (nextVideo) {
-            // Récupérer les infos de la vidéo (titre, etc.)
             const videoInfo = allVideos.find(v => v.id === nextVideo.id);
             recs.push({
               pillarId: pillar.id,
@@ -238,7 +232,7 @@ export default function StudentDashboard() {
         }
         setRecommendations(recs);
 
-        // 9. Calcul du temps total passé (somme des durées des vidéos regardées)
+        // 9. Calcul du temps total passé
         let totalTime = 0;
         for (const vid of watchedVideos) {
           const videoInfo = allVideos.find(v => v.id === vid.video_id);
@@ -248,12 +242,12 @@ export default function StudentDashboard() {
         }
         setTotalTimeSpent(totalTime);
 
-        // 10. Calcul du streak (jours consécutifs)
+        // 10. Calcul du streak
         const dates = watchedVideos
           .map(p => p.completed_at ? new Date(p.completed_at).toDateString() : null)
           .filter(d => d !== null);
-        const uniqueDates = [...new Set(dates)]; // jours distincts
-        uniqueDates.sort((a, b) => new Date(b) - new Date(a)); // décroissant
+        const uniqueDates = [...new Set(dates)];
+        uniqueDates.sort((a, b) => new Date(b) - new Date(a));
         let currentStreak = 0;
         const today = new Date().toDateString();
         if (uniqueDates.includes(today)) {
@@ -270,7 +264,6 @@ export default function StudentDashboard() {
             }
           }
         } else {
-          // regarder si hier est dans la liste
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
           if (uniqueDates.includes(yesterday.toDateString())) {
@@ -308,7 +301,6 @@ export default function StudentDashboard() {
     };
     fetchDashboardData();
 
-    // Abonnement en temps réel
     const channel = supabase
       .channel('dashboard-updates')
       .on(
@@ -332,10 +324,10 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-indigo-200 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     );
@@ -380,19 +372,19 @@ export default function StudentDashboard() {
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                 Bonjour, {escapeText(untrusted(user?.email?.split('@')[0] || 'étudiant'))} 👋
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 {orgName && (
-                  <p className="text-gray-500 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-indigo-600" />
-                    Organisation : <span className="font-medium text-indigo-600">{orgName}</span>
+                  <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    Organisation : <span className="font-medium text-indigo-600 dark:text-indigo-400">{orgName}</span>
                   </p>
                 )}
                 <button 
                   onClick={() => window.location.reload()} 
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors text-gray-400"
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-400 dark:text-gray-500"
                   title="Rafraîchir les données"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
@@ -401,12 +393,12 @@ export default function StudentDashboard() {
             </div>
 
             {/* Progression globale avec cercle */}
-            <div className="bg-white/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-indigo-100 flex items-center gap-4">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-indigo-100 dark:border-gray-700 flex items-center gap-4">
               <div className="text-right">
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Progression Totale</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">Progression Totale</p>
                 <div className="flex items-center justify-end gap-1">
-                  <p className="text-2xl font-bold text-indigo-600">{stats.overallProgress}%</p>
-                  {stats.overallProgress > 0 && <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />}
+                  <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.overallProgress}%</p>
+                  {stats.overallProgress > 0 && <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400 animate-pulse" />}
                 </div>
               </div>
               <div className="relative w-14 h-14">
@@ -418,7 +410,7 @@ export default function StudentDashboard() {
                     stroke="currentColor"
                     strokeWidth="4"
                     fill="transparent"
-                    className="text-gray-200"
+                    className="text-gray-200 dark:text-gray-700"
                   />
                   <circle
                     cx="28"
@@ -429,7 +421,7 @@ export default function StudentDashboard() {
                     fill="transparent"
                     strokeDasharray={2 * Math.PI * 24}
                     strokeDashoffset={2 * Math.PI * 24 * (1 - stats.overallProgress / 100)}
-                    className="text-indigo-600 transition-all duration-500"
+                    className="text-indigo-600 dark:text-indigo-400 transition-all duration-500"
                   />
                 </svg>
               </div>
@@ -443,14 +435,14 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Flame className="w-5 h-5 text-orange-600" />
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+              <Flame className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Série actuelle</p>
-              <p className="text-xl font-bold text-gray-800">{streak} jour{streak > 1 ? 's' : ''}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Série actuelle</p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">{streak} jour{streak > 1 ? 's' : ''}</p>
             </div>
           </motion.div>
 
@@ -458,14 +450,14 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Hourglass className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Hourglass className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Temps total</p>
-              <p className="text-xl font-bold text-gray-800">{formatTimeSpent(totalTimeSpent)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Temps total</p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">{formatTimeSpent(totalTimeSpent)}</p>
             </div>
           </motion.div>
 
@@ -473,14 +465,14 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Zap className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Quiz réussis</p>
-              <p className="text-xl font-bold text-gray-800">{stats.passedQuizzes}/{stats.totalQuizzes}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Quiz réussis</p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">{stats.passedQuizzes}/{stats.totalQuizzes}</p>
             </div>
           </motion.div>
 
@@ -488,14 +480,14 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-green-100 rounded-lg">
-              <PlayCircle className="w-5 h-5 text-green-600" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <PlayCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Vidéos vues</p>
-              <p className="text-xl font-bold text-gray-800">{stats.completedVideos}/{stats.totalVideos}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Vidéos vues</p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">{stats.completedVideos}/{stats.totalVideos}</p>
             </div>
           </motion.div>
         </div>
@@ -507,11 +499,11 @@ export default function StudentDashboard() {
             animate={{ opacity: 1, rotateX: 0, scale: 1 }}
             transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
             whileHover={{ rotateX: 2, rotateY: -2 }}
-            className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-indigo-100 transition-shadow hover:shadow-indigo-200/50"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-indigo-100 dark:border-gray-700 transition-shadow hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/30"
           >
             <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="w-5 h-5 text-indigo-600" />
-              <h2 className="text-lg font-semibold text-gray-800">Progression par pilier</h2>
+              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Progression par pilier</h2>
             </div>
             <div className="h-80 w-full relative" style={{ minHeight: '320px' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -559,15 +551,15 @@ export default function StudentDashboard() {
                     layout="vertical" 
                     verticalAlign="middle" 
                     align="right"
-                    wrapperStyle={{ fontSize: '12px', fontWeight: 500 }}
+                    wrapperStyle={{ fontSize: '12px', fontWeight: 500, color: '#1f2937' }}
                   />
                 </RadialBarChart>
               </ResponsiveContainer>
               {progressByPillar.length === 1 && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="text-center translate-y-[-10px]">
-                    <p className="text-3xl font-bold text-indigo-600 animate-pulse">{progressByPillar[0].value}%</p>
-                    <p className="text-[10px] text-gray-500 uppercase font-semibold">Progression</p>
+                    <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">{progressByPillar[0].value}%</p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">Progression</p>
                   </div>
                 </div>
               )}
@@ -575,16 +567,16 @@ export default function StudentDashboard() {
           </motion.div>
         )}
 
-        {/* Section Recommandations (prochaines vidéos) */}
+        {/* Section Recommandations */}
         {recommendations.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
           >
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <PlayCircle className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
+              <PlayCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               Recommandé pour vous
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -592,17 +584,17 @@ export default function StudentDashboard() {
                 <motion.div
                   key={rec.videoId}
                   whileHover={{ scale: 1.02 }}
-                  className="flex items-center gap-3 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 cursor-pointer hover:shadow-md transition-shadow"
+                  className="flex items-center gap-3 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800 cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => navigate(`/student/video/${rec.videoId}`)}
                 >
-                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-800/50 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                     <PlayCircle className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 truncate">{escapeText(untrusted(rec.title))}</p>
-                    <p className="text-xs text-gray-500">{rec.pillarName} • {formatDuration(rec.duration)}</p>
+                    <p className="font-semibold text-gray-800 dark:text-white truncate">{escapeText(untrusted(rec.title))}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{rec.pillarName} • {formatDuration(rec.duration)}</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                 </motion.div>
               ))}
             </div>
@@ -616,16 +608,16 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <PlayCircle className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                <PlayCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 Continuer à apprendre
               </h3>
               <button
                 onClick={() => navigate('/student/learning')}
-                className="text-sm text-indigo-600 font-semibold hover:underline"
+                className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
               >
                 Tout voir
               </button>
@@ -633,8 +625,8 @@ export default function StudentDashboard() {
 
             {recentVideos.length === 0 ? (
               <div className="text-center py-8">
-                <Video className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-400 italic">Aucune vidéo visionnée récemment</p>
+                <Video className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400 dark:text-gray-500 italic">Aucune vidéo visionnée récemment</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -642,21 +634,21 @@ export default function StudentDashboard() {
                   <motion.div
                     key={video.id}
                     whileHover={{ x: 5 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-indigo-50/50 transition-colors cursor-pointer border border-transparent hover:border-indigo-200"
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800"
                     onClick={() => navigate(`/student/video/${video.id}`)}
                   >
-                    <div className="w-20 h-14 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <div className="w-20 h-14 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
                       {video.thumbnail_url ? (
                         <img src={video.thumbnail_url} alt={video.title} className="w-full h-full object-cover" />
                       ) : (
-                        <PlayCircle className="w-6 h-6 text-indigo-400" />
+                        <PlayCircle className="w-6 h-6 text-indigo-400 dark:text-indigo-400" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-800 truncate">{escapeText(untrusted(video.title))}</h4>
-                      <p className="text-xs text-gray-500">{video.pillar?.name} • {formatDuration(video.duration)}</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white truncate">{escapeText(untrusted(video.title))}</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{video.pillar?.name} • {formatDuration(video.duration)}</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </motion.div>
                 ))}
               </div>
@@ -668,17 +660,17 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
           >
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <Award className="w-5 h-5 text-green-600" />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
+              <Award className="w-5 h-5 text-green-600 dark:text-green-400" />
               Quiz à passer
             </h3>
 
             {upcomingQuizzes.length === 0 ? (
               <div className="text-center py-8">
-                <Award className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-400 italic">Tous vos quiz sont à jour ! ✨</p>
+                <Award className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400 dark:text-gray-500 italic">Tous vos quiz sont à jour ! ✨</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -686,17 +678,17 @@ export default function StudentDashboard() {
                   <motion.div
                     key={quiz.id}
                     whileHover={{ scale: 1.02 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 hover:shadow-md transition-shadow cursor-pointer"
+                    className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-800 hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => navigate(`/student/quiz/${quiz.id}`)}
                   >
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-green-600 shadow-sm">
+                    <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400 shadow-sm">
                       <Award className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800">{escapeText(untrusted(quiz.video?.title || 'Quiz'))}</h4>
-                      <p className="text-xs text-green-600">Prêt à être passé</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{escapeText(untrusted(quiz.video?.title || 'Quiz'))}</h4>
+                      <p className="text-xs text-green-600 dark:text-green-400">Prêt à être passé</p>
                     </div>
-                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-green-700 transition-colors">
+                    <button className="px-4 py-2 bg-green-600 dark:bg-green-600 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-green-700 dark:hover:bg-green-700 transition-colors">
                       Démarrer
                     </button>
                   </motion.div>
@@ -711,7 +703,7 @@ export default function StudentDashboard() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="text-center text-xs text-gray-400 flex flex-col items-center justify-center gap-1"
+          className="text-center text-xs text-gray-400 dark:text-gray-500 flex flex-col items-center justify-center gap-1"
         >
           <div className="flex items-center gap-1">
             <Shield className="w-3 h-3" />

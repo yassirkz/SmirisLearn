@@ -90,10 +90,10 @@ export default function StudentVideoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-indigo-200 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export default function StudentVideoPage() {
       >
         <button
           onClick={() => navigate('/student/learning')}
-          className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors group"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span>Retour aux formations</span>
@@ -122,10 +122,10 @@ export default function StudentVideoPage() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="p-4 bg-indigo-50/80 backdrop-blur-sm border border-indigo-200 rounded-xl flex items-start gap-3"
+              className="p-4 bg-indigo-50/80 dark:bg-indigo-900/30 backdrop-blur-sm border border-indigo-200 dark:border-indigo-800 rounded-xl flex items-start gap-3"
             >
-              <Info className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-indigo-800">
+              <Info className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-indigo-800 dark:text-indigo-300">
                 <span className="font-semibold">Visionnage linéaire :</span> Pour garantir un apprentissage progressif, vous ne pouvez pas avancer rapidement.
               </p>
             </motion.div>
@@ -149,24 +149,24 @@ export default function StudentVideoPage() {
             <motion.div 
                 whileHover={{ z: 30, y: -5 }}
                 style={{ transformStyle: "preserve-3d" }}
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700"
             >
-              <h1 className="text-2xl font-bold text-gray-800 mb-3" style={{ transform: "translateZ(20px)" }}>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-3" style={{ transform: "translateZ(20px)" }}>
                 {escapeText(untrusted(video.title))}
               </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600" style={{ transform: "translateZ(10px)" }}>
-                <span className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full">
-                  <BookOpen className="w-4 h-4 text-indigo-600" />
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400" style={{ transform: "translateZ(10px)" }}>
+                <span className="flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
+                  <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   {video.pillars?.name}
                 </span>
-                <span className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-full">
-                  <Clock className="w-4 h-4 text-purple-600" />
+                <span className="flex items-center gap-2 px-3 py-1 bg-purple-50 dark:bg-purple-900/30 rounded-full">
+                  <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   {formatDuration(video.duration)}
                 </span>
               </div>
               {video.description && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg" style={{ transform: "translateZ(5px)" }}>
-                  <p className="text-gray-700 whitespace-pre-line">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg" style={{ transform: "translateZ(5px)" }}>
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
                     {escapeText(untrusted(video.description))}
                   </p>
                 </div>
@@ -178,9 +178,9 @@ export default function StudentVideoPage() {
             <motion.div 
                 whileHover={{ rotateY: -5, scale: 1.02 }}
                 style={{ transformStyle: "preserve-3d" }}
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100 sticky top-24"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700 sticky top-24"
             >
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2" style={{ transform: "translateZ(20px)" }}>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2" style={{ transform: "translateZ(20px)" }}>
                 <span className="text-xl">{video.pillars?.icon || '📚'}</span>
                 {video.pillars?.name}
               </h3>
@@ -202,19 +202,19 @@ export default function StudentVideoPage() {
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                   ) : (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-center">
-                      <p className="text-green-700 font-semibold">✨ Parcours terminé !</p>
+                    <div className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl text-center">
+                      <p className="text-green-700 dark:text-green-300 font-semibold">✨ Parcours terminé !</p>
                       <button
                         onClick={() => navigate('/student/learning')}
-                        className="mt-2 text-sm text-green-600 hover:underline"
+                        className="mt-2 text-sm text-green-600 dark:text-green-400 hover:underline"
                       >
                         Retour aux formations
                       </button>
                     </div>
                   )
                 ) : (
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                    <p className="text-amber-700 text-sm">
+                  <div className="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl">
+                    <p className="text-amber-700 dark:text-amber-300 text-sm">
                       Terminez le visionnage pour débloquer la suite.
                     </p>
                   </div>
@@ -228,7 +228,7 @@ export default function StudentVideoPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-center text-xs text-gray-400 flex items-center justify-center gap-1"
+          className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1"
         >
           <Shield className="w-3 h-3" />
           <span>Progression enregistrée automatiquement</span>

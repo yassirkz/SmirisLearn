@@ -1,4 +1,3 @@
-// src/pages/admin/MembersPage.jsx
 import { motion } from 'framer-motion';
 import { Users, Sparkles, Shield } from 'lucide-react';
 import AdminLayout from '../../components/layout/AdminLayout';
@@ -37,15 +36,15 @@ export default function MembersPage() {
           </motion.div>
 
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <Users className="w-8 h-8 text-indigo-600" />
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <Users className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               Membres
             </h1>
-            <p className="text-gray-500 mt-1 flex items-center gap-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
               <Shield className="w-4 h-4" />
               Gérez les utilisateurs de votre organisation
               {isImpersonating && (
-                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded-full">
                   Mode lecture seule - Entreprise #{escapeText(untrusted(orgIdFromUrl))}
                 </span>
               )}

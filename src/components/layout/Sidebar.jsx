@@ -8,14 +8,18 @@ import {
     Settings,
     LogOut,
     Sparkles,
-    BookOpen
+    BookOpen,
+    Sun,
+    Moon
     } from 'lucide-react'
-    import { useAuth } from '../../hooks/useAuth'
-    import { useUserRole } from '../../hooks/useUserRole'
+import { useAuth } from '../../hooks/useAuth'
+import { useUserRole } from '../../hooks/useUserRole'
+import { useTheme } from '../../hooks/useTheme'
 
-    export default function Sidebar({ onClose }) {    
+export default function Sidebar({ onClose }) {    
     const { signOut } = useAuth()
     const { role } = useUserRole()
+    const { theme, toggleTheme } = useTheme()
 
     const getMenuItems = () => {
         if (role === 'super_admin') {
@@ -46,68 +50,76 @@ import {
 
     return (
         <motion.aside 
-        className="h-full w-64 bg-white/80 backdrop-blur-xl border-r border-blue-100 shadow-xl flex flex-col"
-        initial={{ x: -20 }}
-        animate={{ x: 0 }}
+            className="h-full w-64 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-blue-100 dark:border-gray-800 shadow-xl flex flex-col"
+            initial={{ x: -20 }}
+            animate={{ x: 0 }}
         >
-        {/* Logo */}
-        <div className="p-6 border-b border-blue-100">
-            <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-xl font-bold text-white">S</span>
+            {/* Logo */}
+            <div className="p-6 border-b border-blue-100 dark:border-gray-800">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <span className="text-xl font-bold text-white">S</span>
+                    </div>
+                    <div>
+                        <h2 className="font-bold text-gray-800 dark:text-gray-200">Smiris Learn</h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Administration' : 'Espace Étudiant'}
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h2 className="font-bold text-gray-800">Smiris Learn</h2>
-                <p className="text-xs text-gray-500">
-                    {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Administration' : 'Espace Étudiant'}
-                </p>
-            </div>
-            </div>
-        </div>
 
-        {/* Menu */}
-        <nav className="flex-1 p-4 space-y-1">
-            {menuItems.map((item, index) => (
-            <motion.div
-                key={item.path}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-            >
-                <NavLink
-                to={item.path}
-                end={item.path === '/super-admin' || item.path === '/admin' || item.path === '/student'}
-                onClick={onClose}
-                className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
-                    ${isActive 
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-200' 
-                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
-                    }`
-                }
+            {/* Menu */}
+            <nav className="flex-1 p-4 space-y-1">
+                {menuItems.map((item, index) => (
+                    <motion.div
+                        key={item.path}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                    >
+                        <NavLink
+                            to={item.path}
+                            end={item.path === '/super-admin' || item.path === '/admin' || item.path === '/student'}
+                            onClick={onClose}
+                            className={({ isActive }) =>
+                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                                ${isActive 
+                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30' 
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
+                                }`
+                            }
+                        >
+                            <item.icon size={20} />
+                            <span className="font-medium">{item.label}</span>
+                            {item.label === 'Dashboard' && (
+                                <Sparkles className="w-4 h-4 ml-auto opacity-50" />
+                            )}
+                        </NavLink>
+                    </motion.div>
+                ))}
+            </nav>
+
+            {/* Bas de la sidebar : bouton Dark Mode et Déconnexion */}
+            <div className="p-4 border-t border-blue-100 dark:border-gray-800 space-y-2">
+                <button
+                    onClick={toggleTheme}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
                 >
-                <item.icon size={20} />
-                <span className="font-medium">{item.label}</span>
-                {item.label === 'Dashboard' && (
-                    <Sparkles className="w-4 h-4 ml-auto opacity-50" />
-                )}
-                </NavLink>
-            </motion.div>
-            ))}
-        </nav>
+                    {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                    <span className="font-medium">Mode {theme === 'light' ? 'sombre' : 'clair'}</span>
+                </button>
 
-        {/* Déconnexion */}
-        <div className="p-4 border-t border-blue-100">
-            <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={signOut}
-            className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-600 hover:bg-red-50 transition-all duration-300"
-            >
-            <LogOut size={20} />
-            <span className="font-medium">Déconnexion</span>
-            </motion.button>
-        </div>
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={signOut}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-300"
+                >
+                    <LogOut size={20} />
+                    <span className="font-medium">Déconnexion</span>
+                </motion.button>
+            </div>
         </motion.aside>
     )
 }

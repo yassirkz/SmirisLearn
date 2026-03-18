@@ -1,14 +1,12 @@
+// src/components/admin/pillars/CreatePillarModal.jsx
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    X, Sparkles, Save, Eye, BookOpen, GraduationCap, Code2, BarChart3,
-    Target, Zap, Star, Flame, Lightbulb,
-    Palette, FileText, FlaskConical
+    X, Sparkles, Save, Eye
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
-import { untrusted, validateInput } from '../../../utils/security';
 import SanitizedInput from '../../ui/SanitizedInput';
 
 // Icônes disponibles
@@ -39,7 +37,6 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
     const [touched, setTouched] = useState({});
     const [previewMode, setPreviewMode] = useState(false);
 
-    // Validation
     const validateForm = () => {
         const errors = {};
         if (!formData.name) errors.name = 'Nom requis';
@@ -49,7 +46,6 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
         if (formData.description && formData.description.length > 200) {
             errors.description = 'Maximum 200 caractères';
         }
-        
         return errors;
     };
 
@@ -57,10 +53,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
     const isValid = Object.keys(errors).length === 0;
 
     const handleChange = (field, value) => {
-        const safeValue = field === 'description' 
-            ? value 
-            : value; // Les autres champs sont sécurisés par SanitizedInput
-        setFormData(prev => ({ ...prev, [field]: safeValue }));
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const handleSubmit = async (e) => {
@@ -69,7 +62,6 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
 
         setLoading(true);
         try {
-            // Récupérer l'organization_id
             let orgId = propOrgId;
             if (!orgId) {
                 const { data: profile } = await supabase
@@ -82,8 +74,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
 
             if (!orgId) throw new Error('Organisation non trouvée');
 
-            // Insérer le pilier
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('pillars')
                 .insert({
                     organization_id: orgId,
@@ -91,20 +82,13 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                     description: formData.description.trim() || null,
                     icon: formData.icon,
                     color: formData.color
-                })
-                .select()
-                .single();
+                });
 
             if (error) throw error;
 
             success('Pilier créé avec succès');
             onSuccess?.();
             onClose();
-            
-            // Reset form
-            setFormData({ name: '', description: '', icon: '📚', color: 'blue' });
-            setTouched({});
-
         } catch (err) {
             console.error('Erreur création pilier:', err);
             showError(err.message || 'Erreur lors de la création');
@@ -121,12 +105,11 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
         <AnimatePresence>
             {isOpen && (
                 <div className="fixed inset-0 z-50 overflow-y-auto">
-                    {/* Overlay */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-md"
+                        className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
                         onClick={onClose}
                     />
 
@@ -139,7 +122,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                             exit={{ opacity: 0, scale: 0.9, y: 40 }}
                             className="relative inline-block w-full max-w-2xl my-8 text-left align-middle"
                         >
-                            <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                            <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                                 {/* Éléments décoratifs */}
                                 <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
                                 <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-orange-400 rounded-full opacity-20 blur-3xl" />
@@ -174,7 +157,6 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                         </button>
                                     </div>
 
-                                    {/* Bouton preview */}
                                     <button
                                         onClick={() => setPreviewMode(!previewMode)}
                                         className="absolute bottom-6 right-8 flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm"
@@ -207,7 +189,6 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                     </div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                                        {/* Nom */}
                                         <SanitizedInput
                                             label="Nom du pilier"
                                             value={formData.name}
@@ -221,24 +202,21 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                             placeholder="ex: Développement web"
                                         />
 
-                                        {/* Description */}
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700">
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                                 Description
-                                                <span className="text-gray-400 text-xs ml-2">(optionnelle)</span>
+                                                <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">(optionnelle)</span>
                                             </label>
                                             <textarea
                                                 value={formData.description}
                                                 onChange={(e) => handleChange('description', e.target.value)}
                                                 onBlur={() => setTouched({ ...touched, description: true })}
                                                 rows={3}
-                                                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all resize-none"
+                                                className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all resize-none dark:text-white"
                                                 placeholder="Décrivez ce pilier..."
                                             />
                                             <div className="flex justify-end">
-                                                <span className={`text-xs ${
-                                                    (formData.description?.length || 0) > 180 ? 'text-orange-500' : 'text-gray-400'
-                                                }`}>
+                                                <span className={`text-xs ${(formData.description?.length || 0) > 180 ? 'text-orange-500 dark:text-orange-400' : 'text-gray-400 dark:text-gray-500'}`}>
                                                     {formData.description?.length || 0}/200
                                                 </span>
                                             </div>
@@ -246,7 +224,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
 
                                         {/* Icône */}
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700">
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                                 Icône
                                             </label>
                                             <div className="grid grid-cols-6 gap-2">
@@ -257,8 +235,8 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                                         onClick={() => handleChange('icon', icon)}
                                                         className={`p-3 text-2xl rounded-xl border-2 transition-all ${
                                                             formData.icon === icon
-                                                                ? `border-${formData.color}-500 bg-${formData.color}-50`
-                                                                : 'border-gray-200 hover:border-gray-300'
+                                                                ? `border-${formData.color}-500 bg-${formData.color}-50 dark:bg-${formData.color}-900/30`
+                                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                                                         }`}
                                                     >
                                                         {icon}
@@ -269,7 +247,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
 
                                         {/* Couleur */}
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700">
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                                 Couleur
                                             </label>
                                             <div className="flex gap-2">
@@ -280,7 +258,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                                         onClick={() => handleChange('color', color.name)}
                                                         className={`w-10 h-10 rounded-xl ${color.class} transition-all ${
                                                             formData.color === color.name
-                                                                ? 'ring-4 ring-offset-2 ring-' + color.name + '-300 scale-110'
+                                                                ? 'ring-4 ring-offset-2 ring-' + color.name + '-300 dark:ring-offset-gray-900 scale-110'
                                                                 : 'hover:scale-105'
                                                         }`}
                                                     />
@@ -293,7 +271,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                             <button
                                                 type="button"
                                                 onClick={onClose}
-                                                className="flex-1 px-6 py-4 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all"
+                                                className="flex-1 px-6 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                                             >
                                                 Annuler
                                             </button>
@@ -305,7 +283,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                                 className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-white relative overflow-hidden group ${
                                                     isValid && !loading
                                                         ? `bg-gradient-to-r ${selectedColor.gradient} shadow-lg`
-                                                        : 'bg-gray-300 cursor-not-allowed'
+                                                        : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                                                 }`}
                                             >
                                                 <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />

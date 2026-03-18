@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useToast } from '../../ui/Toast';
-import { untrusted, escapeText } from '../../../utils/security';
 import SanitizedInput from '../../ui/SanitizedInput';
 
 const ICONS = ['📚', '🎓', '💻', '📊', '🎯', '⚡', '🌟', '🔥', '💡', '🎨', '📝', '🔬'];
@@ -53,7 +52,6 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
         if (formData.description && formData.description.length > 200) {
             errors.description = 'Maximum 200 caractères';
         }
-        
         return errors;
     };
 
@@ -81,7 +79,6 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
             success('Pilier modifié avec succès');
             onSuccess?.();
             onClose();
-
         } catch (err) {
             console.error('Erreur modification pilier:', err);
             showError(err.message || 'Erreur lors de la modification');
@@ -102,7 +99,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-md"
+                        className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
                         onClick={onClose}
                     />
 
@@ -115,7 +112,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                             exit={{ opacity: 0, scale: 0.9, y: 40 }}
                             className="relative inline-block w-full max-w-2xl my-8 text-left align-middle"
                         >
-                            <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                            <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                                 <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
                                 <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-orange-400 rounded-full opacity-20 blur-3xl" />
 
@@ -179,19 +176,19 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                         />
 
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700">
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                                 Description
                                             </label>
                                             <textarea
                                                 value={formData.description}
                                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                                 rows={3}
-                                                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all resize-none"
+                                                className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all resize-none dark:text-white"
                                             />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700">Icône</label>
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Icône</label>
                                             <div className="grid grid-cols-6 gap-2">
                                                 {ICONS.map(icon => (
                                                     <button
@@ -200,8 +197,8 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                                         onClick={() => setFormData({ ...formData, icon })}
                                                         className={`p-3 text-2xl rounded-xl border-2 transition-all ${
                                                             formData.icon === icon
-                                                                ? `border-${formData.color}-500 bg-${formData.color}-50`
-                                                                : 'border-gray-200 hover:border-gray-300'
+                                                                ? `border-${formData.color}-500 bg-${formData.color}-50 dark:bg-${formData.color}-900/30`
+                                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                                                         }`}
                                                     >
                                                         {icon}
@@ -211,7 +208,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700">Couleur</label>
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Couleur</label>
                                             <div className="flex gap-2">
                                                 {COLORS.map(color => (
                                                     <button
@@ -220,7 +217,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                                         onClick={() => setFormData({ ...formData, color: color.name })}
                                                         className={`w-10 h-10 rounded-xl ${color.class} transition-all ${
                                                             formData.color === color.name
-                                                                ? 'ring-4 ring-offset-2 ring-' + color.name + '-300 scale-110'
+                                                                ? 'ring-4 ring-offset-2 ring-' + color.name + '-300 dark:ring-offset-gray-900 scale-110'
                                                                 : 'hover:scale-105'
                                                         }`}
                                                     />
@@ -232,7 +229,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                             <button
                                                 type="button"
                                                 onClick={onClose}
-                                                className="flex-1 px-6 py-4 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all"
+                                                className="flex-1 px-6 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                                             >
                                                 Annuler
                                             </button>
@@ -244,7 +241,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                                 className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-white relative overflow-hidden group ${
                                                     isValid && !loading
                                                         ? `bg-gradient-to-r ${selectedColor.gradient} shadow-lg`
-                                                        : 'bg-gray-300 cursor-not-allowed'
+                                                        : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                                                 }`}
                                             >
                                                 <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />

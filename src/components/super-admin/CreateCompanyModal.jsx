@@ -92,7 +92,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-md"
+                        className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
                         onClick={onClose}
                     />
 
@@ -108,11 +108,11 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                             className="relative inline-block w-full max-w-md my-8 text-left align-middle"
                         >
                             {/* Carte principale avec effet glassmorphisme */}
-                            <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20">
+                            <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800">
                                 
                                 {/* Éléments décoratifs */}
-                                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
-                                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-orange-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
+                                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
+                                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-orange-400 rounded-full opacity-20 blur-3xl" />
                                 
                                 {/* Badge premium */}
                                 <div className="absolute top-4 right-4 z-10">
@@ -167,7 +167,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                 </div>
 
                                 {/* Formulaire */}
-                                <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white/40 rounded-b-3xl">
+                                <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-white/40 dark:bg-gray-900/40 rounded-b-3xl">
                                     
                                     {/* Nom entreprise */}
                                     <motion.div 
@@ -176,12 +176,12 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                         transition={{ delay: 0.1 }}
                                         className="space-y-2"
                                     >
-                                        <label className="block text-sm font-semibold text-gray-700">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                             Nom de l'entreprise
                                             <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">
                                                 <Building className="w-5 h-5" />
                                             </div>
                                             <input
@@ -191,13 +191,13 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('name')}
                                                 className={`
-                                                    w-full pl-12 pr-12 py-5 bg-white border-2 border-gray-100 rounded-2xl 
-                                                    outline-none transition-all duration-300
+                                                    w-full pl-12 pr-12 py-5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl 
+                                                    outline-none transition-all duration-300 dark:text-white
                                                     ${nameError && touched.name
-                                                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-100'
+                                                        ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                         : formData.name && !nameError
-                                                            ? 'border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-100'
-                                                            : 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
+                                                            ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-500 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/30'
+                                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
                                                     }
                                                 `}
                                                 placeholder="ex: smiris academy"
@@ -210,7 +210,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         exit={{ scale: 0 }}
                                                         className="absolute right-4 top-1/2 transform -translate-y-1/2"
                                                     >
-                                                        <CheckCircle className="w-5 h-5 text-green-500" />
+                                                        <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
                                                     </motion.div>
                                                 )}
                                                 {nameError && touched.name && (
@@ -220,7 +220,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         exit={{ scale: 0 }}
                                                         className="absolute right-4 top-1/2 transform -translate-y-1/2"
                                                     >
-                                                        <AlertCircle className="w-5 h-5 text-red-500" />
+                                                        <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
@@ -231,7 +231,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                     initial={{ opacity: 0, y: -10, height: 0 }}
                                                     animate={{ opacity: 1, y: 0, height: 'auto' }}
                                                     exit={{ opacity: 0, y: -10, height: 0 }}
-                                                    className="text-sm text-red-500 flex items-center gap-1 overflow-hidden"
+                                                    className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1 overflow-hidden"
                                                 >
                                                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                                     {nameError}
@@ -247,12 +247,12 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                         transition={{ delay: 0.2 }}
                                         className="space-y-2"
                                     >
-                                        <label className="block text-sm font-semibold text-gray-700">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                             Email de l'administrateur
                                             <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">
                                                 <Mail className="w-5 h-5" />
                                             </div>
                                             <input
@@ -262,13 +262,13 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('adminEmail')}
                                                 className={`
-                                                    w-full pl-12 pr-12 py-5 bg-white border-2 border-gray-100 rounded-2xl 
-                                                    outline-none transition-all duration-300
+                                                    w-full pl-12 pr-12 py-5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl 
+                                                    outline-none transition-all duration-300 dark:text-white
                                                     ${emailError && touched.adminEmail
-                                                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-100'
+                                                        ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                         : formData.adminEmail && !emailError
-                                                            ? 'border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-100'
-                                                            : 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
+                                                            ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-500 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/30'
+                                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
                                                     }
                                                 `}
                                                 placeholder="admin@entreprise.com"
@@ -281,7 +281,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         exit={{ scale: 0 }}
                                                         className="absolute right-4 top-1/2 transform -translate-y-1/2"
                                                     >
-                                                        <CheckCircle className="w-5 h-5 text-green-500" />
+                                                        <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
                                                     </motion.div>
                                                 )}
                                                 {emailError && touched.adminEmail && (
@@ -291,7 +291,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         exit={{ scale: 0 }}
                                                         className="absolute right-4 top-1/2 transform -translate-y-1/2"
                                                     >
-                                                        <AlertCircle className="w-5 h-5 text-red-500" />
+                                                        <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
@@ -302,7 +302,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                     initial={{ opacity: 0, y: -10, height: 0 }}
                                                     animate={{ opacity: 1, y: 0, height: 'auto' }}
                                                     exit={{ opacity: 0, y: -10, height: 0 }}
-                                                    className="text-sm text-red-500 flex items-center gap-1 overflow-hidden"
+                                                    className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1 overflow-hidden"
                                                 >
                                                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                                     {emailError}
@@ -318,12 +318,12 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                         transition={{ delay: 0.3 }}
                                         className="space-y-2"
                                     >
-                                        <label className="block text-sm font-semibold text-gray-700">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                             Nom de l'administrateur
                                             <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">
                                                 <User className="w-5 h-5" />
                                             </div>
                                             <input
@@ -333,13 +333,13 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 onChange={handleChange}
                                                 onBlur={() => handleBlur('adminName')}
                                                 className={`
-                                                    w-full pl-12 pr-12 py-5 bg-white border-2 border-gray-100 rounded-2xl 
-                                                    outline-none transition-all duration-300
+                                                    w-full pl-12 pr-12 py-5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl 
+                                                    outline-none transition-all duration-300 dark:text-white
                                                     ${adminNameError && touched.adminName
-                                                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-100'
+                                                        ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                         : formData.adminName && !adminNameError
-                                                            ? 'border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-100'
-                                                            : 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
+                                                            ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-500 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/30'
+                                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
                                                     }
                                                 `}
                                                 placeholder="youssef fakir"
@@ -352,7 +352,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         exit={{ scale: 0 }}
                                                         className="absolute right-4 top-1/2 transform -translate-y-1/2"
                                                     >
-                                                        <CheckCircle className="w-5 h-5 text-green-500" />
+                                                        <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
                                                     </motion.div>
                                                 )}
                                                 {adminNameError && touched.adminName && (
@@ -362,7 +362,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         exit={{ scale: 0 }}
                                                         className="absolute right-4 top-1/2 transform -translate-y-1/2"
                                                     >
-                                                        <AlertCircle className="w-5 h-5 text-red-500" />
+                                                        <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
@@ -373,7 +373,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                     initial={{ opacity: 0, y: -10, height: 0 }}
                                                     animate={{ opacity: 1, y: 0, height: 'auto' }}
                                                     exit={{ opacity: 0, y: -10, height: 0 }}
-                                                    className="text-sm text-red-500 flex items-center gap-1 overflow-hidden"
+                                                    className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1 overflow-hidden"
                                                 >
                                                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                                     {adminNameError}
@@ -391,8 +391,8 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 exit={{ opacity: 0, y: -10, height: 0 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="p-4 bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 rounded-2xl">
-                                                    <p className="text-sm text-red-600 flex items-center gap-2">
+                                                <div className="p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/30 border-l-4 border-red-500 rounded-2xl">
+                                                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                                                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                                         {error}
                                                     </p>
@@ -411,7 +411,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                         <button
                                             type="button"
                                             onClick={onClose}
-                                            className="flex-1 px-6 py-4 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all duration-300"
+                                            className="flex-1 px-6 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
                                         >
                                             Annuler
                                         </button>
@@ -425,8 +425,8 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 flex-1 px-6 py-4 rounded-2xl font-semibold text-white
                                                 transition-all duration-300 relative overflow-hidden group
                                                 ${isValid && !loading
-                                                    ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-lg shadow-blue-200'
-                                                    : 'bg-gray-300 cursor-not-allowed'
+                                                    ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-lg shadow-blue-200 dark:shadow-blue-900/30'
+                                                    : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                                                 }
                                             `}
                                         >
@@ -454,7 +454,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                         transition={{ delay: 0.5 }}
                                         className="text-center"
                                     >
-                                        <p className="text-xs text-gray-400">
+                                        <p className="text-xs text-gray-400 dark:text-gray-500">
                                             🔒 Un email sera envoyé à l'administrateur avec un lien unique valable 24h
                                         </p>
                                     </motion.div>

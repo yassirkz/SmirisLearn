@@ -24,7 +24,6 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
     const fetchingRef = useRef(false);
     const initialLoadRef = useRef(true);
     
-    // États
     const [videos, setVideos] = useState([]);
     const [pillars, setPillars] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -45,23 +44,17 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [uploadedVideo, setUploadedVideo] = useState(null);
 
-    // Sauvegarder la préférence de vue
     useEffect(() => {
         localStorage.setItem('videoViewMode', viewMode);
     }, [viewMode]);
 
-    // Récupérer l'organization ID
     useEffect(() => {
         const fetchOrgId = async () => {
             if (propOrgId) {
-                console.log('🏢 Utilisation propOrgId:', propOrgId);
                 setUserOrgId(propOrgId);
                 return;
             }
-            
             if (user?.id) {
-                console.log('👤 Récupération orgId pour user:', user.id);
-                
                 const { data: profile, error } = await supabase
                     .from('profiles')
                     .select('organization_id')
@@ -72,43 +65,31 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                     console.error('❌ Erreur récupération profil:', error);
                     return;
                 }
-
-                console.log('📊 Profile:', profile);
-                
                 if (profile?.organization_id) {
                     setUserOrgId(profile.organization_id);
-                } else {
-                    console.warn('⚠️ Aucune organisation trouvée pour cet utilisateur');
                 }
             }
         };
-
         fetchOrgId();
     }, [user, propOrgId]);
 
-    // Charger les piliers
     useEffect(() => {
         const fetchPillars = async () => {
             if (!userOrgId) return;
-
             const { data } = await supabase
                 .from('pillars')
                 .select('id, name, color')
                 .eq('organization_id', userOrgId)
                 .order('name');
-            
             setPillars(data || []);
         };
-        
         fetchPillars();
     }, [userOrgId]);
 
-    // Charger les vidéos
     const fetchVideos = useCallback(async () => {
         if (fetchingRef.current || !userOrgId) return;
         
         fetchingRef.current = true;
-        // Chargement initial = skeleton, refresh = spinner discret
         if (videos.length > 0) {
             setRefreshing(true);
         } else {
@@ -116,9 +97,6 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         }
 
         try {
-            console.log('📦 Chargement des vidéos pour org:', userOrgId);
-
-            // Récupérer les vidéos via pillar_id de l'org (pas de filtre sur alias)
             const { data: pillarRows } = await supabase
                 .from('pillars')
                 .select('id')
@@ -155,7 +133,6 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
 
             if (error) throw error;
 
-            // Filtrer par recherche
             let filtered = data || [];
             if (filters.search) {
                 const searchLower = filters.search.toLowerCase();
@@ -165,9 +142,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                 );
             }
 
-            console.log('✅ Vidéos chargées:', filtered.length);
             setVideos(filtered);
-
         } catch (err) {
             console.error('❌ Erreur chargement vidéos:', err);
             showError('Impossible de charger les vidéos');
@@ -178,7 +153,6 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         }
     }, [userOrgId, filters, showError, videos.length]);
 
-    // Charger les vidéos au montage
     useEffect(() => {
         if (initialLoadRef.current && userOrgId) {
             initialLoadRef.current = false;
@@ -186,7 +160,6 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         }
     }, [userOrgId, fetchVideos]);
 
-    // Handlers
     const handleRefresh = () => {
         fetchVideos();
         success('Données mises à jour');
@@ -231,14 +204,12 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         if (!window.confirm(`Supprimer "${video.title}" ?`)) return;
 
         try {
-            // ✅ Utiliser video_path directement (plus besoin de getPathFromUrl)
             if (video.video_path) {
                 await supabase.storage
                     .from('videos')
                     .remove([video.video_path]);
             }
 
-            // Supprimer de la base
             const { error } = await supabase
                 .from('videos')
                 .delete()
@@ -253,28 +224,27 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             showError('Impossible de supprimer la vidéo');
         }
     };
+
     return (
         <div className="space-y-6">
             {/* Barre d'outils */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
             >
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    {/* Stats rapides */}
                     <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                            <span className="text-gray-600">{videos.length} vidéos</span>
+                            <span className="text-gray-600 dark:text-gray-300">{videos.length} vidéos</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                            <span className="text-gray-600">{pillars.length} piliers</span>
+                            <span className="text-gray-600 dark:text-gray-300">{pillars.length} piliers</span>
                         </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center gap-2">
                         <VideoFilters 
                             filters={filters}
@@ -282,13 +252,13 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                             pillars={pillars}
                         />
 
-                        <div className="flex bg-gray-100 rounded-lg p-1">
+                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode('table')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'table'
-                                        ? 'bg-white text-indigo-600 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                             >
                                 <TableIcon className="w-4 h-4" />
@@ -297,8 +267,8 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => setViewMode('cards')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'cards'
-                                        ? 'bg-white text-indigo-600 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                             >
                                 <LayoutGrid className="w-4 h-4" />
@@ -307,10 +277,10 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
 
                         <button
                             onClick={handleRefresh}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             disabled={loading}
                         >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${loading ? 'animate-spin' : ''}`} />
                         </button>
 
                         {!isReadOnly && (
@@ -342,23 +312,23 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
                         onClick={() => setShowUploader(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
-                            className="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl"
+                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full shadow-2xl"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">Uploader une vidéo</h2>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Uploader une vidéo</h2>
                                 <button
                                     onClick={() => setShowUploader(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
                             <VideoUploader
@@ -378,23 +348,23 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
                         onClick={() => setShowRecorder(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
-                            className="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl"
+                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full shadow-2xl"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">Enregistrer une vidéo d'écran</h2>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Enregistrer une vidéo d'écran</h2>
                                 <button
                                     onClick={() => setShowRecorder(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
                             <ScreenRecorder
@@ -417,7 +387,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
                         onClick={() => {
                             setShowForm(false);
                             setSelectedVideo(null);
@@ -428,11 +398,11 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
-                            className="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">
                                     {selectedVideo ? 'Modifier' : 'Nouvelle'} vidéo
                                 </h2>
                                 <button
@@ -441,9 +411,9 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                         setSelectedVideo(null);
                                         setUploadedVideo(null);
                                     }}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
                             <VideoForm
@@ -466,12 +436,12 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             {loading ? (
                 <PillarSkeleton viewMode={viewMode} />
             ) : videos.length === 0 ? (
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 text-center">
-                    <Film className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
+                    <Film className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
                         Aucune vidéo
                     </h3>
-                    <p className="text-gray-500 mb-6">
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">
                         Commencez par uploader votre première vidéo
                     </p>
                     {!isReadOnly && (
@@ -484,15 +454,15 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                     )}
                 </div>
             ) : viewMode === 'table' ? (
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 overflow-hidden">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden">
                     <table className="w-full">
-                        <thead className="bg-gradient-to-r from-indigo-50 to-purple-50">
+                        <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
                             <tr>
-                                <th className="px-6 py-4 text-left">Vidéo</th>
-                                <th className="px-6 py-4 text-left">Pilier</th>
-                                <th className="px-6 py-4 text-left">Durée</th>
-                                <th className="px-6 py-4 text-left">Ajoutée le</th>
-                                <th className="px-6 py-4 text-right">Actions</th>
+                                <th className="px-6 py-4 text-left dark:text-gray-300">Vidéo</th>
+                                <th className="px-6 py-4 text-left dark:text-gray-300">Pilier</th>
+                                <th className="px-6 py-4 text-left dark:text-gray-300">Durée</th>
+                                <th className="px-6 py-4 text-left dark:text-gray-300">Ajoutée le</th>
+                                <th className="px-6 py-4 text-right dark:text-gray-300">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

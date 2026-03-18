@@ -16,7 +16,7 @@ import {
   Ban
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
-import { useToast } from '../../../hooks/useToast'; // <- import depuis hooks
+import { useToast } from '../../../hooks/useToast';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useMemberInvitation } from '../../../hooks/useMemberInvitation';
 import { supabase } from '../../../lib/supabase';
@@ -28,12 +28,12 @@ const ROLE_CONFIG = {
   org_admin: {
     label: 'Admin',
     icon: Shield,
-    color: 'bg-purple-100 text-purple-700 border-purple-200'
+    color: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800'
   },
   student: {
     label: 'Étudiant',
     icon: GraduationCap,
-    color: 'bg-blue-100 text-blue-700 border-blue-200'
+    color: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
   }
 };
 
@@ -236,7 +236,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       success('Invitation envoyée !');
       setInviteEmail('');
       setShowInviteForm(false);
-      fetchMembers(); // pour voir si l'utilisateur existait déjà et a été ajouté
+      fetchMembers();
     } catch (err) {
       showError(err.message);
     }
@@ -253,23 +253,23 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Barre d'outils */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Rechercher un membre..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm dark:bg-gray-800 dark:text-white"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
             <select
               value={selectedGroup}
               onChange={e => setSelectedGroup(e.target.value)}
-              className="pl-10 pr-8 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm appearance-none bg-white"
+              className="pl-10 pr-8 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm appearance-none bg-white dark:bg-gray-800 dark:text-white"
             >
               <option value="all">Tous les groupes</option>
               {groups.map((g, idx) => (
@@ -300,28 +300,28 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             onSubmit={handleInvite}
-            className="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-5 flex flex-col sm:flex-row gap-3 items-end overflow-hidden"
+            className="bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-200 dark:border-indigo-800 rounded-2xl p-5 flex flex-col sm:flex-row gap-3 items-end overflow-hidden"
           >
             <div className="flex-1 space-y-1">
-              <label className="text-xs font-semibold text-indigo-700">Email</label>
+              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 dark:text-indigo-400" />
                 <input
                   type="email"
                   required
                   value={inviteEmail}
                   onChange={e => setInviteEmail(e.target.value)}
                   placeholder="email@exemple.com"
-                  className="w-full pl-10 pr-4 py-3 bg-white border-2 border-indigo-200 rounded-xl focus:border-indigo-400 outline-none text-sm"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-sm dark:text-white"
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-indigo-700">Rôle</label>
+              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Rôle</label>
               <select
                 value={inviteRole}
                 onChange={e => setInviteRole(e.target.value)}
-                className="px-4 py-3 bg-white border-2 border-indigo-200 rounded-xl focus:border-indigo-400 outline-none text-sm"
+                className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-sm dark:text-white"
               >
                 <option value="student">Étudiant</option>
                 <option value="org_admin">Admin</option>
@@ -342,13 +342,13 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Total membres', value: stats.total, color: 'text-gray-800', key: 'st-tot' },
-          { label: 'Étudiants', value: stats.students, color: 'text-blue-600', key: 'st-stud' },
-          { label: 'Admins', value: stats.admins, color: 'text-purple-600', key: 'st-adm' },
+          { label: 'Total membres', value: stats.total, color: 'text-gray-800 dark:text-gray-200' },
+          { label: 'Étudiants', value: stats.students, color: 'text-blue-600 dark:text-blue-400' },
+          { label: 'Admins', value: stats.admins, color: 'text-purple-600 dark:text-purple-400' },
         ].map((stat, idx) => (
-          <div key={stat.key || idx} className="bg-white border-2 border-gray-100 rounded-2xl p-4 text-center">
+          <div key={idx} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-4 text-center">
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -356,31 +356,31 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Tableau des membres */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
         </div>
       ) : members.length === 0 ? (
         <div className="text-center py-16">
-          <Users className="w-12 h-12 mx-auto text-gray-200 mb-3" />
-          <p className="text-gray-400">
+          <Users className="w-12 h-12 mx-auto text-gray-200 dark:text-gray-600 mb-3" />
+          <p className="text-gray-400 dark:text-gray-500">
             {search || selectedGroup !== 'all' ? 'Aucun résultat' : 'Aucun membre dans cette organisation'}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-100 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Membre</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Rôle</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Groupes</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Inscrit le</th>
+                <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Membre</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rôle</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Groupes</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Inscrit le</th>
                   {!isReadOnly && (
-                    <th className="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="text-right px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {members.map((member, i) => {
                   const rc = ROLE_CONFIG[member.role] || ROLE_CONFIG.student;
                   const initials = (member.full_name || member.email || '?')[0].toUpperCase();
@@ -390,7 +390,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.02 }}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -398,13 +398,13 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-semibold text-gray-800 text-sm truncate">
+                            <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">
                               {escapeText(untrusted(member.full_name || 'Sans nom'))}
                               {member.id === user.id && (
-                                <span className="ml-2 text-xs text-indigo-500">(vous)</span>
+                                <span className="ml-2 text-xs text-indigo-500 dark:text-indigo-400">(vous)</span>
                               )}
                             </p>
-                            <p className="text-xs text-gray-500 truncate">{member.email}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
                           </div>
                         </div>
                       </td>
@@ -417,21 +417,21 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                       <td className="px-6 py-4 hidden lg:table-cell">
                           <div className="flex flex-wrap gap-1 max-w-xs">
                             {member.groups.length === 0 ? (
-                              <span className="text-xs text-gray-400">Aucun groupe</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Aucun groupe</span>
                             ) : (
                               member.groups.slice(0, 3).map((g, idx) => (
-                                <span key={g.id || `m-g-${idx}`} className="inline-block px-2 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs">
+                                <span key={g.id || `m-g-${idx}`} className="inline-block px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs">
                                   {escapeText(untrusted(g.name))}
                                 </span>
                               ))
                             )}
                           {member.groups.length > 3 && (
-                            <span className="text-xs text-gray-500">+{member.groups.length - 3}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">+{member.groups.length - 3}</span>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4 hidden sm:table-cell">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(member.created_at).toLocaleDateString('fr-FR')}
                         </span>
                       </td>
@@ -443,12 +443,12 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                               onClick={() => handleChangeRole(member)}
                               disabled={updatingId === member.id || member.id === user.id}
                               title={member.role === 'student' ? 'Promouvoir Admin' : 'Rétrograder Étudiant'}
-                              className="p-2 hover:bg-purple-50 rounded-xl transition-colors disabled:opacity-30"
+                              className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl transition-colors disabled:opacity-30"
                             >
                               {updatingId === member.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
+                                <Loader2 className="w-4 h-4 animate-spin text-purple-500 dark:text-purple-400" />
                               ) : (
-                                <Shield className="w-4 h-4 text-purple-500" />
+                                <Shield className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                               )}
                             </button>
 
@@ -458,12 +458,12 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => handleRemove(member)}
                                 disabled={deletingId === member.id || member.id === user.id}
                                 title="Retirer de l'organisation"
-                                className="p-2 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-30"
+                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-colors disabled:opacity-30"
                               >
                                 {deletingId === member.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin text-red-400" />
+                                  <Loader2 className="w-4 h-4 animate-spin text-red-400 dark:text-red-400" />
                                 ) : (
-                                  <Trash2 className="w-4 h-4 text-red-400" />
+                                  <Trash2 className="w-4 h-4 text-red-400 dark:text-red-400" />
                                 )}
                               </button>
                             )}

@@ -22,7 +22,6 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Charger tous les piliers de l'organisation
         const { data: pillarsData, error: pillarsError } = await supabase
           .from('pillars')
           .select('id, name, color')
@@ -31,7 +30,6 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
 
         if (pillarsError) throw pillarsError;
 
-        // Charger les accès actuels du groupe
         const { data: accessData, error: accessError } = await supabase
           .from('group_pillar_access')
           .select('pillar_id')
@@ -67,7 +65,6 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Récupérer les accès existants
       const { data: existing, error: fetchError } = await supabase
         .from('group_pillar_access')
         .select('pillar_id')
@@ -113,14 +110,14 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
 
   const getColorClass = (color) => {
     const colors = {
-      blue: 'bg-blue-100 text-blue-700 border-blue-200',
-      purple: 'bg-purple-100 text-purple-700 border-purple-200',
-      green: 'bg-green-100 text-green-700 border-green-200',
-      red: 'bg-red-100 text-red-700 border-red-200',
-      yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-      pink: 'bg-pink-100 text-pink-700 border-pink-200',
-      orange: 'bg-orange-100 text-orange-700 border-orange-200'
+      blue: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+      purple: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+      green: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
+      red: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
+      yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800',
+      indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800',
+      pink: 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800',
+      orange: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800'
     };
     return colors[color] || colors.blue;
   };
@@ -132,23 +129,23 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
           onClick={(e) => e.target === e.currentTarget && onClose()}
         >
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-800">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white">
                   Accès aux piliers : {escapeText(untrusted(group.name))}
                 </h2>
-                <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-                  <X className="w-5 h-5 text-gray-500" />
+                <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
 
@@ -160,30 +157,30 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
                 <>
                   <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
                     {pillars.length === 0 ? (
-                      <p className="text-center text-gray-500 py-8">Aucun pilier disponible</p>
+                      <p className="text-center text-gray-500 dark:text-gray-400 py-8">Aucun pilier disponible</p>
                     ) : (
                       pillars.map((pillar, idx) => {
                         const isSelected = selectedPillarIds.has(pillar.id);
                         const colorClass = getColorClass(pillar.color);
                         return (
                           <label
-                            key={pillar.id || `pillar-${idx}`}
+                            key={pillar.id || idx}
                             className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                               isSelected
-                                ? 'border-indigo-300 bg-indigo-50'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-indigo-300 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                             }`}
                           >
                             <input
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => togglePillar(pillar.id)}
-                              className="w-5 h-5 rounded text-indigo-600"
+                              className="w-5 h-5 rounded text-indigo-600 dark:text-indigo-400"
                             />
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
                               {escapeText(untrusted(pillar.name))}
                             </span>
-                            {isSelected && <Check className="w-4 h-4 text-indigo-600 ml-auto" />}
+                            {isSelected && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 ml-auto" />}
                           </label>
                         );
                       })
@@ -193,7 +190,7 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
                   <div className="flex gap-3 mt-6">
                     <button
                       onClick={onClose}
-                      className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       Annuler
                     </button>

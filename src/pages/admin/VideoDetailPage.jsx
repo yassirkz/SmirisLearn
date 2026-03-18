@@ -1,4 +1,3 @@
-// src/pages/admin/VideoDetailPage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -49,10 +48,9 @@ export default function VideoDetailPage() {
             setVideo(data);
             setPillar(data.pillar);
 
-            // Charger le quiz associé (sans max_attempts qui n'existe pas)
             const { data: quizData } = await supabase
                 .from('quizzes')
-                .select('id, passing_score, timer_minutes, questions')
+                .select('id, passing_score, timer_minutes, questions, max_attempts')
                 .eq('video_id', id)
                 .maybeSingle();
             setQuiz(quizData || null);
@@ -68,14 +66,12 @@ export default function VideoDetailPage() {
         if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?')) return;
         
         try {
-            // Supprimer du storage
             if (video.video_path) {
                 await supabase.storage
                     .from('videos')
                     .remove([video.video_path]);
             }
 
-            // Supprimer de la base
             const { error } = await supabase
                 .from('videos')
                 .delete()
@@ -110,7 +106,7 @@ export default function VideoDetailPage() {
         return (
             <AdminLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
-                    <div className="w-16 h-16 border-4 border-indigo-200 rounded-full border-t-indigo-600 animate-spin" />
+                    <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full border-t-indigo-600 animate-spin" />
                 </div>
             </AdminLayout>
         );
@@ -120,8 +116,8 @@ export default function VideoDetailPage() {
         return (
             <AdminLayout>
                 <div className="text-center py-12">
-                    <Film className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-800">Vidéo non trouvée</h2>
+                    <Film className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Vidéo non trouvée</h2>
                 </div>
             </AdminLayout>
         );
@@ -137,39 +133,36 @@ export default function VideoDetailPage() {
                 {/* Navigation */}
                 <button
                     onClick={() => navigate('/admin/videos')}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                     <ArrowLeft className="w-5 h-5" />
                     Retour aux vidéos
                 </button>
 
                 {/* En-tête */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-indigo-100">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-800">
+                            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
                                 {escapeText(untrusted(video.title))}
                             </h1>
                             {video.description && (
-                                <p className="text-gray-600 mt-2">
+                                <p className="text-gray-600 dark:text-gray-300 mt-2">
                                     {escapeText(untrusted(video.description))}
                                 </p>
                             )}
                         </div>
                         <div className="flex gap-2">
-                            {/* Bouton Modifier - Ouvre le modal */}
                             <button
                                 onClick={() => setShowEditModal(true)}
-                                className="p-2 hover:bg-purple-100 rounded-lg text-purple-600"
+                                className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400"
                                 title="Modifier"
                             >
                                 <Edit className="w-5 h-5" />
                             </button>
-                            
-                            {/* Bouton Supprimer - Corrigé */}
                             <button
                                 onClick={handleDelete}
-                                className="p-2 hover:bg-red-100 rounded-lg text-red-600"
+                                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400"
                                 title="Supprimer"
                             >
                                 <Trash2 className="w-5 h-5" />
@@ -178,7 +171,7 @@ export default function VideoDetailPage() {
                     </div>
 
                     {/* Métadonnées */}
-                    <div className="flex gap-6 mt-4 text-sm text-gray-500">
+                    <div className="flex gap-6 mt-4 text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4" />
                             <span>{formatDuration(video.duration)}</span>
@@ -214,10 +207,10 @@ export default function VideoDetailPage() {
                 </div>
 
                 {/* Section Quiz associé */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-indigo-100">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                            <Award className="w-5 h-5 text-indigo-600" />
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                            <Award className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             Quiz associé
                         </h2>
                         {!quiz && (
@@ -233,14 +226,13 @@ export default function VideoDetailPage() {
 
                     {quiz ? (
                         <div className="space-y-3">
-                            <div className="flex items-center gap-6 text-sm text-gray-600 flex-wrap">
-                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+                            <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-300 flex-wrap">
+                                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium">
                                     {quiz.questions?.length || 0} question{(quiz.questions?.length || 0) > 1 ? 's' : ''}
                                 </span>
                                 <span className="flex items-center gap-1">
                                     Score minimum : <strong>{quiz.passing_score}%</strong>
                                 </span>
-                                {/* NOUVEAU */}
                                 <span className="flex items-center gap-1">
                                     <RefreshCw className="w-4 h-4" />
                                     Tentatives : <strong>{quiz.max_attempts === -1 ? '∞' : quiz.max_attempts}</strong>
@@ -254,34 +246,33 @@ export default function VideoDetailPage() {
                             </div>
                             <button
                                 onClick={() => setShowQuizModal(true)}
-                                className="text-sm text-indigo-600 hover:text-indigo-700 underline"
+                                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline"
                             >
                                 Modifier le quiz
                             </button>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-gray-500">Aucun quiz n'est associé à cette vidéo.</p>
-                        )}
-                    </div>
-                
+                        </div>
+                    ) : (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Aucun quiz n'est associé à cette vidéo.</p>
+                    )}
+                </div>
 
                 {/* Modal Quiz */}
                 {showQuizModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
                         <motion.div
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
-                            className="bg-white rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">
+                                <h2 className="text-xl font-bold dark:text-white">
                                     {quiz ? 'Modifier le quiz' : 'Créer un quiz'}
                                 </h2>
                                 <button
                                     onClick={() => setShowQuizModal(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-5 h-5 dark:text-gray-300" />
                                 </button>
                             </div>
                             <QuizCreator
@@ -299,9 +290,9 @@ export default function VideoDetailPage() {
 
                 {/* Modal d'édition */}
                 {showEditModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                        <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-xl font-bold mb-4">Modifier la vidéo</h2>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                            <h2 className="text-xl font-bold mb-4 dark:text-white">Modifier la vidéo</h2>
                             <VideoForm
                                 video={video}
                                 onSuccess={() => {

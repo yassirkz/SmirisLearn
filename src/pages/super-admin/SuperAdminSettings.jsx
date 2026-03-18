@@ -1,18 +1,21 @@
+// src/pages/super-admin/SuperAdminSettings.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Settings, User, Mail, Bell, Moon, Sun,
     Shield, Eye, EyeOff, Save, RefreshCw, CheckCircle,
-    AlertCircle, X, Key, Download, Zap, Activity,  Server, Sparkles
+    AlertCircle, X, Key, Download, Zap, Activity, Server, Sparkles
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 import { untrusted, escapeText } from '../../utils/security';
 import SanitizedInput from '../../components/ui/SanitizedInput';
 
 export default function SuperAdminSettings() {
     const { user } = useAuth();
+    const { theme, setTheme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [exporting, setExporting] = useState(false);
@@ -50,13 +53,12 @@ export default function SuperAdminSettings() {
         emailNotifications: true,
         newCompanyAlert: true,
         newUserAlert: true,
-        theme: 'light',
         language: 'fr',
         sessionTimeout: '30'
     });
 
     // ============================================
-    // 4. CONFIGURATION PLATEFORME (DYNAMIQUE - Supabase)
+    // 4. CONFIGURATION PLATEFORME
     // ============================================
     const [platformConfig, setPlatformConfig] = useState({
         default_limits: {
@@ -74,7 +76,7 @@ export default function SuperAdminSettings() {
     });
 
     // ============================================
-    // 5. STATISTIQUES PLATEFORME (DYNAMIQUES)
+    // 5. STATISTIQUES PLATEFORME
     // ============================================
     const [platformStats, setPlatformStats] = useState({
         companies: 0,
@@ -93,9 +95,6 @@ export default function SuperAdminSettings() {
         fetchPlatformStats();
     }, [user]);
 
-    // ============================================
-    // Récupérer le profil
-    // ============================================
     const fetchProfile = async () => {
         try {
             const { data, error } = await supabase
@@ -115,95 +114,73 @@ export default function SuperAdminSettings() {
         }
     };
 
-    // ============================================
-    // Récupérer les préférences (localStorage)
-    // ============================================
     const fetchPreferences = () => {
         setPreferences({
             emailNotifications: localStorage.getItem('emailNotifications') !== 'false',
             newCompanyAlert: localStorage.getItem('newCompanyAlert') !== 'false',
             newUserAlert: localStorage.getItem('newUserAlert') !== 'false',
-            theme: localStorage.getItem('theme') || 'light',
             language: localStorage.getItem('language') || 'fr',
             sessionTimeout: localStorage.getItem('sessionTimeout') || '30'
         });
+    };
 
-        // Appliquer le thème
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
+    const fetchPlatformConfig = async () => {
+        try {
+            const { data: existing, error: checkError } = await supabase
+                .from('system_settings')
+                .select('*')
+                .eq('id', 1)
+                .maybeSingle();
+
+            if (checkError) throw checkError;
+
+            if (!existing) {
+                const { error: insertError } = await supabase
+                    .from('system_settings')
+                    .insert({ id: 1 });
+
+                if (insertError) throw insertError;
+            }
+
+            const { data, error } = await supabase
+                .from('system_settings')
+                .select('*')
+                .eq('id', 1)
+                .single();
+
+            if (error) throw error;
+            
+            if (data) {
+                setPlatformConfig({
+                    default_limits: data.default_limits || platformConfig.default_limits,
+                    trial_days: data.trial_days || 14,
+                    allow_registration: data.allow_registration ?? true,
+                    maintenance_mode: data.maintenance_mode ?? false,
+                    max_file_size: data.max_file_size || 500,
+                    allowed_video_formats: data.allowed_video_formats || ['mp4', 'webm', 'mov'],
+                    api_enabled: data.api_enabled ?? false,
+                    api_rate_limit: data.api_rate_limit || 1000
+                });
+            }
+        } catch (error) {
+            console.error('Erreur chargement config:', error);
         }
     };
 
-    // ============================================
-    // Récupérer la configuration depuis Supabase
-    // ============================================
-    const fetchPlatformConfig = async () => {
-    try {
-        // Vérifier si la ligne existe
-        const { data: existing, error: checkError } = await supabase
-            .from('system_settings')
-            .select('*')
-            .eq('id', 1)
-            .maybeSingle();
-
-        if (checkError) throw checkError;
-
-        // Créer la ligne si elle n'existe pas
-        if (!existing) {
-            const { error: insertError } = await supabase
-                .from('system_settings')
-                .insert({ id: 1 });
-
-            if (insertError) throw insertError;
-        }
-
-        // Récupérer les settings
-        const { data, error } = await supabase
-            .from('system_settings')
-            .select('*')
-            .eq('id', 1)
-            .single();
-
-        if (error) throw error;
-        
-        if (data) {
-            setPlatformConfig({
-                default_limits: data.default_limits || platformConfig.default_limits,
-                trial_days: data.trial_days || 14,
-                allow_registration: data.allow_registration ?? true,
-                maintenance_mode: data.maintenance_mode ?? false,
-                max_file_size: data.max_file_size || 500,
-                allowed_video_formats: data.allowed_video_formats || ['mp4', 'webm', 'mov'],
-                api_enabled: data.api_enabled ?? false,
-                api_rate_limit: data.api_rate_limit || 1000
-            });
-        }
-    } catch (error) {
-        console.error('Erreur chargement config:', error);
-    }
-};
-
-    // ============================================
-    // Récupérer les statistiques plateforme
-    // ============================================
     const fetchPlatformStats = async () => {
         try {
-            // Compter les entreprises
             const { count: companiesCount } = await supabase
                 .from('organizations')
                 .select('*', { count: 'exact', head: true });
 
-            // Compter les utilisateurs
             const { count: usersCount } = await supabase
                 .from('profiles')
                 .select('*', { count: 'exact', head: true });
 
-            // Compter les vidéos
             const { count: videosCount } = await supabase
                 .from('videos')
                 .select('*', { count: 'exact', head: true });
 
-            // Calculer le stockage utilisé (estimation: 50 Mo par vidéo)
             const storageUsed = (videosCount || 0) * 50;
 
             setPlatformStats({
@@ -220,9 +197,6 @@ export default function SuperAdminSettings() {
         }
     };
 
-    // ============================================
-    // Validation mot de passe
-    // ============================================
     const validatePassword = (value) => {
         if (!value) return "Mot de passe requis";
         if (value.length < 8) return "Minimum 8 caractères";
@@ -246,9 +220,6 @@ export default function SuperAdminSettings() {
                            passwordData.new &&
                            passwordData.confirm;
 
-    // ============================================
-    // Sauvegarde du profil
-    // ============================================
     const handleSaveProfile = async () => {
         setSaving(true);
         setError('');
@@ -271,9 +242,6 @@ export default function SuperAdminSettings() {
         }
     };
 
-    // ============================================
-    // Changement de mot de passe
-    // ============================================
     const handleChangePassword = async () => {
         if (!isPasswordValid) return;
 
@@ -300,27 +268,14 @@ export default function SuperAdminSettings() {
         }
     };
 
-    // ============================================
-    // Sauvegarde des préférences
-    // ============================================
     const handleSavePreferences = () => {
         Object.entries(preferences).forEach(([key, value]) => {
             localStorage.setItem(key, value.toString());
         });
 
-        // Appliquer le thème
-        if (preferences.theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-
         setSuccess('Préférences sauvegardées');
     };
 
-    // ============================================
-    // Sauvegarde de la configuration plateforme
-    // ============================================
     const handleSavePlatformConfig = async () => {
         setSaving(true);
         setError('');
@@ -350,9 +305,6 @@ export default function SuperAdminSettings() {
         }
     };
 
-    // ============================================
-    // Formater la taille de stockage
-    // ============================================
     const formatStorage = (mb) => {
         if (mb > 1024) {
             return `${(mb / 1024).toFixed(1)} Go`;
@@ -360,9 +312,6 @@ export default function SuperAdminSettings() {
         return `${mb} Mo`;
     };
 
-    // ============================================
-    // Rafraîchir les stats
-    // ============================================
     const handleRefreshStats = async () => {
         setRefreshing(true);
         try {
@@ -376,15 +325,11 @@ export default function SuperAdminSettings() {
         }
     };
 
-    // ============================================
-    // Exporter les données (CSV)
-    // ============================================
     const handleExportData = async () => {
         setExporting(true);
         setError('');
         
         try {
-            // Récupérer les données des organisations
             const { data: orgs, error: orgsError } = await supabase
                 .from('organizations')
                 .select('name, plan_type, created_at');
@@ -396,7 +341,6 @@ export default function SuperAdminSettings() {
                 return;
             }
 
-            // Créer le contenu CSV
             const headers = ['Nom', 'Plan', 'Date de création'];
             const rows = orgs.map(org => [
                 `"${org.name.replace(/"/g, '""')}"`,
@@ -409,7 +353,6 @@ export default function SuperAdminSettings() {
                 ...rows.map(row => row.join(','))
             ].join('\n');
 
-            // Créer le blob et déclencher le téléchargement
             const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -433,9 +376,9 @@ export default function SuperAdminSettings() {
             <MainLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-20 h-20 border-4 border-purple-200 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                        <p className="mt-4 text-gray-500">Chargement des paramètres...</p>
+                        <div className="w-20 h-20 border-4 border-purple-200 dark:border-purple-800 rounded-full"></div>
+                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-purple-600 dark:border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="mt-4 text-gray-500 dark:text-gray-400">Chargement des paramètres...</p>
                     </div>
                 </div>
             </MainLayout>
@@ -463,28 +406,28 @@ export default function SuperAdminSettings() {
                     </motion.div>
 
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                            <Settings className="w-8 h-8 text-purple-600" />
+                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <Settings className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                             Paramètres
                         </h1>
-                        <p className="text-gray-500 mt-1">
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">
                             Gérez votre profil et la configuration de la plateforme
                         </p>
                     </div>
                 </div>
 
-                {/* Messages de succès/erreur */}
+                {/* Messages */}
                 <AnimatePresence>
                     {success && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3"
+                            className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl flex items-center gap-3"
                         >
-                            <CheckCircle className="w-5 h-5 text-green-600" />
-                            <p className="text-sm text-green-700 flex-1">{success}</p>
-                            <button onClick={() => setSuccess('')} className="text-green-600 hover:text-green-800">
+                            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                            <p className="text-sm text-green-700 dark:text-green-300 flex-1">{success}</p>
+                            <button onClick={() => setSuccess('')} className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300">
                                 <X className="w-4 h-4" />
                             </button>
                         </motion.div>
@@ -495,32 +438,30 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3"
+                            className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3"
                         >
-                            <AlertCircle className="w-5 h-5 text-red-600" />
-                            <p className="text-sm text-red-700 flex-1">{error}</p>
-                            <button onClick={() => setError('')} className="text-red-600 hover:text-red-800">
+                            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                            <p className="text-sm text-red-700 dark:text-red-300 flex-1">{error}</p>
+                            <button onClick={() => setError('')} className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
                                 <X className="w-4 h-4" />
                             </button>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* Grille des paramètres */}
+                {/* Grille */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Colonne principale (2/3) */}
+                    {/* Colonne principale */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* ============================================
-                            1. PROFIL SUPER ADMIN
-                        ============================================ */}
+                        {/* PROFIL */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <User className="w-5 h-5 text-purple-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <User className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 Mon profil
                             </h2>
 
@@ -534,13 +475,13 @@ export default function SuperAdminSettings() {
                                     required
                                 />
 
-                                <div className="bg-gray-50 p-4 rounded-xl">
-                                    <p className="text-sm text-gray-600 mb-1">Email</p>
-                                    <p className="text-lg font-medium text-gray-800 flex items-center gap-2">
-                                        <Mail className="w-4 h-4 text-purple-600" />
+                                <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-xl">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Email</p>
+                                    <p className="text-lg font-medium text-gray-800 dark:text-white flex items-center gap-2">
+                                        <Mail className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                                         {profile.email}
                                     </p>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         L'email ne peut pas être modifié.
                                     </p>
                                 </div>
@@ -555,104 +496,102 @@ export default function SuperAdminSettings() {
                             </div>
                         </motion.div>
 
-                        {/* ============================================
-                            2. CHANGEMENT DE MOT DE PASSE
-                        ============================================ */}
+                        {/* MOT DE PASSE */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Key className="w-5 h-5 text-purple-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Key className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 Changer le mot de passe
                             </h2>
 
                             <div className="space-y-4">
                                 {/* Mot de passe actuel */}
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Mot de passe actuel</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Mot de passe actuel</label>
                                     <div className="relative">
                                         <input
                                             type={showPassword.current ? "text" : "password"}
                                             value={passwordData.current}
                                             onChange={(e) => setPasswordData({...passwordData, current: e.target.value})}
                                             onBlur={() => setPasswordTouched({...passwordTouched, current: true})}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all ${
+                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-900 dark:text-white dark:border-gray-700 ${
                                                 passwordErrors.current && passwordTouched.current
-                                                    ? 'border-red-300 focus:border-red-500'
+                                                    ? 'border-red-300 dark:border-red-600 focus:border-red-500'
                                                     : passwordData.current && !passwordErrors.current
-                                                        ? 'border-green-300 focus:border-green-500'
-                                                        : 'border-gray-200 focus:border-purple-400'
+                                                        ? 'border-green-300 dark:border-green-600 focus:border-green-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500'
                                             }`}
                                             placeholder="********"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword({...showPassword, current: !showPassword.current})}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
                                         >
                                             {showPassword.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                     {passwordErrors.current && passwordTouched.current && (
-                                        <p className="text-xs text-red-500 mt-1">{passwordErrors.current}</p>
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{passwordErrors.current}</p>
                                     )}
                                 </div>
 
                                 {/* Nouveau mot de passe */}
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Nouveau mot de passe</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Nouveau mot de passe</label>
                                     <div className="relative">
                                         <input
                                             type={showPassword.new ? "text" : "password"}
                                             value={passwordData.new}
                                             onChange={(e) => setPasswordData({...passwordData, new: e.target.value})}
                                             onBlur={() => setPasswordTouched({...passwordTouched, new: true})}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all ${
+                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-900 dark:text-white dark:border-gray-700 ${
                                                 passwordErrors.new && passwordTouched.new
-                                                    ? 'border-red-300 focus:border-red-500'
+                                                    ? 'border-red-300 dark:border-red-600 focus:border-red-500'
                                                     : passwordData.new && !passwordErrors.new
-                                                        ? 'border-green-300 focus:border-green-500'
-                                                        : 'border-gray-200 focus:border-purple-400'
+                                                        ? 'border-green-300 dark:border-green-600 focus:border-green-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500'
                                             }`}
                                             placeholder="********"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword({...showPassword, new: !showPassword.new})}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
                                         >
                                             {showPassword.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                     {passwordErrors.new && passwordTouched.new && (
-                                        <p className="text-xs text-red-500 mt-1">{passwordErrors.new}</p>
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{passwordErrors.new}</p>
                                     )}
                                 </div>
 
                                 {/* Confirmation */}
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Confirmer</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Confirmer</label>
                                     <div className="relative">
                                         <input
                                             type={showPassword.confirm ? "text" : "password"}
                                             value={passwordData.confirm}
                                             onChange={(e) => setPasswordData({...passwordData, confirm: e.target.value})}
                                             onBlur={() => setPasswordTouched({...passwordTouched, confirm: true})}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all ${
+                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-900 dark:text-white dark:border-gray-700 ${
                                                 passwordErrors.confirm && passwordTouched.confirm
-                                                    ? 'border-red-300 focus:border-red-500'
+                                                    ? 'border-red-300 dark:border-red-600 focus:border-red-500'
                                                     : passwordData.confirm && !passwordErrors.confirm
-                                                        ? 'border-green-300 focus:border-green-500'
-                                                        : 'border-gray-200 focus:border-purple-400'
+                                                        ? 'border-green-300 dark:border-green-600 focus:border-green-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500'
                                             }`}
                                             placeholder="********"
                                         />
                                     </div>
                                     {passwordErrors.confirm && passwordTouched.confirm && (
-                                        <p className="text-xs text-red-500 mt-1">{passwordErrors.confirm}</p>
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{passwordErrors.confirm}</p>
                                     )}
                                 </div>
 
@@ -662,7 +601,7 @@ export default function SuperAdminSettings() {
                                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
                                         isPasswordValid && !saving
                                             ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
-                                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                            : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
                                     Changer le mot de passe
@@ -670,31 +609,29 @@ export default function SuperAdminSettings() {
                             </div>
                         </motion.div>
 
-                        {/* ============================================
-                            3. PRÉFÉRENCES
-                        ============================================ */}
+                        {/* PRÉFÉRENCES */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-purple-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Bell className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 Préférences
                             </h2>
 
                             {/* Notifications */}
                             <div className="mb-6">
-                                <h3 className="text-sm font-medium text-gray-700 mb-3">Notifications</h3>
+                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Notifications</h3>
                                 <div className="space-y-3">
                                     {[
                                         { key: 'emailNotifications', label: 'Notifications par email' },
                                         { key: 'newCompanyAlert', label: 'Nouvelle entreprise créée' },
                                         { key: 'newUserAlert', label: 'Nouvel utilisateur inscrit' }
                                     ].map(item => (
-                                        <label key={item.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors">
-                                            <span className="text-sm text-gray-700">{item.label}</span>
+                                        <label key={item.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">{item.label}</span>
                                             <div className="relative">
                                                 <input
                                                     type="checkbox"
@@ -703,9 +640,9 @@ export default function SuperAdminSettings() {
                                                     className="sr-only"
                                                 />
                                                 <div className={`w-12 h-6 rounded-full transition-colors ${
-                                                    preferences[item.key] ? 'bg-purple-600' : 'bg-gray-300'
+                                                    preferences[item.key] ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
                                                 }`}>
-                                                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                                                    <div className={`w-5 h-5 bg-white dark:bg-gray-200 rounded-full shadow transform transition-transform ${
                                                         preferences[item.key] ? 'translate-x-6' : 'translate-x-1'
                                                     }`} />
                                                 </div>
@@ -717,41 +654,41 @@ export default function SuperAdminSettings() {
 
                             {/* Thème et langue */}
                             <div className="mb-6">
-                                <h3 className="text-sm font-medium text-gray-700 mb-3">Apparence</h3>
+                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Apparence</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-xs text-gray-500 mb-2">Thème</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Thème</p>
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={() => setPreferences({...preferences, theme: 'light'})}
+                                                onClick={() => setTheme('light')}
                                                 className={`flex-1 p-3 rounded-xl border-2 transition-all ${
-                                                    preferences.theme === 'light'
-                                                        ? 'border-purple-600 bg-purple-50'
-                                                        : 'border-gray-200 hover:border-purple-200'
+                                                    theme === 'light'
+                                                        ? 'border-purple-600 dark:border-purple-400 bg-purple-50 dark:bg-purple-900/30'
+                                                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700'
                                                 }`}
                                             >
                                                 <Sun className="w-5 h-5 mx-auto mb-1 text-yellow-500" />
-                                                <span className="text-xs">Clair</span>
+                                                <span className="text-xs dark:text-gray-300">Clair</span>
                                             </button>
                                             <button
-                                                onClick={() => setPreferences({...preferences, theme: 'dark'})}
+                                                onClick={() => setTheme('dark')}
                                                 className={`flex-1 p-3 rounded-xl border-2 transition-all ${
-                                                    preferences.theme === 'dark'
-                                                        ? 'border-purple-600 bg-purple-50'
-                                                        : 'border-gray-200 hover:border-purple-200'
+                                                    theme === 'dark'
+                                                        ? 'border-purple-600 dark:border-purple-400 bg-purple-50 dark:bg-purple-900/30'
+                                                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700'
                                                 }`}
                                             >
-                                                <Moon className="w-5 h-5 mx-auto mb-1 text-indigo-600" />
-                                                <span className="text-xs">Sombre</span>
+                                                <Moon className="w-5 h-5 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
+                                                <span className="text-xs dark:text-gray-300">Sombre</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 mb-2">Langue</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Langue</p>
                                         <select
                                             value={preferences.language}
                                             onChange={(e) => setPreferences({...preferences, language: e.target.value})}
-                                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all"
+                                            className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                         >
                                             <option value="fr">Français</option>
                                             <option value="en">English</option>
@@ -764,13 +701,13 @@ export default function SuperAdminSettings() {
 
                             {/* Sécurité */}
                             <div>
-                                <h3 className="text-sm font-medium text-gray-700 mb-3">Sécurité</h3>
+                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Sécurité</h3>
                                 <div>
-                                    <p className="text-xs text-gray-500 mb-2">Expiration de session</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Expiration de session</p>
                                     <select
                                         value={preferences.sessionTimeout}
                                         onChange={(e) => setPreferences({...preferences, sessionTimeout: e.target.value})}
-                                        className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                     >
                                         <option value="15">15 minutes</option>
                                         <option value="30">30 minutes</option>
@@ -789,35 +726,33 @@ export default function SuperAdminSettings() {
                             </button>
                         </motion.div>
 
-                        {/* ============================================
-                            4. CONFIGURATION PLATEFORME
-                        ============================================ */}
+                        {/* CONFIGURATION PLATEFORME */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Server className="w-5 h-5 text-purple-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Server className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                 Configuration plateforme
                             </h2>
 
                             {/* Limites par défaut */}
                             <div className="mb-6">
-                                <h3 className="text-sm font-medium text-gray-700 mb-3">Limites par défaut</h3>
+                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Limites par défaut</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {['free', 'starter', 'business'].map(plan => (
-                                        <div key={plan} className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200">
-                                            <p className="font-bold text-gray-800 capitalize mb-3 flex items-center gap-2">
-                                                {plan === 'free' && <span className="w-2 h-2 bg-gray-400 rounded-full"></span>}
-                                                {plan === 'starter' && <span className="w-2 h-2 bg-blue-500 rounded-full"></span>}
-                                                {plan === 'business' && <span className="w-2 h-2 bg-purple-500 rounded-full"></span>}
+                                        <div key={plan} className="p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                                            <p className="font-bold text-gray-800 dark:text-white capitalize mb-3 flex items-center gap-2">
+                                                {plan === 'free' && <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"></span>}
+                                                {plan === 'starter' && <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></span>}
+                                                {plan === 'business' && <span className="w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full"></span>}
                                                 {plan}
                                             </p>
                                             <div className="space-y-2 text-sm">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-gray-500">Utilisateurs:</span>
+                                                    <span className="text-gray-500 dark:text-gray-400">Utilisateurs:</span>
                                                     <div className="flex items-center gap-2">
                                                         <input
                                                             type="number"
@@ -835,16 +770,16 @@ export default function SuperAdminSettings() {
                                                                     }
                                                                 });
                                                             }}
-                                                            className="w-16 p-1 text-right border border-gray-200 rounded focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+                                                            className="w-16 p-1 text-right border border-gray-200 dark:border-gray-700 rounded focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
                                                             placeholder="∞"
                                                         />
                                                         {platformConfig.default_limits[plan]?.users === -1 && (
-                                                            <span className="text-xs text-gray-400">(illimité)</span>
+                                                            <span className="text-xs text-gray-400 dark:text-gray-500">(illimité)</span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-gray-500">Vidéos:</span>
+                                                    <span className="text-gray-500 dark:text-gray-400">Vidéos:</span>
                                                     <div className="flex items-center gap-2">
                                                         <input
                                                             type="number"
@@ -862,16 +797,16 @@ export default function SuperAdminSettings() {
                                                                     }
                                                                 });
                                                             }}
-                                                            className="w-16 p-1 text-right border border-gray-200 rounded focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+                                                            className="w-16 p-1 text-right border border-gray-200 dark:border-gray-700 rounded focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
                                                             placeholder="∞"
                                                         />
                                                         {platformConfig.default_limits[plan]?.videos === -1 && (
-                                                            <span className="text-xs text-gray-400">(illimité)</span>
+                                                            <span className="text-xs text-gray-400 dark:text-gray-500">(illimité)</span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-gray-500">Stockage:</span>
+                                                    <span className="text-gray-500 dark:text-gray-400">Stockage:</span>
                                                     <div className="flex items-center gap-2">
                                                         <input
                                                             type="number"
@@ -888,9 +823,9 @@ export default function SuperAdminSettings() {
                                                                     }
                                                                 });
                                                             }}
-                                                            className="w-16 p-1 text-right border border-gray-200 rounded focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+                                                            className="w-16 p-1 text-right border border-gray-200 dark:border-gray-700 rounded focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
                                                         />
-                                                        <span className="text-xs text-gray-500">Go</span>
+                                                        <span className="text-xs text-gray-500 dark:text-gray-400">Go</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -902,28 +837,28 @@ export default function SuperAdminSettings() {
                             {/* Paramètres généraux */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Période d'essai (jours)
                                     </label>
                                     <input
                                         type="number"
                                         value={platformConfig.trial_days}
                                         onChange={(e) => setPlatformConfig({...platformConfig, trial_days: parseInt(e.target.value)})}
-                                        className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                         min="0"
                                         max="90"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Taille maximale des fichiers (Mo)
                                     </label>
                                     <input
                                         type="number"
                                         value={platformConfig.max_file_size}
                                         onChange={(e) => setPlatformConfig({...platformConfig, max_file_size: parseInt(e.target.value)})}
-                                        className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                         min="1"
                                         max="10240"
                                     />
@@ -932,10 +867,10 @@ export default function SuperAdminSettings() {
 
                             {/* Toggles */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors">
+                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
                                     <div>
-                                        <p className="font-medium text-gray-700">Autoriser les inscriptions</p>
-                                        <p className="text-xs text-gray-500">Les nouveaux utilisateurs peuvent s'inscrire</p>
+                                        <p className="font-medium text-gray-700 dark:text-gray-300">Autoriser les inscriptions</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Les nouveaux utilisateurs peuvent s'inscrire</p>
                                     </div>
                                     <div className="relative">
                                         <input
@@ -945,19 +880,19 @@ export default function SuperAdminSettings() {
                                             className="sr-only"
                                         />
                                         <div className={`w-14 h-7 rounded-full transition-colors ${
-                                            platformConfig.allow_registration ? 'bg-green-500' : 'bg-gray-300'
+                                            platformConfig.allow_registration ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
                                         }`}>
-                                            <div className={`w-6 h-6 bg-white rounded-full shadow transform transition-transform mt-0.5 ${
+                                            <div className={`w-6 h-6 bg-white dark:bg-gray-200 rounded-full shadow transform transition-transform mt-0.5 ${
                                                 platformConfig.allow_registration ? 'translate-x-7' : 'translate-x-1'
                                             }`} />
                                         </div>
                                     </div>
                                 </label>
 
-                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors">
+                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
                                     <div>
-                                        <p className="font-medium text-gray-700">Mode maintenance</p>
-                                        <p className="text-xs text-gray-500">La plateforme est en maintenance</p>
+                                        <p className="font-medium text-gray-700 dark:text-gray-300">Mode maintenance</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">La plateforme est en maintenance</p>
                                     </div>
                                     <div className="relative">
                                         <input
@@ -967,9 +902,9 @@ export default function SuperAdminSettings() {
                                             className="sr-only"
                                         />
                                         <div className={`w-14 h-7 rounded-full transition-colors ${
-                                            platformConfig.maintenance_mode ? 'bg-red-500' : 'bg-gray-300'
+                                            platformConfig.maintenance_mode ? 'bg-red-500' : 'bg-gray-300 dark:bg-gray-600'
                                         }`}>
-                                            <div className={`w-6 h-6 bg-white rounded-full shadow transform transition-transform mt-0.5 ${
+                                            <div className={`w-6 h-6 bg-white dark:bg-gray-200 rounded-full shadow transform transition-transform mt-0.5 ${
                                                 platformConfig.maintenance_mode ? 'translate-x-7' : 'translate-x-1'
                                             }`} />
                                         </div>
@@ -977,14 +912,14 @@ export default function SuperAdminSettings() {
                                 </label>
                             </div>
 
-                            {/* Formats vidéo autorisés */}
+                            {/* Formats vidéo */}
                             <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Formats vidéo autorisés
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {['mp4', 'webm', 'mov', 'avi', 'mkv'].map(format => (
-                                        <label key={format} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-purple-50 transition-colors">
+                                        <label key={format} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
                                             <input
                                                 type="checkbox"
                                                 checked={platformConfig.allowed_video_formats?.includes(format)}
@@ -994,20 +929,20 @@ export default function SuperAdminSettings() {
                                                         : (platformConfig.allowed_video_formats || []).filter(f => f !== format);
                                                     setPlatformConfig({...platformConfig, allowed_video_formats: newFormats});
                                                 }}
-                                                className="rounded text-purple-600 focus:ring-purple-200"
+                                                className="rounded text-purple-600 dark:text-purple-400 focus:ring-purple-200 dark:focus:ring-purple-800"
                                             />
-                                            <span className="text-sm text-gray-700 uppercase">{format}</span>
+                                            <span className="text-sm text-gray-700 dark:text-gray-300 uppercase">{format}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
                             {/* API */}
-                            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-100 dark:border-purple-800">
                                 <label className="flex items-center justify-between cursor-pointer">
                                     <div>
-                                        <p className="font-medium text-gray-700">Activer l'API</p>
-                                        <p className="text-xs text-gray-500">Permettre les accès API externes</p>
+                                        <p className="font-medium text-gray-700 dark:text-gray-300">Activer l'API</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Permettre les accès API externes</p>
                                     </div>
                                     <div className="relative">
                                         <input
@@ -1017,9 +952,9 @@ export default function SuperAdminSettings() {
                                             className="sr-only"
                                         />
                                         <div className={`w-14 h-7 rounded-full transition-colors ${
-                                            platformConfig.api_enabled ? 'bg-purple-600' : 'bg-gray-300'
+                                            platformConfig.api_enabled ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
                                         }`}>
-                                            <div className={`w-6 h-6 bg-white rounded-full shadow transform transition-transform mt-0.5 ${
+                                            <div className={`w-6 h-6 bg-white dark:bg-gray-200 rounded-full shadow transform transition-transform mt-0.5 ${
                                                 platformConfig.api_enabled ? 'translate-x-7' : 'translate-x-1'
                                             }`} />
                                         </div>
@@ -1028,21 +963,21 @@ export default function SuperAdminSettings() {
 
                                 {platformConfig.api_enabled && (
                                     <div className="mt-3">
-                                        <label className="block text-sm text-gray-600 mb-1">
+                                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
                                             Limite de requêtes API (par heure)
                                         </label>
                                         <input
                                             type="number"
                                             value={platformConfig.api_rate_limit}
                                             onChange={(e) => setPlatformConfig({...platformConfig, api_rate_limit: parseInt(e.target.value)})}
-                                            className="w-full p-2 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+                                            className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
                                             min="1"
                                         />
                                     </div>
                                 )}
                             </div>
 
-                            {/* Bouton de sauvegarde */}
+                            {/* Bouton sauvegarde */}
                             <div className="mt-6 flex justify-end">
                                 <button
                                     onClick={handleSavePlatformConfig}
@@ -1065,11 +1000,9 @@ export default function SuperAdminSettings() {
                         </motion.div>
                     </div>
 
-                    {/* Colonne latérale (1/3) */}
+                    {/* Colonne latérale */}
                     <div className="space-y-6">
-                        {/* ============================================
-                            STATUT DE LA PLATEFORME (DYNAMIQUE)
-                        ============================================ */}
+                        {/* STATUT PLATEFORME */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -1113,14 +1046,14 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
                         >
-                            <h3 className="text-sm font-medium text-gray-700 mb-4">Actions rapides</h3>
+                            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Actions rapides</h3>
                             <div className="space-y-2">
                                 <button
                                     onClick={handleRefreshStats}
                                     disabled={refreshing || exporting}
-                                    className="w-full px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
+                                    className="w-full px-4 py-2 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800/50 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
                                 >
                                     <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                                     <span>{refreshing ? 'Mise à jour...' : 'Rafraîchir les stats'}</span>
@@ -1128,7 +1061,7 @@ export default function SuperAdminSettings() {
                                 <button
                                     onClick={handleExportData}
                                     disabled={refreshing || exporting}
-                                    className="w-full px-4 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
+                                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
                                 >
                                     {exporting ? (
                                         <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1147,7 +1080,7 @@ export default function SuperAdminSettings() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 }}
-                    className="text-center text-xs text-gray-400 flex items-center justify-center gap-1"
+                    className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1"
                 >
                     <Shield className="w-3 h-3" />
                     <span>Paramètres protégés • Connexion sécurisée • Actions journalisées</span>

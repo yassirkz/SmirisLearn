@@ -1,4 +1,3 @@
-// src/pages/admin/PillarDetailPage.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -68,11 +67,11 @@ export default function PillarDetailPage() {
             )}
 
             {!loading && error && (
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-                    <p className="text-sm text-red-700">{error}</p>
+                <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg">
+                    <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                     <button
                         onClick={() => navigate('/admin/pillars')}
-                        className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+                        className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"
                     >
                         Revenir à la liste des piliers
                     </button>
@@ -90,27 +89,27 @@ export default function PillarDetailPage() {
                         <div className="flex items-start gap-4">
                             <button
                                 onClick={() => navigate('/admin/pillars')}
-                                className="mt-1 mr-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                                className="mt-1 mr-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                 aria-label="Retour aux piliers"
                             >
-                                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                             </button>
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                                    <BookOpen className="w-7 h-7 text-indigo-600" />
+                                <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                                    <BookOpen className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
                                     {pillar.safeName}
                                 </h1>
                                 {pillar.safeDescription && (
-                                    <p className="text-gray-500 mt-1">
+                                    <p className="text-gray-500 dark:text-gray-400 mt-1">
                                         {pillar.safeDescription}
                                     </p>
                                 )}
-                                <div className="mt-3 flex items-center gap-3 text-sm text-gray-500">
-                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700">
+                                <div className="mt-3 flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
                                         <Video className="w-4 h-4" />
                                         {pillar.videoCount} vidéo{pillar.videoCount > 1 ? 's' : ''}
                                     </span>
-                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-50 text-gray-600">
+                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
                                         Créé le{' '}
                                         {pillar.created_at
                                             ? new Date(pillar.created_at).toLocaleDateString('fr-FR')
@@ -134,35 +133,35 @@ export default function PillarDetailPage() {
                     />
 
                     {/* Liste simple des vidéos associées */}
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <Video className="w-5 h-5 text-indigo-600" />
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                            <Video className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             Vidéos du pilier
                         </h2>
                         {pillar.videos && pillar.videos.length > 0 ? (
-                            <ul className="divide-y divide-gray-100">
+                            <ul className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {pillar.videos.map((video) => (
                                     <li key={video.id} className="py-3 flex items-center justify-between gap-3">
                                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                                            <Video className="w-4 h-4 text-indigo-400 shrink-0" />
-                                            <span className="text-sm text-gray-800 truncate">
+                                            <Video className="w-4 h-4 text-indigo-400 dark:text-indigo-500 shrink-0" />
+                                            <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
                                                 {escapeText(untrusted(video.title || 'Vidéo sans titre'))}
                                             </span>
                                             {video.quizzes?.length > 0 && (
-                                                <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 flex items-center gap-1">
+                                                <span className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 flex items-center gap-1">
                                                     <Award className="w-3 h-3" />
                                                     Quiz
                                                 </span>
                                             )}
                                         </div>
-                                        <span className="text-xs text-gray-400 shrink-0">
+                                        <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
                                             {video.duration ? Math.round(video.duration / 60) + ' min' : '—'}
                                         </span>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Aucune vidéo n&apos;est encore associée à ce pilier.
                             </p>
                         )}

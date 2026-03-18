@@ -1,4 +1,3 @@
-// src/pages/admin/QuizPage.jsx
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Award, Sparkles, Shield, Plus, X } from 'lucide-react';
@@ -61,7 +60,6 @@ export default function QuizPage() {
     };
 
     const handleDuplicate = async (quiz) => {
-        // Créer une copie avec un nouvel ID, même contenu, mais on laisse l'utilisateur choisir la vidéo ? Pour simplifier, on ouvre le modal avec préremplissage.
         setEditingQuiz({ ...quiz, id: undefined, video_id: '' });
         setShowCreateModal(true);
     };
@@ -88,15 +86,15 @@ export default function QuizPage() {
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                                <Award className="w-8 h-8 text-indigo-600" />
+                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                <Award className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                                 Quiz
                             </h1>
-                            <p className="text-gray-500 mt-1 flex items-center gap-2">
+                            <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                                 <Shield className="w-4 h-4" />
                                 Créez et gérez les quiz associés aux vidéos
                                 {isImpersonating && (
-                                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                                    <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded-full">
                                         Mode lecture seule - Entreprise #{escapeText(untrusted(orgIdFromUrl))}
                                     </span>
                                 )}
@@ -128,14 +126,14 @@ export default function QuizPage() {
 
                 {/* Modal de création/édition */}
                 {showCreateModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
                         <motion.div
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
-                            className="bg-white rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">
+                                <h2 className="text-xl font-bold dark:text-white">
                                     {editingQuiz ? 'Modifier le quiz' : 'Créer un nouveau quiz'}
                                 </h2>
                                 <button
@@ -144,9 +142,9 @@ export default function QuizPage() {
                                         setEditingQuiz(null);
                                         setSelectedVideoId(null);
                                     }}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-5 h-5 dark:text-gray-300" />
                                 </button>
                             </div>
                             <QuizCreator

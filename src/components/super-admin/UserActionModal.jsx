@@ -47,9 +47,6 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                     .eq('id', user.id);
 
                 if (deleteError) throw deleteError;
-                
-                // Note: Auth user deletion usually requires admin privileges or Edge Function
-                // For now we delete from profiles table.
             }
 
             onSuccess?.();
@@ -88,7 +85,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-black/40 backdrop-blur-md"
+                    className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
                     onClick={onClose}
                 />
 
@@ -101,7 +98,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                         exit={{ opacity: 0, scale: 0.9, y: 40 }}
                         className="relative inline-block w-full max-w-md my-8 text-left align-middle"
                     >
-                        <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                        <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                             
                             {/* Header */}
                             <div className={`px-8 pt-8 pb-6 bg-gradient-to-br ${getHeaderGradient()} text-white relative`}>
@@ -124,12 +121,12 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                             <div className="p-8 space-y-6">
                                 {action === 'delete' ? (
                                     <div className="space-y-6">
-                                        <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-xl">
+                                        <div className="p-4 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 rounded-xl">
                                             <div className="flex gap-3">
-                                                <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+                                                <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 shrink-0" />
                                                 <div>
-                                                    <p className="text-sm font-bold text-red-800">Action irréversible</p>
-                                                    <p className="text-sm text-red-700 mt-1">
+                                                    <p className="text-sm font-bold text-red-800 dark:text-red-300">Action irréversible</p>
+                                                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">
                                                         Êtes-vous sûr de vouloir supprimer <strong>{user.full_name || user.email}</strong> ? 
                                                         Toutes ses données seront définitivement effacées.
                                                     </p>
@@ -140,7 +137,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                         <div className="flex gap-3">
                                             <button
                                                 onClick={onClose}
-                                                className="flex-1 py-4 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all text-sm"
+                                                className="flex-1 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-sm"
                                             >
                                                 Annuler
                                             </button>
@@ -158,59 +155,59 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         {/* Nom complet */}
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Nom complet</label>
+                                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase ml-1">Nom complet</label>
                                             <div className="relative group">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-500 transition-colors" />
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-purple-500 dark:group-focus-within:text-purple-400 transition-colors" />
                                                 <input
                                                     type="text"
                                                     value={formData.full_name}
                                                     disabled
-                                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-gray-500 cursor-not-allowed"
+                                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl text-gray-500 dark:text-gray-400 cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
 
                                         {/* Email */}
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Email</label>
+                                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase ml-1">Email</label>
                                             <div className="relative group">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                 <input
                                                     type="email"
                                                     value={formData.email}
                                                     disabled
-                                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-gray-500 cursor-not-allowed"
+                                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl text-gray-500 dark:text-gray-400 cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
 
                                         {/* Entreprise */}
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Entreprise</label>
+                                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase ml-1">Entreprise</label>
                                             <div className="relative group">
-                                                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                 <input
                                                     type="text"
                                                     value={user.organizations?.name || 'Aucune'}
                                                     disabled
-                                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-gray-500 cursor-not-allowed"
+                                                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl text-gray-500 dark:text-gray-400 cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
 
                                         {/* Rôle */}
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Rôle</label>
+                                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase ml-1">Rôle</label>
                                             <div className="relative group">
-                                                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                                                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500 dark:text-purple-400" />
                                                 <select
                                                     value={formData.role}
                                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                                     disabled={isView || loading}
                                                     className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-2xl outline-none transition-all appearance-none ${
                                                         isView 
-                                                        ? 'bg-gray-50 border-gray-100 text-gray-500 cursor-not-allowed'
-                                                        : 'bg-white border-gray-100 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 text-gray-800'
+                                                        ? 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                                                        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 text-gray-800 dark:text-gray-200'
                                                     }`}
                                                 >
                                                     <option value="student">Élève</option>
@@ -219,7 +216,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                                 </select>
                                                 {!isView && (
                                                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                        <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                                         </svg>
                                                     </div>
@@ -228,7 +225,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                         </div>
 
                                         {error && (
-                                            <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-xl text-sm text-red-600 flex items-center gap-2">
+                                            <div className="p-4 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 rounded-xl text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                                                 <AlertCircle className="w-4 h-4" />
                                                 {error}
                                             </div>
@@ -238,7 +235,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                             <button
                                                 type="button"
                                                 onClick={onClose}
-                                                className="flex-1 py-4 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all text-sm"
+                                                className="flex-1 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-sm"
                                             >
                                                 {isView ? 'Fermer' : 'Annuler'}
                                             </button>

@@ -11,12 +11,14 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useSearchParams } from 'react-router-dom';
 import { useUserRole } from '../../hooks/useUserRole';
+import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
 import { untrusted, escapeText } from '../../utils/security';
 import SanitizedInput from '../../components/ui/SanitizedInput';
 
 export default function AdminSettings() {
     const { user } = useAuth();
     const { role } = useUserRole();
+    const { theme, setTheme } = useTheme(); // ← AJOUT
     const [searchParams] = useSearchParams();
     const orgIdFromUrl = searchParams.get('orgId');
     const isReadOnly = role === 'super_admin' && orgIdFromUrl;
@@ -38,8 +40,7 @@ export default function AdminSettings() {
         videoUploaded: true,
         quizCompleted: true,
         sessionTimeout: '30',
-        theme: 'light',
-        language: 'fr'
+        language: 'fr' // thème retiré car géré globalement
     });
 
     const [originalSettings, setOriginalSettings] = useState({});
@@ -65,7 +66,6 @@ export default function AdminSettings() {
 
             if (isReadOnly) {
                 resolvedOrgId = orgIdFromUrl;
-                // On a besoin d'un admin de cette org pour les infos par défaut
                 const { data: adminProfile } = await supabase
                     .from('profiles')
                     .select('email, full_name')
@@ -76,7 +76,6 @@ export default function AdminSettings() {
                 
                 profileData = adminProfile;
             } else {
-                // Récupérer le profil
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('organization_id, email, full_name')
@@ -112,7 +111,6 @@ export default function AdminSettings() {
                 videoUploaded: localStorage.getItem('videoUploaded') !== 'false',
                 quizCompleted: localStorage.getItem('quizCompleted') !== 'false',
                 sessionTimeout: localStorage.getItem('sessionTimeout') || '30',
-                theme: localStorage.getItem('theme') || 'light',
                 language: localStorage.getItem('language') || 'fr'
             };
 
@@ -162,7 +160,6 @@ export default function AdminSettings() {
         setSuccess('');
 
         try {
-            // Mettre à jour l'organisation
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('organization_id')
@@ -180,7 +177,6 @@ export default function AdminSettings() {
                 }
             }
 
-            // Mettre à jour le nom de l'admin
             if (settings.adminName !== originalSettings.adminName) {
                 const { error } = await supabase
                     .from('profiles')
@@ -190,8 +186,7 @@ export default function AdminSettings() {
                 if (error) throw error;
             }
 
-            // Sauvegarder les préférences
-            localStorage.setItem('theme', settings.theme);
+            // Sauvegarder les préférences (sauf thème)
             localStorage.setItem('language', settings.language);
             localStorage.setItem('sessionTimeout', settings.sessionTimeout);
             localStorage.setItem('emailNotifications', settings.emailNotifications);
@@ -201,13 +196,6 @@ export default function AdminSettings() {
 
             setSuccess('Paramètres mis à jour avec succès');
             setOriginalSettings(settings);
-
-            // Appliquer le thème
-            if (settings.theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
 
         } catch (error) {
             console.error('Erreur sauvegarde:', error);
@@ -251,7 +239,7 @@ export default function AdminSettings() {
             <AdminLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-16 h-16 border-4 border-indigo-200 rounded-full"></div>
+                        <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
                         <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 </div>
@@ -268,11 +256,11 @@ export default function AdminSettings() {
             >
                 {/* En-tête */}
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                        <Settings className="w-8 h-8 text-indigo-600" />
+                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        <Settings className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                         Paramètres
                     </h1>
-                    <p className="text-gray-500 mt-1">
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">
                         Gérez les préférences de votre entreprise
                     </p>
                 </div>
@@ -284,11 +272,11 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3"
+                            className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl flex items-center gap-3"
                         >
-                            <CheckCircle className="w-5 h-5 text-green-600" />
-                            <p className="text-sm text-green-700 flex-1">{success}</p>
-                            <button onClick={() => setSuccess('')} className="text-green-600 hover:text-green-800">
+                            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                            <p className="text-sm text-green-700 dark:text-green-300 flex-1">{success}</p>
+                            <button onClick={() => setSuccess('')} className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300">
                                 <X className="w-4 h-4" />
                             </button>
                         </motion.div>
@@ -299,11 +287,11 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3"
+                            className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3"
                         >
-                            <AlertCircle className="w-5 h-5 text-red-600" />
-                            <p className="text-sm text-red-700 flex-1">{error}</p>
-                            <button onClick={() => setError('')} className="text-red-600 hover:text-red-800">
+                            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                            <p className="text-sm text-red-700 dark:text-red-300 flex-1">{error}</p>
+                            <button onClick={() => setError('')} className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
                                 <X className="w-4 h-4" />
                             </button>
                         </motion.div>
@@ -319,10 +307,10 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Building className="w-5 h-5 text-indigo-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Building className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                 Informations générales
                             </h2>
 
@@ -336,15 +324,16 @@ export default function AdminSettings() {
                                     maxLength={100}
                                     required
                                     disabled={isReadOnly}
+                                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                                 />
 
-                                <div className="bg-gray-50 p-4 rounded-xl">
-                                    <p className="text-sm text-gray-600 mb-1">Email de l'organisation</p>
-                                    <p className="text-lg font-medium text-gray-800 flex items-center gap-2">
-                                        <Mail className="w-4 h-4 text-indigo-600" />
+                                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Email de l'organisation</p>
+                                    <p className="text-lg font-medium text-gray-800 dark:text-white flex items-center gap-2">
+                                        <Mail className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                                         {settings.companyEmail}
                                     </p>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         L'email ne peut pas être modifié. C'est votre identifiant de connexion.
                                     </p>
                                 </div>
@@ -357,6 +346,7 @@ export default function AdminSettings() {
                                     minLength={3}
                                     required
                                     disabled={isReadOnly}
+                                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                                 />
                             </div>
                         </motion.div>
@@ -366,18 +356,18 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-indigo-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Bell className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                 Notifications
                             </h2>
 
                             <div className="space-y-3">
-                                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors">
+                                <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors">
                                     <div>
-                                        <p className="font-medium text-gray-700">Notifications par email</p>
-                                        <p className="text-xs text-gray-500">Recevoir les notifications importantes</p>
+                                        <p className="font-medium text-gray-700 dark:text-gray-300">Notifications par email</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Recevoir les notifications importantes</p>
                                     </div>
                                     <div className="relative">
                                         <input
@@ -387,7 +377,7 @@ export default function AdminSettings() {
                                             className="sr-only"
                                         />
                                         <div className={`w-12 h-6 rounded-full transition-colors ${
-                                            settings.emailNotifications ? 'bg-indigo-600' : 'bg-gray-300'
+                                            settings.emailNotifications ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
                                         }`}>
                                             <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
                                                 settings.emailNotifications ? 'translate-x-6' : 'translate-x-1'
@@ -403,15 +393,15 @@ export default function AdminSettings() {
                                             { key: 'videoUploaded', label: 'Nouvelle vidéo uploadée' },
                                             { key: 'quizCompleted', label: 'Quiz complété' }
                                         ].map(item => (
-                                            <label key={item.key} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg">
+                                            <label key={item.key} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
                                                 <input
                                                     type="checkbox"
                                                     checked={settings[item.key]}
                                                     onChange={(e) => setSettings({...settings, [item.key]: e.target.checked})}
-                                                    className="rounded text-indigo-600"
+                                                    className="rounded text-indigo-600 dark:bg-gray-700 dark:border-gray-600"
                                                     disabled={isReadOnly}
                                                 />
-                                                <span className="text-sm text-gray-600">{item.label}</span>
+                                                <span className="text-sm text-gray-600 dark:text-gray-300">{item.label}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -424,48 +414,48 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Globe className="w-5 h-5 text-indigo-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                 Apparence
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-2">Thème</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Thème</p>
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => setSettings({...settings, theme: 'light'})}
+                                            onClick={() => setTheme('light')}
                                             className={`flex-1 p-3 rounded-xl border-2 transition-all ${
-                                                settings.theme === 'light'
-                                                    ? 'border-indigo-600 bg-indigo-50'
-                                                    : 'border-gray-200 hover:border-indigo-200'
+                                                theme === 'light'
+                                                    ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-700'
                                             }`}
                                         >
                                             <Sun className="w-5 h-5 mx-auto mb-1 text-yellow-500" />
-                                            <span className="text-xs">Clair</span>
+                                            <span className="text-xs dark:text-gray-300">Clair</span>
                                         </button>
                                         <button
-                                            onClick={() => setSettings({...settings, theme: 'dark'})}
+                                            onClick={() => setTheme('dark')}
                                             className={`flex-1 p-3 rounded-xl border-2 transition-all ${
-                                                settings.theme === 'dark'
-                                                    ? 'border-indigo-600 bg-indigo-50'
-                                                    : 'border-gray-200 hover:border-indigo-200'
+                                                theme === 'dark'
+                                                    ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-700'
                                             }`}
                                         >
-                                            <Moon className="w-5 h-5 mx-auto mb-1 text-indigo-600" />
-                                            <span className="text-xs">Sombre</span>
+                                            <Moon className="w-5 h-5 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
+                                            <span className="text-xs dark:text-gray-300">Sombre</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-2">Langue</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Langue</p>
                                     <select
                                         value={settings.language}
                                         onChange={(e) => setSettings({...settings, language: e.target.value})}
-                                        className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white"
                                         disabled={isReadOnly}
                                     >
                                         <option value="fr">Français</option>
@@ -485,19 +475,19 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Lock className="w-5 h-5 text-indigo-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                 Sécurité
                             </h2>
 
                             <div>
-                                <p className="text-sm text-gray-600 mb-2">Expiration de session</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Expiration de session</p>
                                 <select
                                     value={settings.sessionTimeout}
                                     onChange={(e) => setSettings({...settings, sessionTimeout: e.target.value})}
-                                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+                                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white"
                                     disabled={isReadOnly}
                                 >
                                     <option value="15">15 minutes</option>
@@ -514,86 +504,86 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Key className="w-5 h-5 text-indigo-600" />
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Key className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                 Changer le mot de passe
                             </h2>
 
                             <div className="space-y-4">
                                 {/* Mot de passe actuel */}
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Mot de passe actuel</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Mot de passe actuel</label>
                                     <div className="relative">
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             value={passwordData.current}
                                             onChange={(e) => setPasswordData({...passwordData, current: e.target.value})}
                                             onBlur={() => setPasswordTouched({...passwordTouched, current: true})}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all ${
+                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-700 dark:text-white ${
                                                 passwordErrors.current && passwordTouched.current
-                                                    ? 'border-red-300 focus:border-red-500'
+                                                    ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400'
                                                     : passwordData.current && !passwordErrors.current
-                                                        ? 'border-green-300 focus:border-green-500'
-                                                        : 'border-gray-200 focus:border-indigo-400'
+                                                        ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-400'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500'
                                             }`}
                                             placeholder="********"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                     {passwordErrors.current && passwordTouched.current && (
-                                        <p className="text-xs text-red-500 mt-1">{passwordErrors.current}</p>
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{passwordErrors.current}</p>
                                     )}
                                 </div>
 
                                 {/* Nouveau mot de passe */}
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Nouveau mot de passe</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Nouveau mot de passe</label>
                                     <input
                                         type="password"
                                         value={passwordData.new}
                                         onChange={(e) => setPasswordData({...passwordData, new: e.target.value})}
                                         onBlur={() => setPasswordTouched({...passwordTouched, new: true})}
-                                        className={`w-full p-3 border-2 rounded-xl outline-none transition-all ${
+                                        className={`w-full p-3 border-2 rounded-xl outline-none transition-all dark:bg-gray-700 dark:text-white ${
                                             passwordErrors.new && passwordTouched.new
-                                                ? 'border-red-300 focus:border-red-500'
+                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400'
                                                 : passwordData.new && !passwordErrors.new
-                                                    ? 'border-green-300 focus:border-green-500'
-                                                    : 'border-gray-200 focus:border-indigo-400'
+                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-400'
+                                                    : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500'
                                         }`}
                                         placeholder="********"
                                     />
                                     {passwordErrors.new && passwordTouched.new && (
-                                        <p className="text-xs text-red-500 mt-1">{passwordErrors.new}</p>
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{passwordErrors.new}</p>
                                     )}
                                 </div>
 
                                 {/* Confirmation */}
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Confirmer</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Confirmer</label>
                                     <input
                                         type="password"
                                         value={passwordData.confirm}
                                         onChange={(e) => setPasswordData({...passwordData, confirm: e.target.value})}
                                         onBlur={() => setPasswordTouched({...passwordTouched, confirm: true})}
-                                        className={`w-full p-3 border-2 rounded-xl outline-none transition-all ${
+                                        className={`w-full p-3 border-2 rounded-xl outline-none transition-all dark:bg-gray-700 dark:text-white ${
                                             passwordErrors.confirm && passwordTouched.confirm
-                                                ? 'border-red-300 focus:border-red-500'
+                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400'
                                                 : passwordData.confirm && !passwordErrors.confirm
-                                                    ? 'border-green-300 focus:border-green-500'
-                                                    : 'border-gray-200 focus:border-indigo-400'
+                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-400'
+                                                    : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500'
                                         }`}
                                         placeholder="********"
                                     />
                                     {passwordErrors.confirm && passwordTouched.confirm && (
-                                        <p className="text-xs text-red-500 mt-1">{passwordErrors.confirm}</p>
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{passwordErrors.confirm}</p>
                                     )}
                                 </div>
 
@@ -603,7 +593,7 @@ export default function AdminSettings() {
                                     className={`w-full py-3 rounded-xl font-medium transition-all ${
                                         isPasswordValid && !saving
                                             ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg'
-                                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                            : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
                                     Changer le mot de passe

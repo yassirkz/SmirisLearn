@@ -13,8 +13,10 @@ import {
 import { supabase } from '../../lib/supabase';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function GrowthChart() {
+    const { theme } = useTheme();
     const [period, setPeriod] = useState('6m');
     const [chartType, setChartType] = useState('area');
     const [data, setData] = useState([]);
@@ -64,6 +66,12 @@ export default function GrowthChart() {
         }
     };
 
+    const axisColor = theme === 'dark' ? '#9ca3af' : '#6b7280';
+    const gridColor = theme === 'dark' ? '#374151' : '#e5e7eb';
+    const tooltipBg = theme === 'dark' ? '#1f2937' : 'white';
+    const tooltipBorder = theme === 'dark' ? '#374151' : '#e5e7eb';
+    const textColor = theme === 'dark' ? '#f3f4f6' : '#111827';
+
     const renderChart = () => {
         if (chartType === 'area') {
             return (
@@ -81,18 +89,19 @@ export default function GrowthChart() {
                             <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                    <XAxis dataKey="month" stroke="#6B7280" />
-                    <YAxis stroke="#6B7280" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                    <XAxis dataKey="month" stroke={axisColor} />
+                    <YAxis stroke={axisColor} />
                     <Tooltip 
                         contentStyle={{ 
-                            backgroundColor: 'white', 
+                            backgroundColor: tooltipBg, 
                             borderRadius: '12px', 
-                            border: '1px solid #E5E7EB',
-                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                            border: `1px solid ${tooltipBorder}`,
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                            color: textColor
                         }} 
                     />
-                    <Legend />
+                    <Legend wrapperStyle={{ color: textColor }} />
                     <Area 
                         type="monotone" 
                         dataKey="entreprises" 
@@ -112,7 +121,6 @@ export default function GrowthChart() {
                 </AreaChart>
             );
         }
-        // ... autres types de graphiques
         return null;
     };
 
@@ -120,15 +128,15 @@ export default function GrowthChart() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-6 shadow-xl border border-blue-100"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-blue-100 dark:border-gray-700"
         >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800">Croissance</h2>
-                    <p className="text-sm text-gray-500">Évolution des entreprises et utilisateurs</p>
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">Croissance</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Évolution des entreprises et utilisateurs</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="flex bg-gray-100 rounded-lg p-1">
+                    <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                         {[
                             { value: '1m', label: '1M' },
                             { value: '3m', label: '3M' },
@@ -140,8 +148,8 @@ export default function GrowthChart() {
                                 onClick={() => setPeriod(p.value)}
                                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
                                     period === p.value
-                                        ? 'bg-white text-blue-600 shadow-sm'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                        ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
+                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                 }`}
                             >
                                 {p.label}
@@ -154,13 +162,12 @@ export default function GrowthChart() {
             {loading ? (
                 <div className="h-80 flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
+                        <div className="w-16 h-16 border-4 border-blue-200 dark:border-blue-800 rounded-full"></div>
                         <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 </div>
             ) : (
                 <>
-                    {/* Conteneur avec hauteur fixe */}
                     <div className="h-80 w-full min-h-[320px] relative">
                         <ResponsiveContainer width="100%" height="100%" minHeight={320}>
                             {renderChart()}
@@ -168,29 +175,29 @@ export default function GrowthChart() {
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3">
-                            <p className="text-xs text-blue-600 font-medium">Total entreprises</p>
-                            <p className="text-2xl font-bold text-blue-800">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl p-3">
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total entreprises</p>
+                            <p className="text-2xl font-bold text-blue-800 dark:text-blue-300">
                                 {data.reduce((acc, item) => acc + item.entreprises, 0)}
                             </p>
                         </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-3">
-                            <p className="text-xs text-purple-600 font-medium">Total utilisateurs</p>
-                            <p className="text-2xl font-bold text-purple-800">
+                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl p-3">
+                            <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">Total utilisateurs</p>
+                            <p className="text-2xl font-bold text-purple-800 dark:text-purple-300">
                                 {data.reduce((acc, item) => acc + item.utilisateurs, 0)}
                             </p>
                         </div>
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-3">
-                            <p className="text-xs text-green-600 font-medium">Croissance</p>
-                            <p className="text-2xl font-bold text-green-800">
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl p-3">
+                            <p className="text-xs text-green-600 dark:text-green-400 font-medium">Croissance</p>
+                            <p className="text-2xl font-bold text-green-800 dark:text-green-300">
                                 {data.length > 1 
                                     ? `${Math.round(((data[data.length-1].entreprises - data[0].entreprises) / data[0].entreprises) * 100)}%` 
                                     : '0%'}
                             </p>
                         </div>
-                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-3">
-                            <p className="text-xs text-orange-600 font-medium">Période</p>
-                            <p className="text-2xl font-bold text-orange-800">
+                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl p-3">
+                            <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Période</p>
+                            <p className="text-2xl font-bold text-orange-800 dark:text-orange-300">
                                 {period}
                             </p>
                         </div>

@@ -352,11 +352,11 @@ export default function SuperAdminUsers() {
                     </motion.div>
 
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                            <Users className="w-8 h-8 text-purple-600" />
+                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                             Utilisateurs
                         </h1>
-                        <p className="text-gray-500 mt-1">
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">
                             Gérez tous les utilisateurs de la plateforme
                         </p>
                     </div>
@@ -364,50 +364,50 @@ export default function SuperAdminUsers() {
 
                 {/* Cartes de statistiques */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[
-                        { label: 'Total utilisateurs', value: stats.total, icon: Users, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50' },
-                        { label: 'Administrateurs', value: stats.admins, icon: UserCog, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50' },
-                        { label: 'Étudiants', value: stats.students, icon: UserCheck, color: 'from-green-500 to-green-600', bg: 'bg-green-50' },
-                        { label: 'Nouveaux ce mois', value: stats.newThisMonth, icon: Zap, color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50' }
-                    ].map((card, index) => (
-                        <motion.div
-                            key={card.label}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            whileHover={{ y: -5 }}
-                            className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 backdrop-blur-sm relative overflow-hidden group`}
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                            
-                            <div className="relative flex items-start justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-600 mb-1">{card.label}</p>
-                                    <p className="text-3xl font-bold text-gray-800">{card.value}</p>
-                                </div>
-                                <div className={`p-3 bg-gradient-to-br ${card.color} rounded-xl shadow-lg group-hover:scale-110 transition-transform`}>
-                                    <card.icon className="w-6 h-6 text-white" />
-                                </div>
+                {[
+                    { label: 'Total utilisateurs', value: stats.total, icon: Users, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30' },
+                    { label: 'Administrateurs', value: stats.admins, icon: UserCog, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30' },
+                    { label: 'Étudiants', value: stats.students, icon: UserCheck, color: 'from-green-500 to-green-600', bg: 'bg-green-50 dark:bg-green-900/30' },
+                    { label: 'Nouveaux ce mois', value: stats.newThisMonth, icon: Zap, color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50 dark:bg-orange-900/30' }
+                ].map((card, index) => (
+                    <motion.div
+                        key={card.label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        whileHover={{ y: -5 }}
+                        className={`${card.bg} rounded-2xl p-6 shadow-lg border border-white/50 dark:border-gray-700 backdrop-blur-sm relative overflow-hidden group`}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                        
+                        <div className="relative flex items-start justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{card.label}</p>
+                                <p className="text-3xl font-bold text-gray-800 dark:text-white">{card.value}</p>
                             </div>
-                        </motion.div>
-                    ))}
-                </div>
+                            <div className={`p-3 bg-gradient-to-br ${card.color} rounded-xl shadow-lg group-hover:scale-110 transition-transform`}>
+                                <card.icon className="w-6 h-6 text-white" />
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
 
                 {/* Filtres et recherche */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100"
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
                 >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex items-center gap-2">
                             <Filter className="w-5 h-5 text-purple-600" />
-                            <h2 className="text-lg font-semibold text-gray-800">Filtres</h2>
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Filtres</h2>
                             {(searchTerm || selectedOrg !== 'all' || selectedRole !== 'all') && (
                                 <button
                                     onClick={resetFilters}
-                                    className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                                    className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center gap-1"
                                 >
                                     <X className="w-3 h-3" />
                                     Réinitialiser
@@ -415,10 +415,10 @@ export default function SuperAdminUsers() {
                             )}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3 flex-1 lg:justify-end">
+                        <div className="flex flex-col sm:flex-row dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 gap-3 flex-1 lg:justify-end">
                             {/* Barre de recherche */}
-                            <div className="relative flex-1 max-w-md">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <div className="relative flex-1 max-w-md dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 w-4 h-4" />
                                 <input
                                     type="text"
                                     placeholder="Rechercher par nom ou email..."
@@ -427,12 +427,12 @@ export default function SuperAdminUsers() {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
                                     }}
-                                    className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all"
+                                    className="w-full pl-9 pr-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all"
                                 />
                                 {searchTerm && (
                                     <button
                                         onClick={() => setSearchTerm('')}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-400"
                                     >
                                         <X className="w-4 h-4" />
                                     </button>
@@ -446,7 +446,7 @@ export default function SuperAdminUsers() {
                                     setSelectedOrg(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white min-w-[200px]"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white min-w-[200px]"
                             >
                                 <option value="all">Toutes les entreprises</option>
                                 {organizations.map(org => (
@@ -463,7 +463,7 @@ export default function SuperAdminUsers() {
                                     setSelectedRole(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white min-w-[150px]"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white min-w-[150px]"
                             >
                                 <option value="all">Tous les rôles</option>
                                 <option value="super_admin">Super Admin</option>
@@ -476,7 +476,7 @@ export default function SuperAdminUsers() {
                                 whileHover={{ rotate: 180 }}
                                 transition={{ duration: 0.3 }}
                                 onClick={fetchUsers}
-                                className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="p-2 border border-gray-200 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
                                 title="Rafraîchir"
                             >
                                 <RefreshCw className="w-5 h-5 text-gray-600" />
@@ -488,7 +488,7 @@ export default function SuperAdminUsers() {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleExportUsers}
                                 disabled={exporting}
-                                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50"
                             >
                                 {exporting ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -503,7 +503,7 @@ export default function SuperAdminUsers() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowInviteModal(true)}
-                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                             >
                                 <UserPlus className="w-4 h-4" />
                                 <span>Inviter</span>
@@ -517,21 +517,21 @@ export default function SuperAdminUsers() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100 overflow-hidden"
+                    className="bg-white/90 backdrop-blur-sm dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 rounded-2xl shadow-xl border border-purple-100 overflow-hidden"
                 >
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gradient-to-r from-purple-50 to-pink-50">
+                            <thead className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Utilisateur</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Email</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Entreprise</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Rôle</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Inscription</th>
-                                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Utilisateur</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Entreprise</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Rôle</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Inscription</th>
+                                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {loading ? (
                                     // Skeleton loader
                                     [...Array(5)].map((_, i) => (
@@ -580,14 +580,14 @@ export default function SuperAdminUsers() {
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: index * 0.05 }}
-                                                className="hover:bg-purple-50/50 transition-colors group"
+                                                className="hover:bg-purple-50/50 dark:hover:bg-gray-700/50 transition-colors group"
                                             >
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">
                                                             {user.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                                                         </div>
-                                                        <span className="font-medium text-gray-800">
+                                                        <span className="font-medium text-gray-800 dark:text-gray-200">
                                                             {escapeText(untrusted(user.full_name || 'Sans nom'))}
                                                         </span>
                                                     </div>

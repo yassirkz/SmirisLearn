@@ -34,13 +34,11 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
                 throw new Error("Votre navigateur ne supporte pas l'enregistrement d'écran.");
             }
 
-            // 1. Capture écran (+ audio système)
             const displayStream = await navigator.mediaDevices.getDisplayMedia({
                 video: true,
                 audio: true
             });
 
-            // 2. Capture microphone
             let voiceStream = null;
             try {
                 voiceStream = await navigator.mediaDevices.getUserMedia({
@@ -51,7 +49,6 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
                 console.warn("Accès au microphone refusé ou micro non disponible.", err);
             }
 
-            // 3. Mixage de l'audio si le micro est présent
             let combinedStream;
             let audioContext = null;
 
@@ -161,22 +158,22 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
                     <Monitor className="w-5 h-5" />
                 </div>
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                         Enregistrer l'écran
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                         Capturez votre écran (et le son) pour créer une vidéo de formation.
                     </p>
                 </div>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                <p className="text-sm text-gray-600 flex items-center gap-2">
-                    <Mic className="w-4 h-4 text-gray-500" />
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+                <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                    <Mic className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     Lors du partage, choisissez la fenêtre ou l'écran à capturer. Pensez à activer le son si nécessaire.
                 </p>
 
@@ -203,7 +200,7 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
                     <button
                         onClick={handleClose}
                         disabled={uploading || recording}
-                        className="px-4 py-3 text-sm text-gray-600 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                     >
                         Fermer
                     </button>
@@ -212,10 +209,10 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
                 {uploading && (
                     <div className="mt-3 space-y-2">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Upload en cours...</span>
-                            <span className="font-medium text-indigo-600">{progress}%</span>
+                            <span className="text-gray-600 dark:text-gray-300">Upload en cours...</span>
+                            <span className="font-medium text-indigo-600 dark:text-indigo-400">{progress}%</span>
                         </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress}%` }}
@@ -226,14 +223,14 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
                 )}
 
                 {error && (
-                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-sm text-red-700">
+                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
                         <AlertCircle className="w-4 h-4" />
                         <span>{error}</span>
                     </div>
                 )}
 
                 {recording && !uploading && (
-                    <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-xs text-red-700">
+                    <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-900/30 text-xs text-red-700 dark:text-red-300">
                         <Loader2 className="w-3 h-3 animate-spin" />
                         <span>Enregistrement en cours...</span>
                     </div>
@@ -242,4 +239,3 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
         </div>
     );
 }
-

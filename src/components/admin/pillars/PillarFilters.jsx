@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Filter, ArrowUpDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom'; // AJOUTER CET IMPORT
+import { createPortal } from 'react-dom';
 import { untrusted, escapeText } from '../../../utils/security';
 
 export default function PillarFilters({ filters, onChange }) {
@@ -10,7 +10,6 @@ export default function PillarFilters({ filters, onChange }) {
     const buttonRef = useRef(null);
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
-    // Fermer le menu si on clique ailleurs
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (buttonRef.current && !buttonRef.current.contains(event.target)) {
@@ -21,13 +20,12 @@ export default function PillarFilters({ filters, onChange }) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Calculer la position du menu
     useEffect(() => {
         if (showFilters && buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();
             setMenuPosition({
                 top: rect.bottom + window.scrollY + 8,
-                left: rect.right - 256, // 256px = largeur du menu
+                left: rect.right - 256,
             });
         }
     }, [showFilters]);
@@ -62,18 +60,18 @@ export default function PillarFilters({ filters, onChange }) {
             <div className="flex items-center gap-2" ref={buttonRef}>
                 {/* Barre de recherche */}
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                     <input
                         type="text"
                         value={filters.search}
                         onChange={handleSearchChange}
                         placeholder="Rechercher..."
-                        className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 transition-all w-64"
+                        className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all w-64 dark:bg-gray-800 dark:text-white"
                     />
                     {filters.search && (
                         <button
                             onClick={clearSearch}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -87,15 +85,15 @@ export default function PillarFilters({ filters, onChange }) {
                     onClick={() => setShowFilters(!showFilters)}
                     className={`p-2 rounded-lg transition-all ${
                         showFilters || filters.sortBy !== 'name'
-                            ? 'bg-indigo-100 text-indigo-600'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                 >
                     <Filter className="w-4 h-4" />
                 </motion.button>
             </div>
 
-            {/* Menu avec Portal pour être au-dessus de tout */}
+            {/* Menu avec Portal */}
             {showFilters && createPortal(
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -105,11 +103,11 @@ export default function PillarFilters({ filters, onChange }) {
                         position: 'absolute',
                         top: menuPosition.top,
                         left: menuPosition.left,
-                        zIndex: 999999, // Z-index extrême
+                        zIndex: 999999,
                     }}
-                    className="w-64 bg-white rounded-xl shadow-2xl border border-gray-100 p-4"
+                    className="w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4"
                 >
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                         Trier par
                     </h3>
                     
@@ -122,15 +120,15 @@ export default function PillarFilters({ filters, onChange }) {
                             <button
                                 key={option.field}
                                 onClick={() => handleSortChange(option.field)}
-                                className="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                                className="w-full flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             >
-                                <span className="text-sm text-gray-600">
+                                <span className="text-sm text-gray-600 dark:text-gray-300">
                                     {option.label}
                                 </span>
                                 <div className="flex items-center gap-1">
                                     {filters.sortBy === option.field && (
                                         <ArrowUpDown className={`w-3 h-3 ${
-                                            filters.sortOrder === 'asc' ? 'text-indigo-600' : 'text-indigo-600 rotate-180'
+                                            filters.sortOrder === 'asc' ? 'text-indigo-600 dark:text-indigo-400' : 'text-indigo-600 dark:text-indigo-400 rotate-180'
                                         }`} />
                                     )}
                                 </div>
@@ -138,7 +136,7 @@ export default function PillarFilters({ filters, onChange }) {
                         ))}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                         <button
                             onClick={() => {
                                 onChange({
@@ -148,13 +146,13 @@ export default function PillarFilters({ filters, onChange }) {
                                 });
                                 setShowFilters(false);
                             }}
-                            className="text-xs text-indigo-600 hover:text-indigo-700"
+                            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                         >
                             Réinitialiser
                         </button>
                     </div>
                 </motion.div>,
-                document.body // Rendu direct dans le body
+                document.body
             )}
         </>
     );

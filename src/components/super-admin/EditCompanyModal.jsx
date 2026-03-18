@@ -61,7 +61,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-md"
+                        className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md"
                         onClick={onClose}
                     />
 
@@ -74,7 +74,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                             exit={{ opacity: 0, scale: 0.9, y: 40 }}
                             className="relative inline-block w-full max-w-md my-8 text-left align-middle"
                         >
-                            <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                            <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                                 
                                 {/* Header */}
                                 <div className="px-8 pt-8 pb-6 bg-gradient-to-br from-blue-600 to-indigo-600 text-white relative">
@@ -92,27 +92,27 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                                 {/* Form */}
                                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-semibold text-gray-700">Nom de l'entreprise</label>
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Nom de l'entreprise</label>
                                         <div className="relative">
-                                            <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                            <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
                                             <input
                                                 type="text"
                                                 name="name"
                                                 value={formData.name}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
+                                                className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 outline-none transition-all dark:text-white"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-semibold text-gray-700">Type de plan</label>
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Type de plan</label>
                                         <select
                                             name="plan_type"
                                             value={formData.plan_type}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
+                                            className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 outline-none transition-all dark:text-white"
                                         >
                                             <option value="free">Gratuit</option>
                                             <option value="starter">Starter</option>
@@ -121,7 +121,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                                     </div>
 
                                     {error && (
-                                        <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-xl text-sm text-red-600 flex items-center gap-2">
+                                        <div className="p-4 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 rounded-xl text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                                             <AlertCircle className="w-4 h-4" />
                                             {error}
                                         </div>
@@ -131,7 +131,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                                         <button
                                             type="button"
                                             onClick={onClose}
-                                            className="flex-1 py-4 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all"
+                                            className="flex-1 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                                         >
                                             Annuler
                                         </button>
