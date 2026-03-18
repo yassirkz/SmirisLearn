@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Menu, X, LayoutDashboard, BookOpen, Video, 
     Award, Users, Users2, Settings, LogOut, Sparkles,
-    Shield, Zap, Sun, Moon // ← AJOUT
+    Shield, Zap, Sun, Moon 
 } from 'lucide-react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
+import { useTheme } from '../../hooks/useTheme'; 
 import { supabase } from '../../lib/supabase';
 import { useUserRole } from '../../hooks/useUserRole';
 
@@ -17,7 +17,7 @@ export default function AdminLayout({ children }) {
     const [companyPlan, setCompanyPlan] = useState('');
     const [trialDays, setTrialDays] = useState(0);
     const { user, signOut } = useAuth();
-    const { theme, toggleTheme } = useTheme(); // ← AJOUT
+    const { theme, toggleTheme } = useTheme(); 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const orgId = searchParams.get('orgId');
