@@ -81,7 +81,7 @@ export default function Sidebar({ onClose }) {
                         <NavLink
                             to={item.path}
                             end={item.path === '/super-admin' || item.path === '/admin' || item.path === '/student'}
-                            onClick={onClose}
+                            onClick={() => window.innerWidth < 1024 && onClose()}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
                                 ${isActive 

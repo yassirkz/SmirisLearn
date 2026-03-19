@@ -209,7 +209,7 @@ export default function AdminLayout({ children }) {
                                     >
                                         <NavLink
                                             to={item.path}
-                                            onClick={() => setSidebarOpen(false)}
+                                            onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
                                             className={({ isActive }) =>
                                                 `relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group overflow-hidden
                                                 ${isActive 

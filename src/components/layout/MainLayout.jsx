@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
@@ -8,7 +8,22 @@ import { useAuth } from '../../hooks/useAuth'
 import { Navigate } from 'react-router-dom'
 
 export default function MainLayout({ children }) {
-    const [sidebarOpen, setSidebarOpen] = useState(true)
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1024;
+        }
+        return true;
+    });
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) setSidebarOpen(true);
+            else setSidebarOpen(false);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const { user } = useAuth()
 
     if (!user) return <Navigate to="/login" replace />
