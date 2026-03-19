@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  Sparkles, BookOpen, Video, Award, Users, Moon, Globe,
+  Sparkles, BookOpen, Video, Award, Users, Moon, Sun, Globe,
   CheckCircle, Star, ChevronRight, Menu, X, Send,
   Building, Mail, User, MessageSquare, ArrowRight, Lock,
   Zap, Shield, TrendingUp, PlayCircle, ChevronDown, ChevronUp
@@ -196,7 +196,7 @@ const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelec
 
 export default function LandingPage() {
   const { user } = useAuth();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const { success, error: showError } = useToast();
   const containerRef = useRef(null);
@@ -362,7 +362,7 @@ export default function LandingPage() {
         transition={{ type: 'spring', stiffness: 100 }}
         className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-indigo-100 dark:border-gray-800"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-20">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex items-center gap-2">
@@ -391,6 +391,14 @@ export default function LandingPage() {
 
             {/* Boutons */}
             <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                aria-label="Changer le thème"
+              >
+                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+
               <button
                 onClick={() => navigate('/login')}
                 className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors"
