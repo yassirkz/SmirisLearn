@@ -7,7 +7,6 @@ import {
 import { supabase } from '../../../lib/supabase';
 import { useToast } from '../../ui/Toast';
 import SanitizedInput from '../../ui/SanitizedInput';
-import { useTranslation } from 'react-i18next';
 
 const ICONS = ['📚', '🎓', '💻', '📊', '🎯', '⚡', '🌟', '🔥', '💡', '🎨', '📝', '🔬'];
 const COLORS = [
@@ -22,7 +21,6 @@ const COLORS = [
 ];
 
 export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) {
-    const { t } = useTranslation('admin');
     const { success, error: showError } = useToast();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -47,12 +45,12 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
 
     const validateForm = () => {
         const errors = {};
-        if (!formData.name) errors.name = t('pillars.create_modal.validation.required');
-        else if (formData.name.length < 3) errors.name = t('pillars.create_modal.validation.min_length', { count: 3 });
-        else if (formData.name.length > 50) errors.name = t('pillars.create_modal.validation.max_length', { count: 50 });
+        if (!formData.name) errors.name = "Ce champ est obligatoire";
+        else if (formData.name.length < 3) errors.name = "Minimum 3 caractères";
+        else if (formData.name.length > 50) errors.name = "Maximum 50 caractères";
         
         if (formData.description && formData.description.length > 200) {
-            errors.description = t('pillars.create_modal.validation.desc_max', { count: 200 });
+            errors.description = "La description ne peut pas dépasser 200 caractères";
         }
         return errors;
     };
@@ -121,7 +119,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                 <div className="absolute top-4 right-4 z-10">
                                     <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
                                         <Sparkles className="w-3 h-3" />
-                                        {t('pillars.edit_modal.title')}
+                                        Modifier le pilier
                                     </div>
                                 </div>
 
@@ -131,7 +129,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                             <div className="text-4xl">{formData.icon}</div>
                                             <div>
                                                 <h2 className="text-2xl font-bold">
-                                                    {t('pillars.edit_modal.title')}
+                                                    Modifier le pilier
                                                 </h2>
                                                 <p className="text-white/80 text-sm mt-1">
                                                     {pillar.name}
@@ -151,7 +149,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                         className="absolute bottom-6 right-8 flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-all text-sm"
                                     >
                                         <Eye className="w-4 h-4" />
-                                        {previewMode ? t('pillars.create_modal.edit_mode') : t('pillars.create_modal.preview')}
+                                        {previewMode ? "Mode Édition" : "Aperçu"}
                                     </button>
                                 </div>
 
@@ -166,7 +164,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                 ) : (
                                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
                                         <SanitizedInput
-                                            label={t('pillars.create_modal.name')}
+                                            label="Nom du pilier"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             onBlur={() => setTouched({ ...touched, name: true })}
@@ -179,7 +177,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
 
                                         <div className="space-y-2">
                                             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                {t('pillars.create_modal.description')}
+                                                Description
                                             </label>
                                             <textarea
                                                 value={formData.description}
@@ -190,7 +188,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('pillars.create_modal.icon')}</label>
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Icône</label>
                                             <div className="grid grid-cols-6 gap-2">
                                                 {ICONS.map(icon => (
                                                     <button
@@ -210,7 +208,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('pillars.create_modal.color')}</label>
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Couleur</label>
                                             <div className="flex gap-2">
                                                 {COLORS.map(color => (
                                                     <button
@@ -233,7 +231,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                                 onClick={onClose}
                                                 className="flex-1 px-6 py-4 text-gray-600 dark:text-gray-400 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                                             >
-                                                {t('pillars.create_modal.cancel')}
+                                                Annuler
                                             </button>
                                             <motion.button
                                                 type="submit"
@@ -250,12 +248,12 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                                                 {loading ? (
                                                     <div className="flex items-center justify-center gap-2">
                                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                        <span>{t('pillars.edit_modal.sending')}</span>
+                                                        <span>Modification en cours...</span>
                                                     </div>
                                                 ) : (
                                                     <span className="flex items-center justify-center gap-2">
                                                         <Save className="w-5 h-5" />
-                                                        {t('pillars.edit_modal.submit')}
+                                                        Enregistrer les modifications
                                                     </span>
                                                 )}
                                             </motion.button>
@@ -269,4 +267,4 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
             )}
         </AnimatePresence>
     );
-}
+}

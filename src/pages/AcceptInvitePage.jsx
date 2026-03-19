@@ -5,10 +5,8 @@ import { Building, Mail, Lock, AlertCircle, Eye, EyeOff, Users } from 'lucide-re
 import { supabase } from '../lib/supabase';
 import { isTokenExpired } from '../utils/tokenGenerator';
 import { useMemberInvitation } from '../hooks/useMemberInvitation';
-import { useTranslation } from 'react-i18next';
 
 export default function AcceptInvitePage() {
-    const { t } = useTranslation(['invite', 'auth']);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const token = searchParams.get('token');
@@ -40,7 +38,7 @@ export default function AcceptInvitePage() {
     useEffect(() => {
         const verifyToken = async () => {
             if (!token) {
-                setError(t('errors.missingToken'));
+                setError("Lien d'invitation invalide ou manquant");
                 setLoading(false);
                 return;
             }
@@ -50,7 +48,7 @@ export default function AcceptInvitePage() {
                 const memberInv = await getMemberInvitation(token);
                 if (memberInv) {
                     if (isTokenExpired(memberInv.expires_at)) {
-                        setError(t('errors.expired'));
+                        setError("L'invitation a expiré");
                         setLoading(false);
                         return;
                     }
@@ -78,14 +76,14 @@ export default function AcceptInvitePage() {
                 if (companyError) throw companyError;
 
                 if (!companyInv) {
-                    setError(t('errors.notFound'));
+                    setError("Invitation introuvable");
                     setLoading(false);
                     return;
                 }
 
                 // Vérifier l'expiration
                 if (isTokenExpired(companyInv.expires_at)) {
-                    setError(t('errors.expired'));
+                    setError("L'invitation a expiré");
                     setLoading(false);
                     return;
                 }
@@ -96,28 +94,28 @@ export default function AcceptInvitePage() {
 
             } catch (err) {
                 console.error('Erreur vérification:', err);
-                setError(t('errors.verifyError'));
+                setError("Erreur de vérification");
                 setLoading(false);
             }
         };
 
         verifyToken();
-    }, [token, getMemberInvitation, t]);
+    }, [token, getMemberInvitation]);
 
     // ============================================
     // VALIDATION DU FORMULAIRE
     // ============================================
     const validatePassword = (value) => {
-        if (!value) return t('auth:errors.required');
-        if (value.length < 8) return t('auth:errors.passwordTooShort');
-        if (!/[A-Z]/.test(value)) return t('auth:errors.passwordUpper');
-        if (!/[0-9]/.test(value)) return t('auth:errors.passwordNumber');
+        if (!value) return "Requis";
+        if (value.length < 8) return "Trop court (min. 8)";
+        if (!/[A-Z]/.test(value)) return "Une majuscule requise";
+        if (!/[0-9]/.test(value)) return "Un chiffre requis";
         return "";
     };
 
     const validateConfirmPassword = (value) => {
-        if (!value) return t('errors.confirmRequired');
-        if (value !== formData.password) return t('errors.confirmMismatch');
+        if (!value) return "Veuillez confirmer le mot de passe";
+        if (value !== formData.password) return "Les mots de passe ne correspondent pas";
         return "";
     };
 
@@ -153,7 +151,7 @@ export default function AcceptInvitePage() {
                 if (authError) throw authError;
 
                 if (!authData.user) {
-                    throw new Error(t('errors.createError'));
+                    throw new Error("Erreur à la création du compte");
                 }
 
                 // CONNEXION IMMÉDIATE (pour que l'utilisateur soit authentifié)
@@ -204,7 +202,7 @@ export default function AcceptInvitePage() {
 
         } catch (err) {
             console.error('Erreur création compte:', err);
-            setError(err.message || t('errors.createError'));
+            setError(err.message || "Erreur à la création du compte");
         } finally {
             setSubmitting(false);
         }
@@ -229,8 +227,8 @@ export default function AcceptInvitePage() {
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         />
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">{t('validating')}</h2>
-                    <p className="text-gray-500 dark:text-gray-400">{t('pleaseWait')}</p>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Validation de l'invitation...</h2>
+                    <p className="text-gray-500 dark:text-gray-400">Veuillez patienter quelques instants</p>
                 </motion.div>
             </div>
         );
@@ -253,7 +251,7 @@ export default function AcceptInvitePage() {
                         onClick={() => navigate('/login')}
                         className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all"
                     >
-                        {t('common:backToHome')}
+                        Retour à l'accueil
                     </button>
                 </motion.div>
             </div>
@@ -270,7 +268,7 @@ export default function AcceptInvitePage() {
                 {/* Badge */}
                 <div className="absolute -top-1 -right-1">
                     <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg">
-                        {t('validBadge')}
+                        Invitation Valide
                     </div>
                 </div>
 
@@ -283,14 +281,11 @@ export default function AcceptInvitePage() {
                             <Users className="w-10 h-10 text-white" />
                         )}
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">{t('title')}</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Bienvenue !</h1>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">
                         {invitationType === 'company' 
-                            ? t('companyInvite', { name: invitation?.name })
-                            : t('memberInvite', { 
-                                org: invitation?.organizations?.name, 
-                                role: invitation?.role === 'org_admin' ? t('roles.admin') : t('roles.student') 
-                              })
+                            ? `Vous avez été invité à administrer ${invitation?.name}`
+                            : `Rejoignez ${invitation?.organizations?.name} en tant que ${invitation?.role === 'org_admin' ? 'Administrateur' : 'Étudiant'}`
                         }
                     </p>
                 </div>
@@ -309,7 +304,7 @@ export default function AcceptInvitePage() {
                             </div>
                             <div className="flex items-center gap-3 mt-2">
                                 <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs px-2 py-1 rounded-full">
-                                    {t('planBadge')}
+                                    Plan Pro
                                 </div>
                             </div>
                         </>
@@ -327,7 +322,7 @@ export default function AcceptInvitePage() {
                                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                                     invitation?.role === 'org_admin' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                                 }`}>
-                                    {invitation?.role === 'org_admin' ? t('roles.admin') : t('roles.student')}
+                                    {invitation?.role === 'org_admin' ? 'Administrateur' : 'Étudiant'}
                                 </div>
                             </div>
                         </>
@@ -338,7 +333,7 @@ export default function AcceptInvitePage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {invitationType === 'member' && existingUser && (
                         <p className="text-sm text-indigo-600 dark:text-indigo-400 text-center">
-                            {t('alreadyHaveAccount')}
+                            Entrez votre mot de passe pour accepter l'invitation et lier ce compte.
                         </p>
                     )}
 
@@ -347,7 +342,7 @@ export default function AcceptInvitePage() {
                             {/* Mot de passe */}
                             <div className="space-y-1">
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {t('form.password')} <span className="text-red-500">*</span>
+                                    Mot de passe <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative group">
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -393,7 +388,7 @@ export default function AcceptInvitePage() {
                             {/* Confirmation mot de passe */}
                             <div className="space-y-1">
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {t('form.confirmPassword')} <span className="text-red-500">*</span>
+                                    Confirmer le mot de passe <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative group">
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -470,12 +465,12 @@ export default function AcceptInvitePage() {
                         {submitting ? (
                             <div className="flex items-center justify-center gap-2">
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                <span>{t('form.submitting')}</span>
+                                <span>Enregistrement...</span>
                             </div>
                         ) : invitationType === 'member' && existingUser ? (
-                            t('form.submitExisting')
+                            "Accepter l'invitation"
                         ) : (
-                            t('form.submit')
+                            "Créer mon compte"
                         )}
                     </motion.button>
                 </form>
@@ -486,7 +481,7 @@ export default function AcceptInvitePage() {
                         onClick={() => navigate('/login')}
                         className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
                     >
-                        {t('auth:alreadyHaveAccount')}
+                        Déjà un compte ? Connectez-vous
                     </button>
                 </p>
             </motion.div>

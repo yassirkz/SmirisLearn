@@ -5,13 +5,10 @@ import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
 import SearchComponent from '../../pages/SearchComponent';
-import SearchComponent from '../../pages/SearchComponent';
 import NotificationDropdown from './NotificationDropdown';
 import { supabase } from '../../lib/supabase';
-import { useTranslation } from 'react-i18next';
 
 export default function Header({ onToggleSidebar }) {
-    const { t } = useTranslation(['admin', 'common']);
     const { user } = useAuth();
     const { role } = useUserRole();
     const { theme, toggleTheme } = useTheme(); 
@@ -64,14 +61,14 @@ export default function Header({ onToggleSidebar }) {
                 <button
                     onClick={onToggleSidebar}
                     className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 shrink-0"
-                    title={t('common:nav.menu')}
+                    title="Menu"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
                 {/* Barre de recherche */}
                 <div className="hidden md:block flex-1 max-w-2xl">
                     <SearchComponent 
-                        placeholder={t('common:search_component.placeholder')}
+                        placeholder="Rechercher..."
                         autoFocus={false}
                     />
                 </div>
@@ -83,7 +80,7 @@ export default function Header({ onToggleSidebar }) {
                     <button
                         onClick={toggleTheme}
                         className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
-                        title={theme === 'light' ? t('common:darkMode') : t('common:lightMode')}
+                        title={theme === 'light' ? 'Mode Sombre' : 'Mode Clair'}
                     >
                         {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                     </button>
@@ -126,7 +123,7 @@ export default function Header({ onToggleSidebar }) {
                             <p className="text-sm font-medium">{user?.email?.split('@')[0]}</p>
                             <p className="text-xs text-white/70 flex items-center gap-1">
                                 <Shield className="w-3 h-3" />
-                                {role === 'super_admin' ? t('admin:roles.superAdmin') : role === 'org_admin' ? t('admin:roles.administration') : t('admin:roles.studentSpace')}
+                                {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Administration' : 'Espace Étudiant'}
                             </p>
                         </div>
                     </motion.div>
@@ -136,7 +133,7 @@ export default function Header({ onToggleSidebar }) {
             {/* Barre de recherche mobile */}
             <div className="md:hidden px-4 pb-4">
                 <SearchComponent 
-                    placeholder={t('common:search_component.placeholder_short')}
+                    placeholder="Recherche..."
                     autoFocus={false}
                 />
             </div>

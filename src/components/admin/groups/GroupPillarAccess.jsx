@@ -1,5 +1,4 @@
 // src/components/admin/groups/GroupPillarAccess.jsx
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Check } from 'lucide-react';
@@ -11,7 +10,6 @@ import { untrusted, escapeText } from '../../../utils/security';
 
 export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpdate }) {
   const { user } = useAuth();
-  const { t } = useTranslation('admin');
   const { success, error: showError } = useToast();
   const [pillars, setPillars] = useState([]);
   const [selectedPillarIds, setSelectedPillarIds] = useState(new Set());
@@ -43,7 +41,7 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
         setSelectedPillarIds(new Set(accessData.map(a => a.pillar_id)));
       } catch (err) {
         console.error('Erreur chargement piliers:', err);
-        showError(t('groups.errors.fetch_pillars_failed'));
+        showError("Erreur lors du chargement des piliers");
       } finally {
         setLoading(false);
       }
@@ -99,12 +97,12 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
         if (insertError) throw insertError;
       }
 
-      success(t('groups.pillars.success'));
+      success("Accès aux piliers mis à jour avec succès");
       onUpdate?.();
       onClose();
     } catch (err) {
       console.error('Erreur sauvegarde:', err);
-      showError(t('groups.errors.save_failed'));
+      showError("Erreur lors de la mise à jour des accès");
     } finally {
       setSaving(false);
     }
@@ -144,7 +142,7 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                  {t('groups.pillars.title', { name: escapeText(untrusted(group.name)) })}
+                  Accès piliers: {escapeText(untrusted(group.name))}
                 </h2>
                 <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                   <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -159,7 +157,7 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
                 <>
                   <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
                     {pillars.length === 0 ? (
-                      <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('groups.pillars.empty')}</p>
+                      <p className="text-center text-gray-500 dark:text-gray-400 py-8">Aucun pilier créé pour cette entreprise</p>
                     ) : (
                       pillars.map((pillar, idx) => {
                         const isSelected = selectedPillarIds.has(pillar.id);
@@ -194,7 +192,7 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
                       onClick={onClose}
                       className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
-                      {t('common.cancel')}
+                      Annuler
                     </button>
                     <button
                       onClick={handleSave}
@@ -206,7 +204,7 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
                       ) : (
                         <>
                           <Save className="w-4 h-4" />
-                          <span>{t('common.save')}</span>
+                          <span>Enregistrer</span>
                         </>
                       )}
                     </button>
@@ -219,4 +217,4 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
       )}
     </AnimatePresence>
   );
-}
+}

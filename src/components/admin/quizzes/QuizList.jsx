@@ -1,6 +1,5 @@
 // src/components/admin/quizzes/QuizList.jsx
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Filter, X, Edit, Trash2, Copy, Eye,
@@ -14,7 +13,6 @@ import { untrusted, escapeText } from '../../../utils/security';
 
 export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, refreshTrigger = 0 }) {
     const { user } = useAuth();
-    const { t, i18n } = useTranslation('admin');
     const { success, error: showError } = useToast();
     const showErrorRef = useRef(showError);
     useEffect(() => { showErrorRef.current = showError; }, [showError]);
@@ -146,7 +144,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                 hasLoadedOnce.current = true;
             } catch (err) {
                 console.error('Erreur chargement quiz:', err);
-                showErrorRef.current(t('quizzes.errors.fetch_failed'));
+                showErrorRef.current('Échec du chargement des quiz');
             } finally {
                 setLoading(false);
                 setRefreshing(false);
@@ -160,10 +158,10 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
         setLocalRefreshKey(k => k + 1);
     };
 
-    const formatDate = (date) => new Date(date).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : i18n.language);
+    const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR');
 
-    const getVideoTitle = (quiz) => quiz.video?.title || t('quizzes.list.unknown_video');
-    const getPillarName = (quiz) => quiz.video?.pillar?.name || t('quizzes.list.unknown_pillar');
+    const getVideoTitle = (quiz) => quiz.video?.title || 'Vidéo inconnue';
+    const getPillarName = (quiz) => quiz.video?.pillar?.name || 'Pilier inconnu';
 
     if (loading && quizzes.length === 0) {
         return (
@@ -180,7 +178,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                     <div className="flex items-center gap-2">
                         <Filter className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{t('quizzes.title')}</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Gestion des Quiz</h2>
                     </div>
 
                     <div className="flex-1 flex flex-col sm:flex-row gap-3">
@@ -188,7 +186,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                             <input
                                 type="text"
-                                placeholder={t('videos.filters.search_placeholder')}
+                                placeholder="Rechercher un quiz..."
                                 value={filters.search}
                                 onChange={(e) => {
                                     setFilters({ ...filters, search: e.target.value });
@@ -206,7 +204,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                             }}
                             className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 bg-white dark:bg-gray-900 dark:text-white"
                         >
-                            <option value="all">{t('videos.filters.all_pillars')}</option>
+                            <option value="all">Toutes les vidéos</option>
                             {videos.map((v, idx) => (
                                 <option key={v.id || `v-opt-${idx}`} value={v.id}>
                                     {escapeText(untrusted(v.title))}
@@ -222,15 +220,15 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                             }}
                             className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 bg-white dark:bg-gray-900 dark:text-white"
                         >
-                            <option value="created_at:desc">{t('videos.filters.sort.newest')}</option>
-                            <option value="created_at:asc">{t('videos.filters.sort.oldest')}</option>
+                            <option value="created_at:desc">Plus récents</option>
+                            <option value="created_at:asc">Plus anciens</option>
                         </select>
 
                         <button
                             onClick={handleRefresh}
                             disabled={refreshing}
                             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                            title={t('common.refresh')}
+                            title="Actualiser"
                         >
                             <RefreshCw className={`w-5 h-5 text-gray-600 dark:text-gray-300 ${refreshing ? 'animate-spin text-indigo-600 dark:text-indigo-400' : ''}`} />
                         </button>
@@ -242,8 +240,8 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
             {quizzes.length === 0 ? (
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
                     <Award className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">{t('quizzes.list.empty')}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-6">{t('quizzes.subtitle')}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Aucun quiz trouvé</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">Créez des quiz pour évaluer les connaissances de vos étudiants.</p>
                 </div>
             ) : (
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden">
@@ -251,13 +249,13 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                         <table className="w-full">
                             <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.video_pillar')}</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.questions')}</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.passing_score')}</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.attempts')}</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.timer')}</th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.created_at')}</th>
-                                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('quizzes.list.actions')}</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Vidéo / Pilier</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Questions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Score requis</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Tentatives</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Chronomètre</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Créé le</th>
+                                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -298,7 +296,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                             {quiz.timer_minutes ? (
                                                 <div className="flex items-center gap-1">
                                                     <Clock className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                                    <span className="text-gray-700 dark:text-gray-300">{quiz.timer_minutes} {t('videos.detail_page.quiz_section.minutes_unit')}</span>
+                                                    <span className="text-gray-700 dark:text-gray-300">{quiz.timer_minutes} min</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-gray-400 dark:text-gray-500">—</span>
@@ -312,28 +310,28 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                                 <button
                                                     onClick={() => onViewStats?.(quiz)}
                                                     className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg text-blue-600 dark:text-blue-400"
-                                                    title={t('quizzes.stats_placeholder')}
+                                                    title="Statistiques"
                                                 >
                                                     <BarChart3 className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => onEdit(quiz)}
                                                     className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400"
-                                                    title={t('videos.actions.edit')}
+                                                    title="Modifier"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => onDuplicate?.(quiz)}
                                                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
-                                                    title={t('common.duplicate')}
+                                                    title="Dupliquer"
                                                 >
                                                     <Copy className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => onDelete(quiz)}
                                                     className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400"
-                                                    title={t('videos.actions.delete')}
+                                                    title="Supprimer"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -348,7 +346,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                     {totalPages > 1 && (
                         <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {t('common.pagination.page', { current: page, total: totalPages })}
+                                Page {page} sur {totalPages}
                             </p>
                             <div className="flex gap-2">
                                 <button
@@ -372,4 +370,4 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
             )}
         </div>
     );
-}
+}

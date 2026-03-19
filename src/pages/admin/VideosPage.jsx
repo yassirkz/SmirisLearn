@@ -7,10 +7,7 @@ import { useUserRole } from '../../hooks/useUserRole';
 import { useAuth } from '../../hooks/useAuth';
 import { useSearchParams, Navigate } from 'react-router-dom';
 import { untrusted, escapeText } from '../../utils/security';
-import { useTranslation } from 'react-i18next';
-
 export default function VideosPage() {
-    const { t } = useTranslation('admin');
     const { user } = useAuth();
     const { role, isAdminAccess, loading: roleLoading } = useUserRole();
     const [searchParams] = useSearchParams();
@@ -37,21 +34,21 @@ export default function VideosPage() {
                     >
                         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
-                            {t('videos.manage')}
+                            Gestion des Vidéos
                         </div>
                     </motion.div>
 
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                             <Video className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-                            {t('videos.title')}
+                            Bibliothèque Vidéo
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                             <Shield className="w-4 h-4" />
-                            {t('videos.subtitle')}
+                            Gérez vos contenus de formation vidéo
                             {isImpersonating && (
                                 <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded-full">
-                                    {t('videos.read_only', { org_id: escapeText(untrusted(orgIdFromUrl)) })}
+                                    Mode lecture seule - Organisation : {escapeText(untrusted(orgIdFromUrl))}
                                 </span>
                             )}
                         </p>

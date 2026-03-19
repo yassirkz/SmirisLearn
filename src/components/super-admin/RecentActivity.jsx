@@ -3,21 +3,15 @@ import { motion } from 'framer-motion';
 import { Building2, UserPlus, Video, Award, Clock } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
-import { fr, enUS, de, ar } from 'date-fns/locale';
-import { useTranslation } from 'react-i18next';
-
-const locales = { fr, en: enUS, de, ar };
+import { fr } from 'date-fns/locale';
 
 export default function RecentActivity() {
-  const { t, i18n } = useTranslation(['admin', 'common']);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const currentLocale = locales[i18n.language] || fr;
-
   useEffect(() => {
     fetchRecentActivities();
-  }, [i18n.language]);
+  }, []);
 
   const fetchRecentActivities = async () => {
     try {
@@ -45,7 +39,7 @@ export default function RecentActivity() {
           icon: Building2,
           color: 'text-blue-600 dark:text-blue-400',
           bg: 'bg-blue-100 dark:bg-blue-900/30',
-          title: t('admin:superAdmin.dashboard.recent_activity.items.new_org', { name: o.name }),
+          title: `Nouvelle entreprise: ${o.name}`,
           time: o.created_at
         })) || []),
         ...(users?.map(u => ({
@@ -53,7 +47,7 @@ export default function RecentActivity() {
           icon: UserPlus,
           color: 'text-purple-600 dark:text-purple-400',
           bg: 'bg-purple-100 dark:bg-purple-900/30',
-          title: t('admin:superAdmin.dashboard.recent_activity.items.new_user', { name: u.full_name }),
+          title: `Nouvel utilisateur: ${u.full_name}`,
           time: u.created_at
         })) || []),
         ...(videos?.map(v => ({
@@ -61,7 +55,7 @@ export default function RecentActivity() {
           icon: Video,
           color: 'text-green-600 dark:text-green-400',
           bg: 'bg-green-100 dark:bg-green-900/30',
-          title: t('admin:superAdmin.dashboard.recent_activity.items.new_video', { name: v.title }),
+          title: `Nouvelle vidéo: ${v.title}`,
           time: v.created_at
         })) || [])
       ]
@@ -86,8 +80,8 @@ export default function RecentActivity() {
       <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 opacity-[0.03] rounded-bl-[5rem] -z-0" />
       <div className="flex items-center justify-between mb-8 relative z-10">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{t('admin:superAdmin.dashboard.recent_activity.title')}</h2>
-          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{t('admin:superAdmin.dashboard.recent_activity.subtitle')}</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Activité Récente</h2>
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">DERNIÈRES MISES À JOUR</p>
         </div>
         <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-xl">
           <Clock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -109,7 +103,7 @@ export default function RecentActivity() {
       ) : activities.length === 0 ? (
         <div className="text-center py-8">
           <Award className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-gray-400">{t('admin:superAdmin.dashboard.recent_activity.no_activity')}</p>
+          <p className="text-gray-500 dark:text-gray-400">Aucune activité récente</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -130,7 +124,7 @@ export default function RecentActivity() {
                   <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{activity.title}</p>
                   <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {formatDistanceToNow(new Date(activity.time), { addSuffix: true, locale: currentLocale })}
+                    {formatDistanceToNow(new Date(activity.time), { addSuffix: true, locale: fr })}
                   </p>
                 </div>
               </motion.div>
@@ -141,3 +135,4 @@ export default function RecentActivity() {
     </motion.div>
   );
 }
+

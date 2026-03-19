@@ -4,10 +4,8 @@ import { Search, X, Filter, ArrowUpDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { untrusted, escapeText } from '../../../utils/security';
-import { useTranslation } from 'react-i18next';
 
 export default function PillarFilters({ filters, onChange }) {
-    const { t } = useTranslation('admin');
     const [showFilters, setShowFilters] = useState(false);
     const buttonRef = useRef(null);
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -67,7 +65,7 @@ export default function PillarFilters({ filters, onChange }) {
                         type="text"
                         value={filters.search}
                         onChange={handleSearchChange}
-                        placeholder={t('pillars.filters.search_placeholder')}
+                        placeholder="Rechercher un pilier..."
                         className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
                     />
                     {filters.search && (
@@ -110,14 +108,14 @@ export default function PillarFilters({ filters, onChange }) {
                     className="w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4"
                 >
                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                        {t('pillars.filters.sort_by')}
+                        Trier par
                     </h3>
                     
                     <div className="space-y-2">
                         {[
-                            { field: 'name', label: t('pillars.filters.options.name') },
-                            { field: 'created_at', label: t('pillars.filters.options.created_at') },
-                            { field: 'videoCount', label: t('pillars.filters.options.video_count') }
+                            { field: 'name', label: 'Nom' },
+                            { field: 'created_at', label: 'Date de création' },
+                            { field: 'videoCount', label: 'Nombre de vidéos' }
                         ].map((option) => (
                             <button
                                 key={option.field}
@@ -150,7 +148,7 @@ export default function PillarFilters({ filters, onChange }) {
                             }}
                             className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                         >
-                            {t('pillars.filters.reset')}
+                            Réinitialiser
                         </button>
                     </div>
                 </motion.div>,
@@ -158,4 +156,4 @@ export default function PillarFilters({ filters, onChange }) {
             )}
         </>
     );
-}
+}

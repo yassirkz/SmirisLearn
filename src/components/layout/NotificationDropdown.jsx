@@ -4,10 +4,8 @@ import { Bell, Check, Trash2, X, Info, AlertTriangle, CheckCircle, AlertCircle }
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 
 export default function NotificationDropdown({ isOpen, onClose }) {
-    const { t } = useTranslation('common');
     const { user } = useAuth();
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
@@ -51,7 +49,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
             if (error) throw error;
             setNotifications(data || []);
         } catch (err) {
-            console.error(t('notifications.error_fetch'), err);
+            console.error('Erreur récupération notifications', err);
         } finally {
             setLoading(false);
         }
@@ -131,7 +129,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                         <div className="p-4 border-b border-blue-50 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-800 flex items-center justify-between">
                             <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
                                 <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                                {t('notifications.header')}
+                                Notifications
                             </h3>
                             <div className="flex items-center gap-2">
                                 {notifications.some(n => !n.read) && (
@@ -139,7 +137,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                                         onClick={markAllAsRead}
                                         className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
                                     >
-                                        {t('notifications.mark_all')}
+                                        Tout marquer comme lu
                                     </button>
                                 )}
                                 <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
@@ -153,15 +151,15 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                             {loading ? (
                                 <div className="p-8 text-center">
                                     <div className="w-8 h-8 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t('loading')}</p>
+                                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Chargement...</p>
                                 </div>
                             ) : notifications.length === 0 ? (
                                 <div className="p-12 text-center">
                                     <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <Bell className="w-8 h-8 text-blue-200 dark:text-blue-600" />
                                     </div>
-                                    <p className="text-gray-500 dark:text-gray-400 font-medium">{t('notifications.empty')}</p>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('notifications.up_to_date')}</p>
+                                    <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune notification</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Vous êtes à jour</p>
                                 </div>
                             ) : (
                                 <div className="divide-y divide-gray-50 dark:divide-gray-700">
@@ -195,7 +193,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
                                                         className="p-1.5 bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-600"
-                                                        title={t('notifications.mark_as_read')}
+                                                        title="Marquer comme lu"
                                                     >
                                                         <Check className="w-3.5 h-3.5" />
                                                     </button>
@@ -203,7 +201,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                                                 <button 
                                                     onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}
                                                     className="p-1.5 bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600 rounded-lg text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
-                                                    title={t('notifications.delete')}
+                                                    title="Supprimer"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>

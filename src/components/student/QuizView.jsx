@@ -1,6 +1,5 @@
 // src/components/student/QuizView.jsx
 import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertCircle, CheckCircle, XCircle, Loader, ArrowRight, ArrowLeft, RefreshCw, HelpCircle } from 'lucide-react';
@@ -11,7 +10,6 @@ import { untrusted, escapeText } from '../../utils/security';
 import { sendNotification } from '../../utils/notifications';
 
 export default function QuizView() {
-    const { t } = useTranslation('student');
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -59,7 +57,7 @@ export default function QuizView() {
                 }
             } catch (err) {
                 console.error('Erreur chargement quiz:', err);
-                showErrorRef.current(t('errors.fetch_quiz_failed'));
+                showErrorRef.current('Erreur lors du chargement du quiz');
             } finally {
                 setLoading(false);
             }
@@ -138,7 +136,7 @@ export default function QuizView() {
         if (submitted) return;
 
         if (!timeout && answers.some(a => a === null || (Array.isArray(a) && a.length === 0))) {
-            info(t('errors.submit_incomplete'));
+            info('Veuillez répondre à toutes les questions');
             return;
         }
 
@@ -165,25 +163,25 @@ export default function QuizView() {
             setAttempts(prev => prev + 1);
 
             if (passed) {
-                success(t('messages.quiz_passed'));
+                success('Félicitations, vous avez réussi le quiz !');
                 await sendNotification(
                     user.id,
-                    t('quiz.notifications.success_title'),
-                    t('quiz.notifications.success_body', { title: quiz.title, score }),
+                    'Quiz réussi !',
+                    `Vous avez réussi le quiz "${quiz.title}" avec ${score}%`,
                     'success'
                 );
             } else {
-                info(t('messages.quiz_failed', { score, passing_score: quiz.passing_score }));
+                info(`Vous avez obtenu ${score}%. Il faut ${quiz.passing_score}% pour réussir.`);
             }
         } catch (err) {
             console.error('Erreur sauvegarde progression:', err);
-            showError(t('errors.save_progress_failed'));
+            showError('Erreur lors de la sauvegarde');
         }
     };
 
     const handleRetry = () => {
         if (maxAttempts !== -1 && attempts >= maxAttempts) {
-            showError(t('errors.max_attempts_reached'));
+            showError('Nombre maximum de tentatives atteint');
             return;
         }
         setAnswers(new Array(quiz.questions.length).fill(null));
@@ -212,7 +210,7 @@ export default function QuizView() {
     if (!quiz) {
         return (
             <div className="min-h-screen flex items-center justify-center text-gray-500 dark:text-gray-400 italic bg-indigo-50 dark:bg-gray-900">
-                {t('quiz.not_found')}
+                Quiz introuvable
             </div>
         );
     }
@@ -228,15 +226,15 @@ export default function QuizView() {
                     <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                         <AlertCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">{t('quiz.attempts_exhausted.title')}</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">Tentatives épuisées</h2>
                     <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                        {t('quiz.attempts_exhausted.desc', { count: maxAttempts })}
+                        Vous avez utilisé vos {maxAttempts} tentatives pour ce quiz.
                     </p>
                     <button
                         onClick={() => navigate('/student/learning')}
                         className="w-full py-4 bg-gray-900 dark:bg-gray-700 text-white rounded-2xl font-bold hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors shadow-lg"
                     >
-                        {t('quiz.navigation.back_to_learning')}
+                        Retour aux modules
                     </button>
                 </motion.div>
             </div>
@@ -258,10 +256,10 @@ export default function QuizView() {
                             {result.passed ? <CheckCircle className="w-12 h-12" /> : <XCircle className="w-12 h-12" />}
                         </div>
                         <h2 className="text-4xl font-black mb-2 tracking-tight text-gray-900 dark:text-white">
-                            {result.passed ? t('quiz.result.success_title') : t('quiz.result.fail_title')}
+                            {result.passed ? 'Félicitations !' : 'Dommage !'}
                         </h2>
                         <p className="text-xl text-gray-600 dark:text-gray-300">
-                            {result.passed ? t('quiz.result.success_desc') : t('quiz.result.fail_desc', { score: quiz.passing_score })}
+                            {result.passed ? 'Quiz validé avec succès' : `Score minimum requis : ${quiz.passing_score}%`}
                         </p>
                         
                         <div className="mt-8 flex justify-center items-end gap-2">
@@ -272,7 +270,7 @@ export default function QuizView() {
                         </div>
                         {maxAttempts !== -1 && (
                             <p className="text-sm text-gray-400 dark:text-gray-500 mt-4 font-medium uppercase tracking-widest">
-                                {t('quiz.result.attempt', { current: attempts, total: maxAttempts })}
+                                Tentative {attempts}/{maxAttempts}
                             </p>
                         )}
                     </div>
@@ -280,7 +278,7 @@ export default function QuizView() {
                     <div className="space-y-6 mt-12 bg-gray-50/50 dark:bg-gray-900/30 p-8 rounded-3xl border border-gray-100 dark:border-gray-700">
                         <h3 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-2 mb-6">
                             <HelpCircle className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                            {t('quiz.result.detailed_correction')}
+                            Correction détaillée
                         </h3>
                         {quiz.questions.map((q, idx) => {
                             const correct = isQuestionCorrect(q, answers[idx]);
@@ -297,20 +295,20 @@ export default function QuizView() {
                                             
                                             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="p-3 bg-white/60 dark:bg-gray-800/60 rounded-xl border border-white dark:border-gray-700 shadow-sm">
-                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase mb-1">{t('quiz.result.your_answer')}</p>
+                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase mb-1">Votre réponse</p>
                                                     <p className={`font-medium ${correct ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                                                         {q.type === 'single' || q.type === 'truefalse' 
-                                                            ? (answers[idx] !== null ? (q.type === 'truefalse' ? (answers[idx] ? t('quiz.types.true') : t('quiz.types.false')) : escapeText(untrusted(q.options[answers[idx]]))) : t('quiz.result.no_answer'))
-                                                            : (answers[idx]?.length > 0 ? answers[idx].map(i => escapeText(untrusted(q.options[i]))).join(', ') : t('quiz.result.no_answer'))
+                                                            ? (answers[idx] !== null ? (q.type === 'truefalse' ? (answers[idx] ? 'Vrai' : 'Faux') : escapeText(untrusted(q.options[answers[idx]]))) : 'Aucune réponse')
+                                                            : (answers[idx]?.length > 0 ? answers[idx].map(i => escapeText(untrusted(q.options[i]))).join(', ') : 'Aucune réponse')
                                                         }
                                                     </p>
                                                 </div>
                                                 {!correct && (
                                                     <div className="p-3 bg-indigo-50/50 dark:bg-indigo-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
-                                                        <p className="text-[10px] text-indigo-400 dark:text-indigo-400 font-black uppercase mb-1">{t('quiz.result.correct_answer')}</p>
+                                                        <p className="text-[10px] text-indigo-400 dark:text-indigo-400 font-black uppercase mb-1">Bonne réponse</p>
                                                         <p className="font-bold text-indigo-700 dark:text-indigo-300">
                                                             {q.type === 'single' || q.type === 'truefalse'
-                                                                ? (q.type === 'truefalse' ? (q.answer ? t('quiz.types.true') : t('quiz.types.false')) : escapeText(untrusted(q.options[q.answer])))
+                                                                ? (q.type === 'truefalse' ? (q.answer ? 'Vrai' : 'Faux') : escapeText(untrusted(q.options[q.answer])))
                                                                 : q.answer.map(i => escapeText(untrusted(q.options[i]))).join(', ')
                                                             }
                                                         </p>
@@ -331,14 +329,14 @@ export default function QuizView() {
                                 className="flex items-center justify-center gap-2 py-5 px-6 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-2xl font-black hover:bg-indigo-100 dark:hover:bg-indigo-800/50 transition-all border-2 border-indigo-100 dark:border-indigo-800 active:scale-95"
                             >
                                 <RefreshCw className="w-5 h-5" />
-                                {t('quiz.result.retry')}
+                                Réessayer
                             </button>
                         )}
                         <button
                             onClick={() => result.passed && nextVideoId ? navigate(`/student/video/${nextVideoId}`) : navigate('/student/learning')}
                             className={`flex items-center justify-center gap-2 py-5 px-6 text-white rounded-2xl font-black shadow-2xl transition-all hover:scale-[1.02] active:scale-95 ${result.passed ? 'bg-indigo-600 hover:bg-indigo-700 col-span-full md:col-span-1 shadow-indigo-200 dark:shadow-indigo-900/30' : 'bg-gray-900 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 col-span-full md:col-span-1 shadow-gray-200 dark:shadow-gray-900/30'}`}
                         >
-                            {result.passed && nextVideoId ? t('quiz.result.next_video') : t('quiz.navigation.back_to_learning')}
+                            {result.passed && nextVideoId ? 'Vidéo suivante' : 'Retour aux modules'}
                             <ArrowRight className="w-5 h-5" />
                         </button>
                     </div>
@@ -360,7 +358,7 @@ export default function QuizView() {
                             {currentQuestionIndex + 1}
                         </div>
                         <div>
-                            <h3 className="font-black text-gray-900 dark:text-white leading-none">{t('quiz.navigation.question_counter', { current: currentQuestionIndex + 1, total: quiz.questions.length })}</h3>
+                            <h3 className="font-black text-gray-900 dark:text-white leading-none">Question {currentQuestionIndex + 1}/{quiz.questions.length}</h3>
                             <div className="flex gap-1.5 mt-2">
                                 {quiz.questions.map((_, i) => (
                                     <div 
@@ -438,11 +436,11 @@ export default function QuizView() {
                             ))}
 
                             {question.type === 'truefalse' && (
-                                <div className="grid grid-cols-2 gap-8">
-                                    {[
-                                        { value: true, label: t('quiz.types.true') },
-                                        { value: false, label: t('quiz.types.false') }
-                                    ].map(opt => (
+                                    <div className="grid grid-cols-2 gap-8">
+                                        {[
+                                            { value: true, label: 'Vrai' },
+                                            { value: false, label: 'Faux' }
+                                        ].map(opt => (
                                         <button
                                             key={opt.label}
                                             onClick={() => handleAnswer(opt.value)}
@@ -471,7 +469,7 @@ export default function QuizView() {
                                 className="flex items-center gap-3 py-5 px-10 rounded-2xl font-black text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 dark:disabled:hover:text-gray-500 transition-all active:scale-95"
                             >
                                 <ArrowLeft className="w-6 h-6" />
-                                {t('quiz.navigation.prev')}
+                                Précédent
                             </button>
                             
                             {currentQuestionIndex === quiz.questions.length - 1 ? (
@@ -479,7 +477,7 @@ export default function QuizView() {
                                     onClick={() => handleSubmit()}
                                     className="flex items-center gap-3 py-5 px-14 bg-indigo-600 dark:bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 dark:hover:bg-indigo-700 shadow-2xl shadow-indigo-100 dark:shadow-indigo-900/30 transition-all hover:scale-105 active:scale-95"
                                 >
-                                    {t('quiz.navigation.finish')}
+                                    Terminer
                                     <ArrowRight className="w-6 h-6" />
                                 </button>
                             ) : (
@@ -487,7 +485,7 @@ export default function QuizView() {
                                     onClick={goToNext}
                                     className="flex items-center gap-3 py-5 px-14 bg-gray-900 dark:bg-gray-700 text-white rounded-2xl font-black hover:bg-black dark:hover:bg-gray-600 transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-200 dark:shadow-gray-900/30"
                                 >
-                                    {t('quiz.navigation.next')}
+                                    Suivant
                                     <ArrowRight className="w-6 h-6" />
                                 </button>
                             )}

@@ -12,21 +12,15 @@ import {
 } from 'recharts';
 import { supabase } from '../../lib/supabase';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { fr, enUS, de, ar } from 'date-fns/locale';
+import { fr } from 'date-fns/locale';
 import { useTheme } from '../../hooks/useTheme';
-import { useTranslation } from 'react-i18next';
-
-const locales = { fr, en: enUS, de, ar };
 
 export default function GrowthChart() {
     const { theme } = useTheme();
-    const { t, i18n } = useTranslation(['admin', 'common']);
     const [period, setPeriod] = useState('6m');
     const [chartType, setChartType] = useState('area');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const currentLocale = locales[i18n.language] || fr;
 
     useEffect(() => {
         fetchGrowthData();
@@ -58,7 +52,7 @@ export default function GrowthChart() {
                     .lt('created_at', monthEnd);
 
                 chartData.push({
-                    month: format(monthDate, 'MMM yyyy', { locale: currentLocale }),
+                    month: format(monthDate, 'MMM yyyy', { locale: fr }),
                     entreprises: companiesCount || 0,
                     utilisateurs: usersCount || 0,
                 });
@@ -114,7 +108,7 @@ export default function GrowthChart() {
                         stroke="#3B82F6" 
                         fillOpacity={1} 
                         fill="url(#colorEntreprises)" 
-                        name={t('admin:superAdmin.dashboard.charts.growth.companies')}
+                        name="Entreprises"
                     />
                     <Area 
                         type="monotone" 
@@ -122,7 +116,7 @@ export default function GrowthChart() {
                         stroke="#8B5CF6" 
                         fillOpacity={1} 
                         fill="url(#colorUtilisateurs)" 
-                        name={t('admin:superAdmin.dashboard.charts.growth.users')}
+                        name="Utilisateurs"
                     />
                 </AreaChart>
             );
@@ -138,8 +132,8 @@ export default function GrowthChart() {
         >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">{t('admin:superAdmin.dashboard.charts.growth.title')}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin:superAdmin.dashboard.charts.growth.subtitle')}</p>
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">Croissance</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Évolution des entreprises et utilisateurs</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
@@ -182,19 +176,19 @@ export default function GrowthChart() {
 
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl p-3">
-                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">{t('admin:superAdmin.dashboard.charts.growth.total_companies')}</p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total Entreprises</p>
                             <p className="text-2xl font-bold text-blue-800 dark:text-blue-300">
                                 {data.reduce((acc, item) => acc + item.entreprises, 0)}
                             </p>
                         </div>
                         <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl p-3">
-                            <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">{t('admin:superAdmin.dashboard.charts.growth.total_users')}</p>
+                            <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">Total Utilisateurs</p>
                             <p className="text-2xl font-bold text-purple-800 dark:text-purple-300">
                                 {data.reduce((acc, item) => acc + item.utilisateurs, 0)}
                             </p>
                         </div>
                         <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl p-3">
-                            <p className="text-xs text-green-600 dark:text-green-400 font-medium">{t('admin:superAdmin.dashboard.charts.growth.growth_rate')}</p>
+                            <p className="text-xs text-green-600 dark:text-green-400 font-medium">Taux de croissance</p>
                             <p className="text-2xl font-bold text-green-800 dark:text-green-300">
                                 {data.length > 1 
                                     ? `${Math.round(((data[data.length-1].entreprises - data[0].entreprises) / (data[0].entreprises || 1)) * 100)}%` 
@@ -202,7 +196,7 @@ export default function GrowthChart() {
                             </p>
                         </div>
                         <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl p-3">
-                            <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">{t('admin:superAdmin.dashboard.charts.period')}</p>
+                            <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Période</p>
                             <p className="text-2xl font-bold text-orange-800 dark:text-orange-300">
                                 {period}
                             </p>
@@ -213,3 +207,4 @@ export default function GrowthChart() {
         </motion.div>
     );
 }
+

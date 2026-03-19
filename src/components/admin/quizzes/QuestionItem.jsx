@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
     Copy, Trash2, Plus, X,
@@ -8,16 +7,14 @@ import {
 import { untrusted, escapeText } from '../../../utils/security';
 import SanitizedInput from '../../ui/SanitizedInput';
 
-const QUESTION_TYPES = (t) => [
-    { value: 'single', label: t('quizzes.question.types.single') },
-    { value: 'multiple', label: t('quizzes.question.types.multiple') },
-    { value: 'truefalse', label: t('quizzes.question.types.truefalse') }
+const QUESTION_TYPES = [
+    { value: 'single', label: 'Choix unique' },
+    { value: 'multiple', label: 'Choix multiple' },
+    { value: 'truefalse', label: 'Vrai/Faux' }
 ];
 
 export default function QuestionItem({ question, index, onChange, onRemove, onDuplicate }) {
-    const { t } = useTranslation('admin');
     const [showAnswerHelp, setShowAnswerHelp] = useState(false);
-    const types = QUESTION_TYPES(t);
 
     const handleTypeChange = (type) => {
         let newQuestion = { ...question, type };
@@ -81,14 +78,14 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
             {/* En-tête avec numéro et actions */}
             <div className="flex items-center justify-between mb-4">
                 <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
-                    {t('quizzes.question.title', { index: index + 1 })}
+                    Question {index + 1}
                 </span>
                 <div className="flex gap-1">
                     <button
                         type="button"
                         onClick={onDuplicate}
                         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        title={t('common.duplicate')}
+                        title="Dupliquer"
                     >
                         <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     </button>
@@ -96,7 +93,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                         type="button"
                         onClick={onRemove}
                         className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors"
-                        title={t('videos.actions.delete')}
+                        title="Supprimer"
                     >
                         <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
                     </button>
@@ -105,13 +102,13 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
 
             {/* Type de question */}
             <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('quizzes.question.type_label')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de question</label>
                 <select
                     value={question.type}
                     onChange={(e) => handleTypeChange(e.target.value)}
                     className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                 >
-                    {types.map(t_opt => (
+                    {QUESTION_TYPES.map(t_opt => (
                         <option key={t_opt.value} value={t_opt.value}>{t_opt.label}</option>
                     ))}
                 </select>
@@ -120,12 +117,12 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
             {/* Texte de la question */}
             <div className="mb-4">
                 <SanitizedInput
-                    label={t('quizzes.question.text_label')}
+                    label="Texte de la question"
                     value={question.text}
                     onChange={(e) => handleTextChange(e.target.value)}
                     validate="text"
                     required
-                    placeholder={t('quizzes.question.text_placeholder')}
+                    placeholder="Saisir la question..."
                     className='dark:bg-gray-800/50 dark:border-gray-500 dark:text-white'
                 />
             </div>
@@ -133,7 +130,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
             {/* Options pour QCM */}
             {(question.type === 'single' || question.type === 'multiple') && (
                 <div className="space-y-3 mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('quizzes.question.options_label')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Options de réponse</label>
                     {question.options?.map((opt, optIdx) => (
                         <div key={optIdx} className="flex items-center gap-2">
                             <input
@@ -153,7 +150,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                                 type="text"
                                 value={opt}
                                 onChange={(e) => handleOptionChange(optIdx, e.target.value)}
-                                placeholder={t('quizzes.question.option_placeholder', { index: optIdx + 1 })}
+                                placeholder={`Option ${optIdx + 1}`}
                                 className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                             />
                             <button
@@ -171,7 +168,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                         onClick={addOption}
                         className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
                     >
-                        <Plus className="w-4 h-4" /> {t('quizzes.question.btn_add_option')}
+                        <Plus className="w-4 h-4" /> Ajouter une option
                     </button>
                 </div>
             )}
@@ -188,7 +185,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                             onChange={() => handleAnswerChange(true)}
                             className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                         />
-                        <span className="text-gray-700 dark:text-gray-300">{t('quizzes.question.true_label')}</span>
+                        <span className="text-gray-700 dark:text-gray-300">Vrai</span>
                     </label>
                     <label className="flex items-center gap-2">
                         <input
@@ -199,7 +196,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                             onChange={() => handleAnswerChange(false)}
                             className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                         />
-                        <span className="text-gray-700 dark:text-gray-300">{t('quizzes.question.false_label')}</span>
+                        <span className="text-gray-700 dark:text-gray-300">Faux</span>
                     </label>
                 </div>
             )}
@@ -212,16 +209,16 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                     className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-1"
                 >
                     <AlertCircle className="w-3 h-3" />
-                    {showAnswerHelp ? t('quizzes.question.help.btn_hide') : t('quizzes.question.help.btn_show')}
+                    {showAnswerHelp ? "Masquer l'aide" : "Afficher l'aide"}
                 </button>
                 {showAnswerHelp && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {question.type === 'single' && t('quizzes.question.help.single')}
-                        {question.type === 'multiple' && t('quizzes.question.help.multiple')}
-                        {question.type === 'truefalse' && t('quizzes.question.help.truefalse')}
+                        {question.type === 'single' && "Cochez la case à gauche de l'option correcte."}
+                        {question.type === 'multiple' && "Cochez toutes les cases correspondant aux bonnes réponses."}
+                        {question.type === 'truefalse' && "Sélectionnez si l'affirmation est Vraie ou Fausse."}
                     </p>
                 )}
             </div>
         </motion.div>
     );
-}
+}

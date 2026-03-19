@@ -1,6 +1,5 @@
 // src/components/admin/quizzes/QuizCreator.jsx
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Save, X, AlertCircle, Loader } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
@@ -19,7 +18,6 @@ const DEFAULT_QUESTION = () => ({
 
 export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
     const { user } = useAuth();
-    const { t } = useTranslation('admin');
     const { success, error: showError } = useToast();
 
     const [videos, setVideos] = useState([]);
@@ -68,37 +66,37 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
         const newErrors = {};
 
         if (!form.video_id) {
-            newErrors.video_id = t('quizzes.creator.validation.select_video');
+            newErrors.video_id = "Veuillez sélectionner une vidéo";
         }
 
         if (form.passing_score < 0 || form.passing_score > 100) {
-            newErrors.passing_score = t('quizzes.creator.validation.score_range');
+            newErrors.passing_score = "Le score doit être entre 0 et 100";
         }
 
         const attempts = parseInt(form.max_attempts);
         if (isNaN(attempts) || (attempts !== -1 && attempts < 1)) {
-            newErrors.max_attempts = t('quizzes.creator.validation.attempts_invalid');
+            newErrors.max_attempts = "Le nombre de tentatives doit être au moins 1 (ou -1 pour illimité)";
         }
 
         if (form.questions.length === 0) {
-            newErrors.questions = t('quizzes.creator.validation.no_questions');
+            newErrors.questions = "Vous devez ajouter au moins une question";
         }
 
         form.questions.forEach((q, i) => {
             if (!q.text?.trim()) {
-                newErrors[`question_${i}`] = t('quizzes.creator.validation.empty_question', { index: i + 1 });
+                newErrors[`question_${i}`] = `La question ${i + 1} est vide`;
             }
             if ((q.type === 'single' || q.type === 'multiple') && q.options.some(o => !o.trim())) {
-                newErrors[`question_${i}_options`] = t('quizzes.creator.validation.empty_options', { index: i + 1 });
+                newErrors[`question_${i}_options`] = `Toutes les options de la question ${i + 1} doivent être remplies`;
             }
             if (q.type === 'single' && q.answer === null) {
-                newErrors[`question_${i}_answer`] = t('quizzes.creator.validation.select_answer', { index: i + 1 });
+                newErrors[`question_${i}_answer`] = `Veuillez sélectionner la bonne réponse pour la question ${i + 1}`;
             }
             if (q.type === 'multiple' && (!q.answer || q.answer.length === 0)) {
-                newErrors[`question_${i}_answer`] = t('quizzes.creator.validation.select_multiple', { index: i + 1 });
+                newErrors[`question_${i}_answer`] = `Veuillez sélectionner au moins une bonne réponse pour la question ${i + 1}`;
             }
             if (q.type === 'truefalse' && q.answer === null) {
-                newErrors[`question_${i}_answer`] = t('quizzes.creator.validation.select_truefalse', { index: i + 1 });
+                newErrors[`question_${i}_answer`] = `Veuillez sélectionner Vrai ou Faux pour la question ${i + 1}`;
             }
         });
 
@@ -135,13 +133,12 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
 
             if (error) throw error;
 
-            if (error) throw error;
-            success(quiz?.id ? t('quizzes.success.modified') : t('quizzes.success.created'));
+            success(quiz?.id ? "Quiz modifié avec succès" : "Quiz créé avec succès");
             onSuccess?.();
             onSuccess?.();
         } catch (err) {
             console.error('Erreur sauvegarde quiz:', err);
-            showError(t('quizzes.errors.save_failed'));
+            showError("Erreur lors de la sauvegarde du quiz");
         } finally {
             setSaving(false);
         }
@@ -185,7 +182,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                 <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                         <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                        <span className="text-sm font-medium text-red-700 dark:text-red-300">{t('videos.form.validation.fix_errors')} :</span>
+                        <span className="text-sm font-medium text-red-700 dark:text-red-300">Veuillez corriger les erreurs suivantes :</span>
                     </div>
                     <ul className="list-disc list-inside space-y-1">
                         {errorList.map((e, i) => (
@@ -198,12 +195,12 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             {/* Sélection vidéo */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('quizzes.creator.video_label')} <span className="text-red-500">*</span>
+                    Vidéo associée <span className="text-red-500">*</span>
                 </label>
                 {loadingVideos ? (
                     <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
                         <Loader className="w-4 h-4 animate-spin" />
-                        {t('quizzes.creator.loading_videos')}
+                        Chargement des vidéos...
                     </div>
                 ) : (
                     <select
@@ -213,7 +210,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                             errors.video_id ? 'border-red-400 dark:border-red-600' : 'border-gray-200 dark:border-gray-700'
                         }`}
                     >
-                        <option value="">{t('quizzes.creator.select_video')}</option>
+                        <option value="">Sélectionner une vidéo</option>
                         {videos.map(v => (
                             <option key={v.id} value={v.id}>
                                 {escapeText(untrusted(v.title))}
@@ -231,7 +228,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('quizzes.creator.min_score_label')}
+                        Score de réussite (%)
                     </label>
                     <input
                         type="number"
@@ -247,20 +244,20 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('quizzes.creator.timer_label')}
+                        Temps limite (minutes)
                     </label>
                     <input
                         type="number"
                         min="1"
                         value={form.timer_minutes}
                         onChange={(e) => setForm(f => ({ ...f, timer_minutes: e.target.value }))}
-                        placeholder={t('quizzes.creator.timer_placeholder')}
+                        placeholder="Saisir une durée en minutes"
                         className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('quizzes.creator.attempts_label')} <span className="text-xs text-gray-400 dark:text-gray-500">{t('quizzes.creator.attempts_help')}</span>
+                        Nombre de tentatives <span className="text-xs text-gray-400 dark:text-gray-500">(-1 = illimité)</span>
                     </label>
                     <input
                         type="number"
@@ -280,7 +277,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             <div>
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {t('quizzes.creator.questions_count', { count: form.questions.length })}
+                        {form.questions.length} questions
                     </h3>
                     <button
                         type="button"
@@ -288,7 +285,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
                     >
                         <Plus className="w-4 h-4" />
-                        {t('quizzes.creator.btn_add_question')}
+                        Ajouter une question
                     </button>
                 </div>
 
@@ -319,7 +316,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     onClick={onCancel}
                     className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
                 >
-                    {t('quizzes.creator.btn_cancel')}
+                    Annuler
                 </button>
                 <button
                     type="button"
@@ -332,9 +329,9 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     ) : (
                         <Save className="w-4 h-4" />
                     )}
-                    {quiz?.id ? t('quizzes.creator.btn_save') : t('quizzes.creator.btn_create')}
+                    {quiz?.id ? "Enregistrer" : "Créer le quiz"}
                 </button>
             </div>
         </div>
     );
-}
+}

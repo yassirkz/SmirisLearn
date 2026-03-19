@@ -1,6 +1,5 @@
 // src/components/admin/members/MembersList.jsx
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -25,25 +24,23 @@ import { untrusted, escapeText, validateEmail } from '../../../utils/security';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 import SanitizedInput from '../../ui/SanitizedInput';
 
-const getRoleConfig = (t) => ({
+const ROLE_CONFIG = {
   org_admin: {
-    label: t('members.roles.org_admin'),
+    label: "Administrateur",
     icon: Shield,
     color: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800'
   },
   student: {
-    label: t('members.roles.student'),
+    label: "Étudiant",
     icon: GraduationCap,
     color: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
   }
-});
+};
 
 export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
-  const { t, i18n } = useTranslation('admin');
   const { user } = useAuth();
   const { success, error: showError } = useToast();
   const { createInvitation, loading: inviting } = useMemberInvitation();
-  const ROLE_CONFIG = getRoleConfig(t);
 
   const [members, setMembers] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -168,7 +165,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       setMembers(filtered);
     } catch (err) {
       console.error('Erreur chargement membres:', err);
-      showError(t('members.errors.fetch_failed'));
+      showError("Erreur lors du chargement des membres");
     } finally {
       setLoading(false);
     }
@@ -180,14 +177,11 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
 
   const handleChangeRole = async (member) => {
     if (member.id === user.id) {
-      showError(t('members.errors.self_edit_role'));
+      showError("Vous ne pouvez pas modifier votre propre rôle");
       return;
     }
     const newRole = member.role === 'student' ? 'org_admin' : 'student';
-    if (!confirm(t('members.errors.change_role_confirm', { 
-      name: member.full_name || member.email, 
-      role: ROLE_CONFIG[newRole].label 
-    }))) return;
+    if (!confirm(`Êtes-vous sûr de vouloir changer le rôle de ${member.full_name || member.email} en ${ROLE_CONFIG[newRole].label} ?`)) return;
 
     setUpdatingId(member.id);
     try {
@@ -197,7 +191,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
         .eq('id', member.id);
       if (error) throw error;
       setMembers(prev => prev.map(m => m.id === member.id ? { ...m, role: newRole } : m));
-      success(t('members.success.role_updated'));
+      success("Rôle mis à jour avec succès");
     } catch (err) {
       showError(err.message);
     } finally {
@@ -207,10 +201,10 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
 
   const handleRemove = async (member) => {
     if (member.id === user.id) {
-      showError(t('members.errors.self_remove'));
+      showError("Vous ne pouvez pas vous retirer vous-même de l'entreprise");
       return;
     }
-    if (!confirm(t('members.errors.remove_confirm', { name: member.full_name || member.email }))) return;
+    if (!confirm(`Êtes-vous sûr de vouloir retirer ${member.full_name || member.email} de l'entreprise ?`)) return;
 
     setDeletingId(member.id);
     try {
@@ -220,7 +214,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
         .eq('id', member.id);
       if (error) throw error;
       setMembers(prev => prev.filter(m => m.id !== member.id));
-      success(t('members.success.member_removed'));
+      success("Membre retiré de l'entreprise avec succès");
     } catch (err) {
       showError(err.message);
     } finally {
@@ -239,7 +233,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
         organization_id: organizationId,
         invited_by: user.id,
       });
-      success(t('members.invite_form.success'));
+      success("Invitation envoyée avec succès");
       setInviteEmail('');
       setShowInviteForm(false);
       fetchMembers();
@@ -262,7 +256,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
-            placeholder={t('members.list.search_placeholder')}
+            placeholder="Rechercher un membre..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm dark:bg-gray-800 dark:text-white"
@@ -277,7 +271,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
               onChange={e => setSelectedGroup(e.target.value)}
               className="pl-10 pr-8 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm appearance-none bg-white dark:bg-gray-800 dark:text-white"
             >
-              <option value="all">{t('members.list.filter_all_groups')}</option>
+              <option value="all">Tous les groupes</option>
               {groups.map((g, idx) => (
                 <option key={g.id || `grp-${idx}`} value={g.id}>
                   {escapeText(untrusted(g.name))}
@@ -292,7 +286,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
               className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
             >
               <UserPlus className="w-4 h-4" />
-              {t('members.actions.invite')}
+              Inviter un membre
             </button>
           )}
         </div>
@@ -309,7 +303,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             className="bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-200 dark:border-indigo-800 rounded-2xl p-5 flex flex-col sm:flex-row gap-3 items-end overflow-hidden"
           >
             <div className="flex-1 space-y-1">
-              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{t('members.invite_form.email_label')}</label>
+              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Adresse email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 dark:text-indigo-400" />
                 <input
@@ -317,20 +311,20 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                   required
                   value={inviteEmail}
                   onChange={e => setInviteEmail(e.target.value)}
-                  placeholder={t('members.invite_form.email_placeholder')}
+                  placeholder="exemple@email.com"
                   className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-sm dark:text-white"
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{t('members.invite_form.role_label')}</label>
+              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Rôle</label>
               <select
                 value={inviteRole}
                 onChange={e => setInviteRole(e.target.value)}
                 className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-sm dark:text-white"
               >
-                <option value="student">{t('members.invite_form.roles.student')}</option>
-                <option value="org_admin">{t('members.invite_form.roles.org_admin')}</option>
+                <option value="student">Étudiant</option>
+                <option value="org_admin">Administrateur</option>
               </select>
             </div>
             <button
@@ -339,7 +333,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
               className="flex items-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
             >
               {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-              {t('members.invite_form.submit')}
+              Envoyer l'invitation
             </button>
           </motion.form>
         )}
@@ -348,9 +342,9 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: t('members.stats.total'), value: stats.total, color: 'text-gray-800 dark:text-gray-200' },
-          { label: t('members.stats.students'), value: stats.students, color: 'text-blue-600 dark:text-blue-400' },
-          { label: t('members.stats.admins'), value: stats.admins, color: 'text-purple-600 dark:text-purple-400' },
+          { label: "Total membres", value: stats.total, color: 'text-gray-800 dark:text-gray-200' },
+          { label: "Étudiants", value: stats.students, color: 'text-blue-600 dark:text-blue-400' },
+          { label: "Administrateurs", value: stats.admins, color: 'text-purple-600 dark:text-purple-400' },
         ].map((stat, idx) => (
           <div key={idx} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-4 text-center">
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -368,7 +362,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
         <div className="text-center py-16">
           <Users className="w-12 h-12 mx-auto text-gray-200 dark:text-gray-600 mb-3" />
           <p className="text-gray-400 dark:text-gray-500">
-            {search || selectedGroup !== 'all' ? t('members.list.no_results') : t('members.list.empty')}
+            {search || selectedGroup !== 'all' ? "Aucun membre trouvé pour votre recherche" : "Aucun membre dans cette entreprise"}
           </p>
         </div>
       ) : (
@@ -377,12 +371,12 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('members.list.table.member')}</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('members.list.table.role')}</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">{t('members.list.table.groups')}</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">{t('members.list.table.joined_at')}</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Membre</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rôle</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Groupes</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Date d'arrivée</th>
                   {!isReadOnly && (
-                    <th className="text-right px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('members.list.table.actions')}</th>
+                    <th className="text-right px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                   )}
                 </tr>
               </thead>
@@ -405,9 +399,9 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                           </div>
                           <div className="min-w-0">
                             <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">
-                              {escapeText(untrusted(member.full_name || t('common.loading')))}
+                              {escapeText(untrusted(member.full_name || "Chargement..."))}
                               {member.id === user.id && (
-                                <span className="ml-2 text-xs text-indigo-500 dark:text-indigo-400">{t('members.list.self_indicator')}</span>
+                                <span className="ml-2 text-xs text-indigo-500 dark:text-indigo-400">(Vous)</span>
                               )}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
@@ -423,7 +417,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                       <td className="px-6 py-4 hidden lg:table-cell">
                           <div className="flex flex-wrap gap-1 max-w-xs">
                             {member.groups.length === 0 ? (
-                              <span className="text-xs text-gray-400 dark:text-gray-500">{t('members.list.no_groups')}</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Aucun groupe</span>
                             ) : (
                               member.groups.slice(0, 3).map((g, idx) => (
                                 <span key={g.id || `m-g-${idx}`} className="inline-block px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs">
@@ -438,7 +432,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                       </td>
                       <td className="px-6 py-4 hidden sm:table-cell">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(member.created_at).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : i18n.language)}
+                          {new Date(member.created_at).toLocaleDateString('fr-FR')}
                         </span>
                       </td>
                       {!isReadOnly && (
@@ -448,7 +442,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                             <button
                               onClick={() => handleChangeRole(member)}
                               disabled={updatingId === member.id || member.id === user.id}
-                              title={member.role === 'student' ? t('members.actions.promote') : t('members.actions.demote')}
+                              title={member.role === 'student' ? "Promouvoir administrateur" : "Rétrograder étudiant"}
                               className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl transition-colors disabled:opacity-30"
                             >
                               {updatingId === member.id ? (
@@ -457,13 +451,13 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                                 <Shield className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                               )}
                             </button>
-
+ 
                             {/* Supprimer (uniquement étudiants) */}
                             {member.role === 'student' && (
                               <button
                                 onClick={() => handleRemove(member)}
                                 disabled={deletingId === member.id || member.id === user.id}
-                                title={t('members.actions.remove')}
+                                title="Retirer de l'entreprise"
                                 className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-colors disabled:opacity-30"
                               >
                                 {deletingId === member.id ? (

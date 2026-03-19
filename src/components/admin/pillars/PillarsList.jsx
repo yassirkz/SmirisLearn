@@ -6,7 +6,6 @@ import {
     LayoutGrid, Table as TableIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
@@ -19,7 +18,6 @@ import EditPillarModal from './EditPillarModal';
 import PillarSkeleton from './PillarSkeleton';
 
 export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
-    const { t } = useTranslation('admin');
     const navigate = useNavigate();
     const { user } = useAuth();
     const { success, error: showError } = useToast();
@@ -93,7 +91,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             const orgId = await getOrgId();
             if (!orgId) {
                 if (isMounted.current) {
-                    setError(t('pillars.errors.no_org'));
+                    setError("ID d'organisation non trouvé");
                     if (isRefresh) setRefreshing(false); else setLoading(false);
                 }
                 fetchingRef.current = false;
@@ -188,8 +186,8 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
         } catch (err) {
             console.error('Erreur chargement piliers:', err);
             if (isMounted.current) {
-                setError(err.message || t('pillars.errors.fetch_failed'));
-                showError(t('pillars.errors.fetch_failed'));
+                setError(err.message || "Erreur lors du chargement des piliers");
+                showError("Erreur lors du chargement des piliers");
             }
         } finally {
             if (isMounted.current) {
@@ -214,45 +212,45 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     const handleRefresh = useCallback(() => {
         if (refreshing || fetchingRef.current) return;
         fetchPillars(true);
-        success(t('pillars.refresh_success'));
-    }, [fetchPillars, success, refreshing, t]);
+        success("Liste des piliers actualisée");
+    }, [fetchPillars, success, refreshing]);
 
     const handleCreate = useCallback(() => {
         if (isReadOnly) {
-            showError(t('pillars.errors.read_only'));
+            showError("Vous n'avez pas les droits pour modifier les piliers");
             return;
         }
         setShowCreateModal(true);
-    }, [isReadOnly, showError, t]);
+    }, [isReadOnly, showError]);
 
     const handleEdit = useCallback((pillar) => {
         if (isReadOnly) {
-            showError(t('pillars.errors.read_only'));
+            showError("Vous n'avez pas les droits pour modifier les piliers");
             return;
         }
         setSelectedPillar(pillar);
         setShowEditModal(true);
-    }, [isReadOnly, showError, t]);
+    }, [isReadOnly, showError]);
 
     const handleDelete = useCallback(async (pillar) => {
         if (isReadOnly) {
-            showError(t('pillars.errors.read_only'));
+            showError("Vous n'avez pas les droits pour modifier les piliers");
             return;
         }
-        if (!window.confirm(t('pillars.delete_confirm.confirm_text', { name: pillar.safeName }))) return;
+        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le pilier "${pillar.safeName}" ?`)) return;
         try {
             const { error } = await supabase
                 .from('pillars')
                 .delete()
                 .eq('id', pillar.id);
             if (error) throw error;
-            success(t('pillars.delete_confirm.success'));
+            success("Pilier supprimé avec succès");
             fetchPillars(false);
         } catch (err) {
             console.error('❌ Erreur suppression:', err);
-            showError(t('pillars.errors.delete_failed'));
+            showError("Erreur lors du suppression du pilier");
         }
-    }, [isReadOnly, showError, success, fetchPillars, t]);
+    }, [isReadOnly, showError, success, fetchPillars]);
 
     const handleViewChange = useCallback((mode) => {
         setViewMode(mode);
@@ -271,7 +269,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                         <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                         {error.includes('infinite recursion') && (
                             <p className="text-xs text-red-500 dark:text-red-400 mt-1 font-medium">
-                                {t('pillars.errors.rls_recursion')}
+                                Erreur d'accès à la base de données. Veuillez contacter le support.
                             </p>
                         )}
                     </div>
@@ -280,7 +278,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                     onClick={handleRefresh}
                     className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"
                 >
-                    {t('admin_dashboard.retry')}
+                    Réessayer
                 </button>
             </div>
         );
@@ -298,19 +296,19 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                                {t('pillars.stats_summary.total', { count: stats.total })}
+                                {stats.total} Piliers
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                                {t('pillars.stats_summary.videos', { count: stats.totalVideos })}
+                                {stats.totalVideos} Vidéos
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                                {t('pillars.stats_summary.students', { count: stats.totalStudents })}
+                                {stats.totalStudents} Étudiants
                             </span>
                         </div>
                     </div>
@@ -328,7 +326,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                                         ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
-                                title={t('pillars.view_modes.table')}
+                                title="Vue Tableau"
                             >
                                 <TableIcon className="w-4 h-4" />
                             </button>
@@ -339,7 +337,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                                         ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
-                                title={t('pillars.view_modes.cards')}
+                                title="Vue Cartes"
                             >
                                 <LayoutGrid className="w-4 h-4" />
                             </button>
@@ -350,7 +348,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             transition={{ duration: 0.3 }}
                             onClick={handleRefresh}
                             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0"
-                            title={t('pillars.refresh')}
+                            title="Actualiser"
                             disabled={refreshing || loading}
                         >
                             <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${(refreshing || loading) ? 'animate-spin' : ''}`} />
@@ -373,9 +371,9 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">{t('pillars.empty_state.title')}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Aucun pilier trouvé</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">
-                        {t('pillars.empty_state.desc')}
+                        Commencez par créer votre premier pilier de formation.
                     </p>
                     {!isReadOnly && (
                         <button
@@ -383,7 +381,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all inline-flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
-                            {t('pillars.list.create')}
+                            Créer un pilier
                         </button>
                     )}
                 </motion.div>
@@ -427,4 +425,4 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             />
         </div>
     );
-}
+}

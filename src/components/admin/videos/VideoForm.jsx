@@ -10,7 +10,6 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
 import { untrusted, escapeText } from '../../../utils/security';
 import SanitizedInput from '../../ui/SanitizedInput';
-import { useTranslation } from 'react-i18next';
 
 export default function VideoForm({
     video = null,
@@ -19,7 +18,6 @@ export default function VideoForm({
     orgId: propOrgId,
     uploadedVideo = null
 }) {
-    const { t } = useTranslation('admin');
     const { user } = useAuth();
     const { success, error: showError } = useToast();
     const [loading, setLoading] = useState(false);
@@ -64,20 +62,20 @@ export default function VideoForm({
     const validateForm = () => {
         const newErrors = {};
         
-        if (!formData.title) newErrors.title = t('videos.form.validation.title_required');
-        else if (formData.title.length < 3) newErrors.title = t('videos.form.validation.title_min', { count: 3 });
-        else if (formData.title.length > 100) newErrors.title = t('videos.form.validation.title_max', { count: 100 });
+        if (!formData.title) newErrors.title = "Le titre est requis";
+        else if (formData.title.length < 3) newErrors.title = "Le titre doit faire au moins 3 caractères";
+        else if (formData.title.length > 100) newErrors.title = "Le titre ne peut pas dépasser 100 caractères";
         
-        if (!formData.pillar_id) newErrors.pillar_id = t('videos.form.validation.pillar_required');
+        if (!formData.pillar_id) newErrors.pillar_id = "Veuillez sélectionner un pilier";
         
-        if (!formData.video_url && !video) newErrors.video = t('videos.form.validation.video_required');
+        if (!formData.video_url && !video) newErrors.video = "Veuillez importer une vidéo";
         
         if (formData.description && formData.description.length > 500) {
-            newErrors.description = t('videos.form.validation.desc_max', { count: 500 });
+            newErrors.description = "La description ne peut pas dépasser 500 caractères";
         }
         
         if (formData.sequence_order < 0) {
-            newErrors.sequence_order = t('videos.form.validation.order_positive');
+            newErrors.sequence_order = "L'ordre doit être un nombre positif";
         }
         
         return newErrors;
@@ -89,7 +87,7 @@ export default function VideoForm({
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            showError(t('videos.form.validation.fix_errors'));
+            showError("Veuillez corriger les erreurs dans le formulaire");
             return;
         }
 
@@ -174,14 +172,14 @@ export default function VideoForm({
                 >
                     <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                     <p className="text-sm text-green-700 dark:text-green-300 flex-1">
-                        {t('videos.form.upload_success', { name: escapeText(untrusted(uploadedVideo.name)) })}
+                        Vidéo "{escapeText(untrusted(uploadedVideo.name))}" prête à être enregistrée
                     </p>
                 </motion.div>
             )}
 
             {/* Titre */}
             <SanitizedInput
-                label={t('videos.form.title_label')}
+                label="Titre de la vidéo"
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
                 onBlur={() => setTouched({ ...touched, title: true })}
@@ -190,14 +188,14 @@ export default function VideoForm({
                 maxLength={100}
                 required
                 error={touched.title ? errors.title : ''}
-                placeholder={t('videos.form.title_placeholder')}
+                placeholder="Ex: Introduction à la cybersécurité"
             />
 
             {/* Description */}
              <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {t('videos.form.desc_label')}
-                    <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">({t('pillars.create_modal.optional')})</span>
+                    Description
+                    <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">(optionnel)</span>
                 </label>
                 <textarea
                     value={formData.description}
@@ -209,7 +207,7 @@ export default function VideoForm({
                             ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-100 dark:focus:ring-red-900/30'
                             : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
                     }`}
-                    placeholder={t('videos.form.desc_placeholder')}
+                    placeholder="Décrivez brièvement le contenu de cette vidéo..."
                 />
                 <div className="flex justify-end">
                     <span className={`text-xs ${(formData.description?.length || 0) > 450 ? 'text-orange-500 dark:text-orange-400' : 'text-gray-400 dark:text-gray-500'}`}>
@@ -221,7 +219,7 @@ export default function VideoForm({
             {/* Pilier */}
              <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {t('videos.form.pillar_label')}
+                    Pilier associé
                     <span className="text-red-500 ml-1">*</span>
                 </label>
                 <select
@@ -234,7 +232,7 @@ export default function VideoForm({
                             : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
                     }`}
                 >
-                    <option value="">{t('videos.form.pillar_placeholder')}</option>
+                    <option value="">Sélectionner un pilier</option>
                     {pillars.map(pillar => (
                         <option key={pillar.id} value={pillar.id}>
                             {escapeText(untrusted(pillar.name))}
@@ -252,7 +250,7 @@ export default function VideoForm({
             {/* Ordre séquentiel */}
             <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {t('videos.form.order_label')}
+                    Ordre de lecture
                 </label>
                 <div className="flex items-center gap-4">
                     <input
@@ -263,7 +261,7 @@ export default function VideoForm({
                         className="w-24 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {t('videos.form.order_help')}
+                        Définit la position de la vidéo dans le pilier
                     </p>
                 </div>
             </div>
@@ -271,7 +269,7 @@ export default function VideoForm({
             {/* Durée (optionnelle) */}
             <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {t('videos.form.duration_label')}
+                    Durée (secondes)
                 </label>
                 <div className="flex items-center gap-4">
                     <input
@@ -282,7 +280,7 @@ export default function VideoForm({
                         className="w-32 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {t('videos.form.duration_help')}
+                        Sera détectée automatiquement si vide
                     </p>
                 </div>
             </div>
@@ -294,7 +292,7 @@ export default function VideoForm({
                     onClick={onCancel}
                     className="flex-1 px-6 py-4 text-gray-600 dark:text-gray-300 font-semibold rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                 >
-                    {t('pillars.create_modal.cancel')}
+                    Annuler
                 </button>
                 <motion.button
                     type="submit"
@@ -306,16 +304,16 @@ export default function VideoForm({
                     {loading ? (
                         <>
                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span>{t('videos.form.saving')}</span>
+                            <span>Enregistrement...</span>
                         </>
                     ) : (
                         <>
                             <Save className="w-5 h-5" />
-                            <span>{video ? t('videos.form.submit_edit') : t('videos.form.submit_new')}</span>
+                            <span>{video ? "Modifier la vidéo" : "Créer la vidéo"}</span>
                         </>
                     )}
                 </motion.button>
             </div>
         </form>
     );
-}
+}

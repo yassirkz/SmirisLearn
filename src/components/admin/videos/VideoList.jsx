@@ -5,7 +5,6 @@ import {
     LayoutGrid, Table as TableIcon,
     X, Monitor
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
@@ -18,7 +17,6 @@ import VideoForm from './VideoForm';
 import PillarSkeleton from '../pillars/PillarSkeleton';
 
 export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
-    const { t } = useTranslation('admin');
     const { user } = useAuth();
     const { success, error: showError } = useToast();
     
@@ -147,7 +145,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             setVideos(filtered);
         } catch (err) {
             console.error('❌ Erreur chargement vidéos:', err);
-            showError(t('videos.errors.fetch_failed'));
+            showError("Erreur lors du chargement des vidéos");
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -164,12 +162,12 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
 
     const handleRefresh = () => {
         fetchVideos();
-        success(t('videos.success.updated'));
+        success("Vidéos actualisées");
     };
 
     const handleOpenUploader = () => {
         if (!userOrgId) {
-            showError(t('videos.errors.no_org'));
+            showError("Organisation non trouvée");
             return;
         }
         setShowUploader(true);
@@ -177,7 +175,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
 
     const handleOpenRecorder = () => {
         if (!userOrgId) {
-            showError(t('videos.errors.no_org'));
+            showError("Organisation non trouvée");
             return;
         }
         setShowRecorder(true);
@@ -194,7 +192,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
         setSelectedVideo(null);
         setUploadedVideo(null);
         fetchVideos();
-        success(t('videos.success.saved'));
+        success("Vidéo enregistrée avec succès");
     };
 
     const handleEdit = (video) => {
@@ -203,7 +201,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
     };
 
     const handleDelete = async (video) => {
-        if (!window.confirm(t('videos.confirm_delete', { title: video.title }))) return;
+        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer la vidéo "${video.title}" ?`)) return;
 
         try {
             if (video.video_path) {
@@ -223,7 +221,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             fetchVideos();
         } catch (err) {
             console.error('❌ Erreur suppression:', err);
-            showError(t('videos.errors.delete_failed'));
+            showError("Erreur lors de la suppression de la vidéo");
         }
     };
 
@@ -239,11 +237,11 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                     <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{t('videos.stats.videos', { count: videos.length })}</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{videos.length} {videos.length > 1 ? 'vidéos' : 'vidéo'}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{t('videos.stats.pillars', { count: pillars.length })}</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{pillars.length} {pillars.length > 1 ? 'piliers' : 'pilier'}</span>
                         </div>
                     </div>
 
@@ -294,7 +292,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                     className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    <span className="hidden xs:inline">{t('videos.new_video')}</span>
+                                    <span className="hidden xs:inline">Ajouter une vidéo</span>
                                     <Plus className="w-4 h-4 xs:hidden" />
                                 </button>
                                 <button
@@ -302,7 +300,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                     className="flex-1 sm:flex-none px-4 py-2 bg-gray-900 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     <Monitor className="w-4 h-4" />
-                                    <span className="hidden xs:inline">{t('videos.record')}</span>
+                                    <span className="hidden xs:inline">Enregistrer l'écran</span>
                                     <Monitor className="w-4 h-4 xs:hidden" />
                                 </button>
                             </div>
@@ -329,7 +327,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">{t('videos.modals.upload.title')}</h2>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Importer une vidéo</h2>
                                 <button
                                     onClick={() => setShowUploader(false)}
                                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
@@ -365,7 +363,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">{t('videos.modals.record.title')}</h2>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Enregistrement d'écran</h2>
                                 <button
                                     onClick={() => setShowRecorder(false)}
                                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
@@ -409,7 +407,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                                    {selectedVideo ? t('videos.modals.form.title_edit') : t('videos.modals.form.title_new')}
+                                    {selectedVideo ? "Modifier la vidéo" : "Nouvelle vidéo"}
                                 </h2>
                                 <button
                                     onClick={() => {
@@ -445,17 +443,17 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
                     <Film className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                        {t('videos.empty_state.title')}
+                        Aucune vidéo
                     </h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">
-                        {t('videos.empty_state.desc')}
+                        Commencez par ajouter votre première vidéo ou enregistrez votre écran.
                     </p>
                     {!isReadOnly && (
                         <button
                             onClick={handleOpenUploader}
                             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
                         >
-                            {t('videos.empty_state.button')}
+                            Ajouter une vidéo
                         </button>
                     )}
                 </div>
@@ -465,11 +463,11 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                         <table className="w-full">
                             <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-left dark:text-gray-300">{t('videos.table.video')}</th>
-                                    <th className="px-6 py-4 text-left dark:text-gray-300">{t('videos.table.pillar')}</th>
-                                    <th className="px-6 py-4 text-left dark:text-gray-300">{t('videos.table.duration')}</th>
-                                    <th className="px-6 py-4 text-left dark:text-gray-300">{t('videos.table.added_at')}</th>
-                                    <th className="px-6 py-4 text-right dark:text-gray-300">{t('videos.table.actions')}</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Vidéo</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Pilier</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Durée</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Ajoutée le</th>
+                                    <th className="px-6 py-4 text-right dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -505,4 +503,4 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             )}
         </div>
     );
-}
+}

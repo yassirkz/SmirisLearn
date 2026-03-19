@@ -3,10 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Filter, ArrowUpDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { untrusted, escapeText } from '../../../utils/security';
-import { useTranslation } from 'react-i18next';
 
 export default function VideoFilters({ filters, onChange, pillars }) {
-    const { t } = useTranslation('admin');
     const [showFilters, setShowFilters] = useState(false);
     const filterRef = useRef(null);
 
@@ -59,7 +57,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                         type="text"
                         value={filters.search}
                         onChange={handleSearchChange}
-                        placeholder={t('pillars.filters.search_placeholder')}
+                        placeholder="Rechercher une vidéo..."
                         className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
                     />
                     {filters.search && (
@@ -78,7 +76,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                     onChange={handlePillarChange}
                     className="flex-1 sm:flex-none px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 bg-white dark:bg-gray-800 dark:text-white"
                 >
-                    <option value="all">{t('videos.filters.all_pillars')}</option>
+                    <option value="all">Tous les piliers</option>
                     {pillars.map(pillar => (
                         <option key={pillar.id} value={pillar.id}>
                             {escapeText(untrusted(pillar.name))}
@@ -111,14 +109,14 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                         className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 z-50"
                     >
                         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                            {t('pillars.filters.sort_by')}
+                            Trier par
                         </h3>
                         
                         <div className="space-y-2">
                             {[
-                                { field: 'title', label: t('videos.filters.sort_options.title') },
-                                { field: 'created_at', label: t('videos.filters.sort_options.added_at') },
-                                { field: 'duration', label: t('videos.filters.sort_options.duration') }
+                                { field: 'title', label: "Titre" },
+                                { field: 'created_at', label: "Date d'ajout" },
+                                { field: 'duration', label: "Durée" }
                             ].map((option) => (
                                 <button
                                     key={option.field}
@@ -152,7 +150,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                                 }}
                                 className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                             >
-                                {t('pillars.filters.reset')}
+                                Réinitialiser les filtres
                             </button>
                         </div>
                     </motion.div>
@@ -160,4 +158,4 @@ export default function VideoFilters({ filters, onChange, pillars }) {
             </AnimatePresence>
         </div>
     );
-}
+}

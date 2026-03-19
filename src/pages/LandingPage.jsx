@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
-import { useTranslation } from 'react-i18next';
 import { useToast } from '../hooks/useToast';
 import { supabase } from '../lib/supabase';
 import { untrusted, escapeText, validateEmail } from '../utils/security';
@@ -199,7 +198,6 @@ const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelec
 export default function LandingPage() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { t } = useTranslation(['common', 'auth']);
   const navigate = useNavigate();
   const { success, error: showError } = useToast();
   const containerRef = useRef(null);
@@ -216,18 +214,20 @@ export default function LandingPage() {
   const [formErrors, setFormErrors] = useState({});
   const [sending, setSending] = useState(false);
 
-  const faqs = (t('faq.items', { returnObjects: true }) || []).map((faq, index) => ({
-    question: faq.q,
-    answer: faq.a
-  }));
+  const faqs = [
+    {
+      question: "Les vidéos sont-elles hébergées chez vous ?",
+      answer: "Oui, nous hébergeons toutes vos vidéos sur des serveurs sécurisés et optimisés pour une lecture fluide partout dans le monde."
+    }
+  ];
 
   // Sections pour la navigation
   const sections = [
-    { id: 'hero', label: t('nav.home') },
-    { id: 'features', label: t('nav.features') },
-    { id: 'testimonials', label: t('nav.testimonials') },
-    { id: 'demo', label: t('nav.demo') },
-    { id: 'cta', label: t('nav.signup') }
+    { id: 'hero', label: 'Accueil' },
+    { id: 'features', label: 'Fonctionnalités' },
+    { id: 'testimonials', label: 'Témoignages' },
+    { id: 'demo', label: 'Aperçu' },
+    { id: 'cta', label: 'Inscription' }
   ];
 
   // Détecter la section active lors du scroll (optimisé)
@@ -273,8 +273,8 @@ export default function LandingPage() {
   // Validation du formulaire de contact
   const validateForm = () => {
     const errors = {};
-    if (!formData.fullName.trim()) errors.fullName = t('auth.errors.nameRequired');
-    else if (formData.fullName.length < 2) errors.fullName = t('auth.errors.nameMin');
+    if (!formData.fullName.trim()) errors.fullName = 'Nom requis';
+    else if (formData.fullName.length < 2) errors.fullName = 'Minimum 2 caractères';
     
     try {
       validateEmail(untrusted(formData.email.trim()));
@@ -370,7 +370,7 @@ export default function LandingPage() {
                       : 'text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400'
                   }`}
                 >
-                  {t(`nav.${id}`)}
+                  {label}
                 </button>
               ))}
             </nav>
@@ -390,14 +390,14 @@ export default function LandingPage() {
                 onClick={() => navigate('/login')}
                 className="hidden md:inline-flex items-center gap-2 px-3 lg:px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors whitespace-nowrap"
               >
-                {t('cta.login')}
+                Se connecter
               </button>
               
               <button
                 onClick={() => navigate('/login?signup=true')}
                 className="hidden sm:inline-flex px-4 lg:px-6 py-2 lg:py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
               >
-                {t('cta.freeTrial')}
+                Essai gratuit
               </button>
 
               <button
@@ -437,7 +437,7 @@ export default function LandingPage() {
                     }}
                     className="block w-full text-left px-4 py-3 rounded-xl hover:bg-indigo-50 dark:hover:bg-gray-800 transition-colors"
                   >
-                    <span className="text-gray-800 dark:text-white font-medium">{t(`nav.${id}`)}</span>
+                    <span className="text-gray-800 dark:text-white font-medium">{label}</span>
                   </button>
                 ))}
                 <hr className="border-gray-200 dark:border-gray-700" />
@@ -505,9 +505,9 @@ export default function LandingPage() {
             transition={{ delay: 0.2 }}
             className="text-5xl md:text-7xl font-black text-gray-900 dark:text-white mb-6 tracking-tight"
           >
-            {t('hero.title1')}
+            Formez vos équipes
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-              {t('hero.title2')}
+              sans effort
             </span>
           </motion.h1>
           
@@ -517,7 +517,7 @@ export default function LandingPage() {
             transition={{ delay: 0.4 }}
             className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto"
           >
-            {t('hero.description')}
+            Smiris Learn, la plateforme SaaS qui simplifie la création de parcours pédagogiques. Gérez vidéos, quiz, et suivez la progression en temps réel.
           </motion.p>
           
           <motion.div
@@ -530,14 +530,14 @@ export default function LandingPage() {
               onClick={() => navigate('/login?signup=true')}
               className="px-10 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl text-lg font-bold shadow-2xl hover:shadow-3xl hover:scale-105 transition-all flex items-center gap-2 group"
             >
-              {t('hero.ctaStart')}
+              Commencer gratuitement
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
              <button
               onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
               className="px-10 py-5 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border-2 border-indigo-200 dark:border-indigo-800 text-gray-800 dark:text-white rounded-2xl text-lg font-bold hover:bg-white/30 dark:hover:bg-gray-800/30 transition-all"
             >
-              {t('hero.ctaDiscover')}
+              Découvrir
             </button>
           </motion.div>
 
@@ -548,7 +548,7 @@ export default function LandingPage() {
             className="mt-16 text-sm text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2"
           >
              <Shield className="w-4 h-4" />
-            <span>{t('hero.trustText')}</span>
+            <span>Plus de 500 entreprises nous font confiance</span>
           </motion.div>
         </motion.div>
       </Section>
@@ -562,7 +562,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-black text-center text-gray-900 dark:text-white mb-4"
           >
-            {t('features.title')}
+            Tout ce dont vous avez besoin
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -571,32 +571,32 @@ export default function LandingPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-center text-gray-600 dark:text-gray-300 mb-16 max-w-3xl mx-auto"
           >
-            {t('features.subtitle')}
+            Une suite complète pour créer, gérer et analyser vos formations.
           </motion.p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FeatureCard
               icon={BookOpen}
-              title={t('features.items.pillars.title')}
-              description={t('features.items.pillars.desc')}
+              title="Piliers de formation"
+              description="Organisez vos cours en piliers thématiques, gérez l'ordre séquentiel."
               delay={0.2}
             />
             <FeatureCard
               icon={Video}
-              title={t('features.items.videos.title')}
-              description={t('features.items.videos.desc')}
+              title="Vidéos interactives"
+              description="Upload simple, lecteur intégré, progression automatique."
               delay={0.3}
             />
             <FeatureCard
               icon={Award}
-              title={t('features.items.quiz.title')}
-              description={t('features.items.quiz.desc')}
+              title="Quiz personnalisés"
+              description="QCM, vrai/faux, timer, tentatives, feedback détaillé."
               delay={0.4}
             />
             <FeatureCard
               icon={Users}
-              title={t('features.items.groups.title')}
-              description={t('features.items.groups.desc')}
+              title="Groupes & accès"
+              description="Affectez des étudiants à des groupes, contrôlez l'accès."
               delay={0.5}
             />
           </div>
@@ -610,15 +610,15 @@ export default function LandingPage() {
           >
             <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
               <Moon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{t('features.badges.darkMode')}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Dark mode inclus</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 rounded-full">
               <Globe className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{t('features.badges.multilingual')}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Multilingue</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/30 rounded-full">
               <Lock className="w-5 h-5 text-green-600 dark:text-green-400" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{t('features.badges.security')}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Sécurité renforcée (RLS)</span>
             </div>
           </motion.div>
         </div>
@@ -633,7 +633,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-black text-center text-gray-900 dark:text-white mb-4"
           >
-            {t('testimonials.title')}
+            Ils nous font confiance
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -641,30 +641,30 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-xl text-center text-gray-600 dark:text-gray-300 mb-16"
           >
-            {t('testimonials.subtitle')}
+            Découvrez ce que nos clients pensent de Smiris Learn.
           </motion.p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <TestimonialCard
-              name={t('testimonials.items.marie.name')}
-              role={t('testimonials.items.marie.role')}
-              content={t('testimonials.items.marie.content')}
+              name="Marie D."
+              role="Responsable RH, Groupe XYZ"
+              content="Smiris Learn a transformé notre façon de former nos équipes. L'interface est intuitive et le suivi des progrès est un vrai plus."
               rating={5}
               avatar="M"
               delay={0.2}
             />
             <TestimonialCard
-              name={t('testimonials.items.thomas.name')}
-              role={t('testimonials.items.thomas.role')}
-              content={t('testimonials.items.thomas.content')}
+              name="Thomas L."
+              role="Formateur indépendant"
+              content="La gestion des groupes et des accès est incroyablement simple. Mes étudiants adorent la clarté des quiz."
               rating={5}
               avatar="T"
               delay={0.3}
             />
             <TestimonialCard
-              name={t('testimonials.items.sophie.name')}
-              role={t('testimonials.items.sophie.role')}
-              content={t('testimonials.items.sophie.content')}
+              name="Sophie M."
+              role="Directrice pédagogique"
+              content="Le dark mode est un vrai plus pour nos équipes. Un outil moderne et efficace."
               rating={5}
               avatar="S"
               delay={0.4}
@@ -683,10 +683,10 @@ export default function LandingPage() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-              {t('demo.title')}
+              Un aperçu de l'interface
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              {t('demo.subtitle')}
+              Dashboard, lecteur vidéo, quiz... tout est pensé pour une expérience fluide.
             </p>
           </motion.div>
 
@@ -716,10 +716,10 @@ export default function LandingPage() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-              {t('faq.title')}
+              Questions fréquentes
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              {t('faq.subtitle')}
+              Tout ce que vous devez savoir sur Smiris Learn.
             </p>
           </motion.div>
 
@@ -752,10 +752,10 @@ export default function LandingPage() {
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-2xl border border-indigo-100 dark:border-gray-700"
           >
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 text-center">
-              {t('contact.title')}
+              Contactez-nous
             </h2>
             <p className="text-xl text-center text-gray-600 dark:text-gray-300 mb-10">
-              {t('contact.subtitle')}
+              Une question ? Notre équipe vous répondra dans les plus brefs délais.
             </p>
 
             <form onSubmit={handleSubmitContact} className="space-y-6">
@@ -763,7 +763,7 @@ export default function LandingPage() {
                 {/* Nom complet */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('contact.fields.fullName')} <span className="text-red-500">*</span>
+                    Nom complet <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -777,7 +777,7 @@ export default function LandingPage() {
                           ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30'
                           : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
                       }`}
-                      placeholder={t('contact.fields.placeholders.name')}
+                      placeholder="Jean Dupont"
                     />
                   </div>
                   {formErrors.fullName && (
@@ -788,7 +788,7 @@ export default function LandingPage() {
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('contact.fields.email')} <span className="text-red-500">*</span>
+                    Email <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -802,7 +802,7 @@ export default function LandingPage() {
                           ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30'
                           : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
                       }`}
-                      placeholder={t('contact.fields.placeholders.email')}
+                      placeholder="contact@exemple.com"
                     />
                   </div>
                   {formErrors.email && (
@@ -814,7 +814,7 @@ export default function LandingPage() {
               {/* Nom de l'entreprise (optionnel) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('contact.fields.company')} <span className="text-gray-400 dark:text-gray-500 text-xs">{t('contact.fields.optional')}</span>
+                  Nom de l'entreprise <span className="text-gray-400 dark:text-gray-500 text-xs">(optionnel)</span>
                 </label>
                 <div className="relative">
                   <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -824,7 +824,7 @@ export default function LandingPage() {
                     value={formData.companyName}
                     onChange={handleInputChange}
                     className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
-                    placeholder={t('contact.fields.placeholders.company')}
+                    placeholder="Smiris Learn"
                   />
                 </div>
               </div>
@@ -832,7 +832,7 @@ export default function LandingPage() {
               {/* Message */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('contact.fields.message')} <span className="text-red-500">*</span>
+                  Message <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <MessageSquare className="absolute left-4 top-5 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -846,7 +846,7 @@ export default function LandingPage() {
                         ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30'
                         : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
                     }`}
-                    placeholder={t('contact.fields.placeholders.message')}
+                    placeholder="Bonjour, j'aimerais en savoir plus sur..."
                   />
                 </div>
                 {formErrors.message && (
@@ -862,12 +862,12 @@ export default function LandingPage() {
                 {sending ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>{t('contact.sending')}</span>
+                    <span>Envoi en cours...</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-5 h-5" />
-                    <span>{t('contact.submit')}</span>
+                    <span>Envoyer le message</span>
                   </>
                 )}
               </button>
@@ -885,19 +885,19 @@ export default function LandingPage() {
           className="max-w-4xl mx-auto text-center"
         >
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6">
-            {t('finalCta.title1')}
+            Prêt à révolutionner
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-              {t('finalCta.title2')}
+              vos formations ?
             </span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-10">
-            {t('finalCta.subtitle')}
+            Rejoignez des milliers d'entreprises qui forment leurs équipes avec Smiris Learn.
           </p>
           <button
             onClick={() => navigate('/login?signup=true')}
             className="px-12 py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl text-xl font-bold shadow-2xl hover:shadow-3xl hover:scale-105 transition-all inline-flex items-center gap-3 group"
           >
-            {t('finalCta.button')}
+            Créer mon compte
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
@@ -915,12 +915,12 @@ export default function LandingPage() {
                 <span className="font-bold text-gray-800 dark:text-white">Smiris Learn</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('footer.desc')}
+                La plateforme de formation SaaS pour les entreprises modernes.
               </p>
             </div>
             
             <div>
-              <h4 className="font-bold text-gray-800 dark:text-white mb-4">{t('footer.links')}</h4>
+              <h4 className="font-bold text-gray-800 dark:text-white mb-4">Liens rapides</h4>
               <ul className="space-y-2">
                 {sections.map(({ id, label }) => (
                   <li key={id}>
@@ -936,16 +936,16 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-bold text-gray-800 dark:text-white mb-4">{t('footer.legal')}</h4>
+              <h4 className="font-bold text-gray-800 dark:text-white mb-4">Légal</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">CGU</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">{t('footer.legalLinks.privacy')}</a></li>
-                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">{t('footer.legalLinks.terms')}</a></li>
+                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Politique de confidentialité</a></li>
+                <li><a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Conditions d'utilisation</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold text-gray-800 dark:text-white mb-4">{t('footer.contact')}</h4>
+              <h4 className="font-bold text-gray-800 dark:text-white mb-4">Contact</h4>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Mail className="w-4 h-4" />
@@ -960,7 +960,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-8 pt-8 border-t border-indigo-100 dark:border-gray-800 text-center text-sm text-gray-400 dark:text-gray-500">
-            {t('footer.rights')}
+            © 2026 Smiris Learn. Tous droits réservés.
           </div>
         </div>
       </footer>
