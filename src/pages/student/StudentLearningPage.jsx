@@ -202,13 +202,12 @@ export default function StudentLearningPage() {
                       key={video.id}
                       whileHover={{ 
                         z: 20, 
-                        scale: 1.02,
-                        backgroundColor: "rgba(255, 255, 255, 1) dark:rgba(31, 41, 55, 1)"
+                        scale: 1.02
                       }}
                       className={`relative group flex items-center justify-between p-4 rounded-xl transition-all duration-300 border-2 ${
                         video.canAccess
-                          ? 'bg-white dark:bg-gray-800 border-indigo-100 dark:border-indigo-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-lg'
-                          : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-75'
+                          ? 'bg-white dark:bg-gray-800 border-indigo-100 dark:border-indigo-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700'
+                          : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-75 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                       onMouseEnter={() => setHoveredVideo(video.id)}
                       onMouseLeave={() => setHoveredVideo(null)}
