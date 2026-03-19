@@ -439,12 +439,12 @@ export default function StudentDashboard() {
             transition={{ delay: 0.05 }}
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <Flame className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+              <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Série actuelle</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">{streak} jour{streak > 1 ? 's' : ''}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Piliers</p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">{stats.pillarsCount}</p>
             </div>
           </motion.div>
 
