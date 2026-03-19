@@ -15,13 +15,18 @@ export default function MainLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-            {/* Bouton menu for mobile */}
-            <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900"
-            >
-                {sidebarOpen ? <X size={24} className="text-gray-600 dark:text-gray-300" /> : <Menu size={24} className="text-gray-600 dark:text-gray-300" />}
-            </button>
+            {/* Overlay mobile */}
+            <AnimatePresence mode="wait">
+                {sidebarOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30"
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Sidebar avec animation */}
             <AnimatePresence mode="wait">
@@ -47,7 +52,7 @@ export default function MainLayout({ children }) {
                     sidebarOpen ? 'lg:ml-64' : 'ml-0'
                 }`}
             >
-                <Header />
+                <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                 <main className="p-4 md:p-8 dark:text-gray-200">
                     {children}
                 </main>

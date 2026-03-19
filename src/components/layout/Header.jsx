@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, User, Shield, Zap, Sun, Moon } from 'lucide-react'; // ← AJOUT Sun/Moon
+import { Bell, User, Shield, Zap, Sun, Moon, Menu } from 'lucide-react'; // ← AJOUT Sun/Moon/Menu
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
@@ -8,7 +8,7 @@ import SearchComponent from '../../pages/SearchComponent';
 import NotificationDropdown from './NotificationDropdown';
 import { supabase } from '../../lib/supabase';
 
-export default function Header() {
+export default function Header({ onToggleSidebar }) {
     const { user } = useAuth();
     const { role } = useUserRole();
     const { theme, toggleTheme } = useTheme(); // ← AJOUT
@@ -58,6 +58,13 @@ export default function Header() {
             className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-blue-100 dark:border-gray-800 sticky top-0 z-30"
         >
             <div className="flex items-center justify-between px-4 md:px-8 py-4 gap-4">
+                <button
+                    onClick={onToggleSidebar}
+                    className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 shrink-0"
+                    title="Toggle Menu"
+                >
+                    <Menu className="w-5 h-5" />
+                </button>
                 {/* Barre de recherche */}
                 <div className="hidden md:block flex-1 max-w-2xl">
                     <SearchComponent 
