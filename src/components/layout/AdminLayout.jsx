@@ -12,7 +12,22 @@ import { supabase } from '../../lib/supabase';
 import { useUserRole } from '../../hooks/useUserRole';
 
 export default function AdminLayout({ children }) {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1024;
+        }
+        return true;
+    });
+    // Fermer automatiquement la sidebar sur mobile en cas de changement de route ou clic
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) setSidebarOpen(true);
+            else setSidebarOpen(false);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const [companyName, setCompanyName] = useState('');
     const [companyPlan, setCompanyPlan] = useState('');
     const [trialDays, setTrialDays] = useState(0);
@@ -123,13 +138,36 @@ export default function AdminLayout({ children }) {
                 </div>
             )}
 
-            {/* Bouton menu mobile */}
-            <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-indigo-100 dark:border-gray-700"
-            >
-                {sidebarOpen ? <X size={24} className="text-indigo-600 dark:text-indigo-400" /> : <Menu size={24} className="text-indigo-600 dark:text-indigo-400" />}
-            </button>
+            {/* Overlay mobile */}
+            <AnimatePresence mode="wait">
+                {sidebarOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30"
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Mobile Header (Sticky) */}
+            <div className="lg:hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-indigo-100 dark:border-gray-800 sticky top-0 z-20 flex items-center justify-between px-4 py-3">
+                <button
+                    onClick={() => setSidebarOpen(true)}
+                    className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl transition-colors text-indigo-600 dark:text-indigo-400"
+                >
+                    <Menu className="w-5 h-5" />
+                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={toggleTheme}
+                        className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                    >
+                        {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                    </button>
+                </div>
+            </div>
 
             {/* Sidebar */}
             <AnimatePresence mode="wait">

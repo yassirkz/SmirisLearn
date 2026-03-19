@@ -455,30 +455,32 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                 </div>
             ) : viewMode === 'table' ? (
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
-                            <tr>
-                                <th className="px-6 py-4 text-left dark:text-gray-300">Vidéo</th>
-                                <th className="px-6 py-4 text-left dark:text-gray-300">Pilier</th>
-                                <th className="px-6 py-4 text-left dark:text-gray-300">Durée</th>
-                                <th className="px-6 py-4 text-left dark:text-gray-300">Ajoutée le</th>
-                                <th className="px-6 py-4 text-right dark:text-gray-300">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {videos.map((video, index) => (
-                                <VideoCard
-                                    key={video.id}
-                                    video={video}
-                                    index={index}
-                                    onEdit={handleEdit}
-                                    onDelete={handleDelete}
-                                    isReadOnly={isReadOnly}
-                                    viewMode="table"
-                                />
-                            ))}
-                        </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
+                                <tr>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Vidéo</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Pilier</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Durée</th>
+                                    <th className="px-6 py-4 text-left dark:text-gray-300">Ajoutée le</th>
+                                    <th className="px-6 py-4 text-right dark:text-gray-300">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {videos.map((video, index) => (
+                                    <VideoCard
+                                        key={video.id}
+                                        video={video}
+                                        index={index}
+                                        onEdit={handleEdit}
+                                        onDelete={handleDelete}
+                                        isReadOnly={isReadOnly}
+                                        viewMode="table"
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
