@@ -233,26 +233,28 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
             >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="flex items-center gap-4 text-sm">
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                            <span className="text-gray-600 dark:text-gray-300">{videos.length} vidéos</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{videos.length} vidéos</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                            <span className="text-gray-600 dark:text-gray-300">{pillars.length} piliers</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{pillars.length} piliers</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <VideoFilters 
-                            filters={filters}
-                            onChange={setFilters}
-                            pillars={pillars}
-                        />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex-1 sm:flex-none">
+                            <VideoFilters 
+                                filters={filters}
+                                onChange={setFilters}
+                                pillars={pillars}
+                            />
+                        </div>
 
-                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 shrink-0">
                             <button
                                 onClick={() => setViewMode('table')}
                                 className={`p-2 rounded-lg transition-all ${
@@ -277,29 +279,31 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
 
                         <button
                             onClick={handleRefresh}
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0"
                             disabled={loading}
                         >
                             <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${loading ? 'animate-spin' : ''}`} />
                         </button>
 
                         {!isReadOnly && (
-                            <>
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={handleOpenUploader}
-                                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                    className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    Nouvelle vidéo
+                                    <span className="hidden xs:inline">Nouvelle vidéo</span>
+                                    <Plus className="w-4 h-4 xs:hidden" />
                                 </button>
                                 <button
                                     onClick={handleOpenRecorder}
-                                    className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                    className="flex-1 sm:flex-none px-4 py-2 bg-gray-900 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     <Monitor className="w-4 h-4" />
-                                    Enregistrer l'écran
+                                    <span className="hidden xs:inline">Enregistrer</span>
+                                    <Monitor className="w-4 h-4 xs:hidden" />
                                 </button>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>

@@ -128,11 +128,10 @@ export default function StudentLearningPage() {
           Retour au Dashboard
         </motion.button>
         {/* En-tête avec badge */}
-        <div className="relative">
-          <motion.div
+        <div className="relative">          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-4 -right-4"
+            className="absolute -top-4 -right-4 hidden sm:block"
           >
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
@@ -141,11 +140,11 @@ export default function StudentLearningPage() {
           </motion.div>
 
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-              <BookOpen className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" />
               Formations disponibles
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
               <Shield className="w-4 h-4" />
               Accédez aux piliers qui vous sont assignés
             </p>
@@ -153,10 +152,10 @@ export default function StudentLearningPage() {
         </div>
 
         {pillars.length === 0 ? (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
-            <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 sm:p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
+            <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Aucune formation disponible</h3>
-            <p className="text-gray-500 dark:text-gray-400">Vous n'avez pas encore accès à des piliers.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Vous n'avez pas encore accès à des piliers.</p>
           </div>
         ) : (
           <div className="space-y-8">
@@ -167,13 +166,13 @@ export default function StudentLearningPage() {
                 animate={{ opacity: 1, rotateX: 0, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ 
-                  rotateY: 2, 
-                  rotateX: -2, 
+                  rotateY: window.innerWidth > 768 ? 2 : 0, 
+                  rotateX: window.innerWidth > 768 ? -2 : 0, 
                   scale: 1.01,
                   boxShadow: "0 40px 80px -20px rgba(79, 70, 229, 0.15)"
                 }}
                 style={{ transformStyle: "preserve-3d" }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700 relative overflow-hidden group"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl border border-indigo-100 dark:border-gray-700 relative overflow-hidden group"
               >
                 {/* Effet de shine */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />

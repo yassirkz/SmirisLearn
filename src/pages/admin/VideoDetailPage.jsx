@@ -140,29 +140,29 @@ export default function VideoDetailPage() {
                 </button>
 
                 {/* En-tête */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-100 dark:border-gray-700">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                        <div className="min-w-0">
+                            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white truncate">
                                 {escapeText(untrusted(video.title))}
                             </h1>
                             {video.description && (
-                                <p className="text-gray-600 dark:text-gray-300 mt-2">
+                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 line-clamp-2 sm:line-clamp-none">
                                     {escapeText(untrusted(video.description))}
                                 </p>
                             )}
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 self-end sm:self-start">
                             <button
                                 onClick={() => setShowEditModal(true)}
-                                className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400"
+                                className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400 transition-colors"
                                 title="Modifier"
                             >
                                 <Edit className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400"
+                                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400 transition-colors"
                                 title="Supprimer"
                             >
                                 <Trash2 className="w-5 h-5" />
@@ -171,17 +171,17 @@ export default function VideoDetailPage() {
                     </div>
 
                     {/* Métadonnées */}
-                    <div className="flex gap-6 mt-4 text-sm text-gray-500 dark:text-gray-400">
-                        <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap gap-3 sm:gap-6 mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
                             <Clock className="w-4 h-4" />
                             <span>{formatDuration(video.duration)}</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
                             <Calendar className="w-4 h-4" />
                             <span>Ajoutée le {formatDate(video.created_at)}</span>
                         </div>
                         {pillar && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
                                 <Film className="w-4 h-4" />
                                 <span>Pilier: {escapeText(untrusted(pillar.name))}</span>
                             </div>

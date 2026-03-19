@@ -57,16 +57,16 @@ export default function PillarFilters({ filters, onChange }) {
 
     return (
         <>
-            <div className="flex items-center gap-2" ref={buttonRef}>
+            <div className="flex items-center gap-2 w-full sm:w-auto" ref={buttonRef}>
                 {/* Barre de recherche */}
-                <div className="relative">
+                <div className="relative flex-1 sm:flex-none">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                     <input
                         type="text"
                         value={filters.search}
                         onChange={handleSearchChange}
                         placeholder="Rechercher..."
-                        className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all w-64 dark:bg-gray-800 dark:text-white"
+                        className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
                     />
                     {filters.search && (
                         <button

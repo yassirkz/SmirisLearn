@@ -109,15 +109,15 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                     className="transition-colors group cursor-pointer hover:bg-indigo-50/80 dark:hover:bg-gray-700/80"
                                 >
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 ${colorStyle} rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
+                                        <div className="flex items-center gap-3 min-w-[200px]">
+                                            <div className={`w-10 h-10 ${colorStyle} rounded-xl flex items-center justify-center shadow-sm sm:group-hover:scale-110 transition-transform`}>
                                                 <span className="text-lg">{pillar.icon || '📚'}</span>
                                             </div>
-                                            <div>
+                                            <div className="min-w-0">
                                                 <div className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                                                    {escapeText(untrusted(pillar.safeName))}
+                                                    <span className="truncate">{escapeText(untrusted(pillar.safeName))}</span>
                                                     {pillar.description && (
-                                                        <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">
+                                                        <span className="text-xs text-gray-400 dark:text-gray-500 font-normal hidden sm:inline truncate">
                                                             {escapeText(untrusted(pillar.safeDescription.substring(0, 30)))}...
                                                         </span>
                                                     )}
@@ -126,33 +126,33 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 min-w-[80px]">
                                             <Video className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                             <span className="text-sm text-gray-600 dark:text-gray-300">{pillar.videoCount}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 min-w-[100px]">
                                             <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                             <span className="text-sm text-gray-600 dark:text-gray-300">{pillar.studentCount}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 min-w-[120px]">
                                             <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                                            <span className="text-sm text-gray-600 dark:text-gray-300">
+                                            <span className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                                                 {new Date(pillar.created_at).toLocaleDateString('fr-FR')}
                                             </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
+                                        <div className="flex items-center justify-end gap-1 sm:gap-2">
                                             {/* Bouton Voir détails */}
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={(e) => handleViewDetails(e, pillar.id)}
-                                                className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100"
+                                                className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400 sm:opacity-0 sm:group-hover:opacity-100"
                                                 title="Voir détails"
                                             >
                                                 <Eye className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}
                                                         onClick={(e) => handleEditClick(e, pillar)}
-                                                        className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100"
+                                                        className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 sm:opacity-0 sm:group-hover:opacity-100"
                                                         title="Modifier"
                                                     >
                                                         <Edit className="w-4 h-4" />
@@ -174,7 +174,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}
                                                         onClick={(e) => handleDeleteClick(e, pillar)}
-                                                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400 opacity-0 group-hover:opacity-100"
+                                                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400 sm:opacity-0 sm:group-hover:opacity-100"
                                                         title="Supprimer"
                                                     >
                                                         <Trash2 className="w-4 h-4" />

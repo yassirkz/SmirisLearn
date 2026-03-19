@@ -85,31 +85,31 @@ export default function PillarDetailPage() {
                     className="space-y-8"
                 >
                     {/* En-tête */}
-                    <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-4">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                        <div className="flex items-start gap-2 sm:gap-4">
                             <button
                                 onClick={() => navigate('/admin/pillars')}
-                                className="mt-1 mr-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                className="mt-1 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
                                 aria-label="Retour aux piliers"
                             >
                                 <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                             </button>
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
-                                    <BookOpen className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
-                                    {pillar.safeName}
+                            <div className="min-w-0">
+                                <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                                    <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                                    <span className="truncate">{pillar.safeName}</span>
                                 </h1>
                                 {pillar.safeDescription && (
-                                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 sm:line-clamp-none">
                                         {pillar.safeDescription}
                                     </p>
                                 )}
-                                <div className="mt-3 flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
+                                <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">
                                         <Video className="w-4 h-4" />
                                         {pillar.videoCount} vidéo{pillar.videoCount > 1 ? 's' : ''}
                                     </span>
-                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 whitespace-nowrap">
                                         Créé le{' '}
                                         {pillar.created_at
                                             ? new Date(pillar.created_at).toLocaleDateString('fr-FR')
@@ -119,7 +119,7 @@ export default function PillarDetailPage() {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1">
+                        <div className="hidden sm:flex bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg items-center gap-1 shrink-0">
                             <Sparkles className="w-3 h-3" />
                             Détails du pilier
                         </div>

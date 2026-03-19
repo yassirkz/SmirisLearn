@@ -113,12 +113,12 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                     {formatDate(video.created_at)}
                 </td>
                 <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-1 sm:gap-2">
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleView}
-                            className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100"
+                            className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400 sm:opacity-0 sm:group-hover:opacity-100"
                             title="Voir détails"
                         >
                             <Eye className="w-4 h-4" />
@@ -130,7 +130,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleEdit}
-                                    className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100"
+                                    className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 sm:opacity-0 sm:group-hover:opacity-100"
                                     title="Modifier"
                                 >
                                     <Edit className="w-4 h-4" />
@@ -140,7 +140,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleDelete}
-                                    className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400 opacity-0 group-hover:opacity-100"
+                                    className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400 sm:opacity-0 sm:group-hover:opacity-100"
                                     title="Supprimer"
                                 >
                                     <Trash2 className="w-4 h-4" />

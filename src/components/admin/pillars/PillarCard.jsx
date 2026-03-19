@@ -67,15 +67,15 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             whileHover={{ 
-                rotateY: 5, 
-                rotateX: -5, 
+                rotateY: window.innerWidth > 768 ? 5 : 0, 
+                rotateX: window.innerWidth > 768 ? -5 : 0, 
                 scale: 1.05, 
                 z: 20,
                 boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
             }}
             style={{ transformStyle: "preserve-3d" }}
             onClick={handleCardClick}
-            className={`${getBgLight(pillar.color)} rounded-2xl p-6 shadow-lg border border-white/50 dark:border-gray-700 backdrop-blur-sm relative overflow-hidden group cursor-pointer`}
+            className={`${getBgLight(pillar.color)} rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50 dark:border-gray-700 backdrop-blur-sm relative overflow-hidden group cursor-pointer`}
         >
             {/* Effet de shine */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
@@ -89,16 +89,16 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* En-tête avec icône */}
-            <div className="flex items-start gap-4 mb-4" style={{ transform: "translateZ(40px)" }}>
-                <div className={`w-16 h-16 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-2xl flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform`}>
+            <div className="flex items-start gap-3 sm:gap-4 mb-4" style={{ transform: "translateZ(40px)" }}>
+                <div className={`w-12 h-12 sm:w-16 sm:h-16 shrink-0 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-lg sm:group-hover:scale-110 transition-transform`}>
                     {pillar.icon || '📚'}
                 </div>
-                <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-200 mb-1 truncate">
                         {escapeText(untrusted(pillar.safeName))}
                     </h3>
                     {pillar.description && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
                             {escapeText(untrusted(pillar.safeDescription))}
                         </p>
                     )}
@@ -106,21 +106,27 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* Statistiques */}
-            <div className="grid grid-cols-3 gap-2 mb-4 dark:bg-gray-800/50 dark:border-gray-500 dark:text-white"  style={{ transform: "translateZ(20px)" }}>
-                <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                    <Video className="w-4 h-4 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Vidéos</p>
-                    <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.videoCount}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4"  style={{ transform: "translateZ(20px)" }}>
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <div className="flex items-center gap-2 sm:block sm:text-center">
+                        <Video className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-indigo-600 dark:text-indigo-400" />
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Vidéos</p>
+                    </div>
+                    <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.videoCount}</p>
                 </div>
-                <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                    <Users className="w-4 h-4 mx-auto mb-1 text-purple-600 dark:text-purple-400" />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Étudiants</p>
-                    <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.studentCount}</p>
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <div className="flex items-center gap-2 sm:block sm:text-center">
+                        <Users className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-purple-600 dark:text-purple-400" />
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Étudiants</p>
+                    </div>
+                    <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.studentCount}</p>
                 </div>
-                <div className="text-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                    <Calendar className="w-4 h-4 mx-auto mb-1 text-green-600 dark:text-green-400" />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Création</p>
-                    <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                    <div className="flex items-center gap-2 sm:block sm:text-center">
+                        <Calendar className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-green-600 dark:text-green-400" />
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Création</p>
+                    </div>
+                    <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
                         {new Date(pillar.created_at).toLocaleDateString('fr-FR')}
                     </p>
                 </div>

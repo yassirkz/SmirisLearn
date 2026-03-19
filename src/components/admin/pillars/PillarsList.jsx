@@ -291,26 +291,28 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
             >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 dark:bg-gray-800/50 dark:border-gray-500 dark:text-white">
-                    <div className="flex items-center gap-4 text-sm dark:text-white dark:bg-gray-800/50 dark:border-gray-500 dark:text-white">
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                            <span className="text-gray-600 dark:text-gray-300">{stats.total} piliers</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{stats.total} piliers</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                            <span className="text-gray-600 dark:text-gray-300">{stats.totalVideos} vidéos</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{stats.totalVideos} vidéos</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span className="text-gray-600 dark:text-gray-300">{stats.totalStudents} étudiants</span>
+                            <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{stats.totalStudents} étudiants</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <PillarFilters filters={filters} onChange={handleFilterChange} />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex-1 sm:flex-none">
+                            <PillarFilters filters={filters} onChange={handleFilterChange} />
+                        </div>
 
-                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 shrink-0">
                             <button
                                 onClick={() => handleViewChange('table')}
                                 className={`p-2 rounded-lg transition-all ${
@@ -339,7 +341,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             whileHover={{ rotate: 180 }}
                             transition={{ duration: 0.3 }}
                             onClick={handleRefresh}
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0"
                             title="Rafraîchir"
                             disabled={refreshing || loading}
                         >
@@ -351,10 +353,11 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleCreate}
-                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2 group"
+                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2 group flex-1 sm:flex-none justify-center whitespace-nowrap"
                             >
                                 <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-                                Nouveau pilier
+                                <span className="hidden xs:inline">Nouveau pilier</span>
+                                <Plus className="w-4 h-4 xs:hidden" />
                                 <Sparkles className="w-3 h-3 opacity-50" />
                             </motion.button>
                         )}
