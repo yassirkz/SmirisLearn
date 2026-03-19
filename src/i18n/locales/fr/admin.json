@@ -541,8 +541,7 @@
         "title": "Apparence",
         "theme": "Thème",
         "theme_light": "Clair",
-        "theme_dark": "Sombre",
-        "language": "Langue"
+        "theme_dark": "Sombre"
       },
       "security": {
         "title": "Sécurité",
@@ -576,7 +575,6 @@
         "orgs": "Entreprises Approuvées",
         "orgs_active": "Organisations actives",
         "users": "Membres Plateforme",
-        "trials": "{{count}} comptes en essai",
         "videos": "Vidéos Hébergées",
         "storage": "{{count}} Mo de stockage",
         "engagement": "Score d'Engagement",
@@ -593,7 +591,6 @@
       "manage": "Gestion des entreprises",
       "deploy": "Déployer Entreprise",
       "identification": "Identification",
-      "license": "Licence",
       "usage": "Usage",
       "registered": "Registré le",
       "management": "Gestion",
@@ -622,16 +619,6 @@
       "unsuspend": "Réactiver",
       "delete_confirm": "Êtes-vous sûr de vouloir supprimer {{name}} ?",
       "no_admin_email": "Aucun email d'administrateur trouvé."
-    },
-    "limits": {
-      "title": "Limites du plan {{plan}}",
-      "users": "Utilisateurs",
-      "videos": "Vidéos",
-      "storage": "Stockage",
-      "used": "Utilisés",
-      "created": "Créées",
-      "reached_users": "Limite utilisateurs atteinte. Passez à un plan supérieur.",
-      "reached_videos": "Limite vidéos atteinte. Passez à un plan supérieur."
     }
   }
 }

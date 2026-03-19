@@ -41,8 +41,7 @@ export default function AdminSettings() {
         memberJoined: true,
         videoUploaded: true,
         quizCompleted: true,
-        sessionTimeout: '30',
-        language: 'fr' // thème retiré car géré globalement
+        sessionTimeout: '30'
     });
 
     const [originalSettings, setOriginalSettings] = useState({});
@@ -112,8 +111,7 @@ export default function AdminSettings() {
                 memberJoined: localStorage.getItem('memberJoined') !== 'false',
                 videoUploaded: localStorage.getItem('videoUploaded') !== 'false',
                 quizCompleted: localStorage.getItem('quizCompleted') !== 'false',
-                sessionTimeout: localStorage.getItem('sessionTimeout') || '30',
-                language: localStorage.getItem('language') || 'fr'
+                sessionTimeout: localStorage.getItem('sessionTimeout') || '30'
             };
 
             setSettings(newSettings);
@@ -189,7 +187,6 @@ export default function AdminSettings() {
             }
 
             // Sauvegarder les préférences (sauf thème)
-            localStorage.setItem('language', settings.language);
             localStorage.setItem('sessionTimeout', settings.sessionTimeout);
             localStorage.setItem('emailNotifications', settings.emailNotifications);
             localStorage.setItem('memberJoined', settings.memberJoined);
@@ -450,22 +447,7 @@ export default function AdminSettings() {
                                             <span className="text-xs dark:text-gray-300">{t('settings.sections.appearance.theme_dark')}</span>
                                         </button>
                                     </div>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('settings.sections.appearance.language')}</p>
-                                    <select
-                                        value={settings.language}
-                                        onChange={(e) => setSettings({...settings, language: e.target.value})}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white"
-                                        disabled={isReadOnly}
-                                    >
-                                        <option value="fr">Français</option>
-                                        <option value="en">English</option>
-                                        <option value="de">Deutsch</option>
-                                        <option value="ar">العربية</option>
-                                    </select>
-                                </div>
+                                          </div>
                             </div>
                         </motion.div>
                     </div>

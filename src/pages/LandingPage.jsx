@@ -13,7 +13,7 @@ import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../hooks/useToast';
 import { supabase } from '../lib/supabase';
-import LanguageSwitcher from '../components/ui/LanguageSwitcher';
+import { untrusted, escapeText, validateEmail } from '../utils/security';
 import { untrusted, escapeText, validateEmail } from '../utils/security';
 
 // Composant pour chaque section avec scroll snap
@@ -227,9 +227,6 @@ export default function LandingPage() {
     { id: 'features', label: t('nav.features') },
     { id: 'testimonials', label: t('nav.testimonials') },
     { id: 'demo', label: t('nav.demo') },
-    { id: 'pricing', label: t('nav.pricing') },
-    { id: 'faq', label: t('nav.faq') },
-    { id: 'contact', label: t('nav.contact') },
     { id: 'cta', label: t('nav.signup') }
   ];
 
@@ -380,7 +377,6 @@ export default function LandingPage() {
 
             {/* Boutons */}
             <div className="flex items-center gap-1.5 sm:gap-3">
-              <LanguageSwitcher />
 
               <button
                 onClick={toggleTheme}
@@ -709,76 +705,6 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* Section Tarifs */}
-      <Section id="pricing">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-black text-center text-gray-900 dark:text-white mb-4"
-          >
-            {t('pricing.title')}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-xl text-center text-gray-600 dark:text-gray-300 mb-8"
-          >
-            {t('pricing.subtitle')}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex justify-center items-center gap-4 mb-16"
-          >
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>{t('pricing.monthly')}</span>
-            <button
-              onClick={() => setIsAnnual(!isAnnual)}
-              className="relative inline-flex h-7 w-14 items-center rounded-full bg-indigo-100 dark:bg-gray-700 transition-colors focus:outline-none"
-            >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-indigo-600 transition-transform ${isAnnual ? 'translate-x-8' : 'translate-x-1'}`}
-              />
-            </button>
-            <span className={`text-sm font-medium flex items-center gap-2 ${isAnnual ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-              {t('pricing.annual')} <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold">{t('pricing.discount')}</span>
-            </span>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            <PricingCard
-              name={t('pricing.plans.free.name')}
-              price="0€"
-              features={t('pricing.plans.free.features', { returnObjects: true })}
-              isPopular={false}
-              delay={0.2}
-              onSelect={() => navigate('/login?signup=true')}
-            />
-            <PricingCard
-              name={t('pricing.plans.starter.name')}
-              price={isAnnual ? "39€" : "49€"}
-              subtext={isAnnual ? t('pricing.plans.billedYearly', { price: '468€' }) : null}
-              features={t('pricing.plans.starter.features', { returnObjects: true })}
-              isPopular={true}
-              delay={0.3}
-              onSelect={() => navigate('/login?signup=true&plan=starter')}
-            />
-            <PricingCard
-              name={t('pricing.plans.business.name')}
-              price={isAnnual ? "79€" : "99€"}
-              subtext={isAnnual ? t('pricing.plans.billedYearly', { price: '948€' }) : null}
-              features={t('pricing.plans.business.features', { returnObjects: true })}
-              isPopular={false}
-              delay={0.4}
-              onSelect={() => navigate('/contact')}
-            />
-          </div>
-        </div>
-      </Section>
 
       {/* Section FAQ */}
       <Section id="faq" className="bg-white/50 dark:bg-gray-800/20">

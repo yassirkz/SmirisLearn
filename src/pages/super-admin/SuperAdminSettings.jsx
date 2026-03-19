@@ -53,19 +53,10 @@ export default function SuperAdminSettings() {
         emailNotifications: true,
         newCompanyAlert: true,
         newUserAlert: true,
-        language: 'fr',
         sessionTimeout: '30'
     });
 
-    // ============================================
-    // 4. CONFIGURATION PLATEFORME
-    // ============================================
     const [platformConfig, setPlatformConfig] = useState({
-        default_limits: {
-            free: { users: 5, videos: 5, storage: 1 },
-            starter: { users: 20, videos: 50, storage: 10 },
-            business: { users: -1, videos: -1, storage: 100 }
-        },
         trial_days: 14,
         allow_registration: true,
         maintenance_mode: false,
@@ -74,6 +65,36 @@ export default function SuperAdminSettings() {
         api_enabled: false,
         api_rate_limit: 1000
     });
+    
+    const handleSavePlatformConfig = async () => {
+        setSaving(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const { error } = await supabase
+                .from('system_settings')
+                .update({
+                    trial_days: platformConfig.trial_days,
+                    allow_registration: platformConfig.allow_registration,
+                    maintenance_mode: platformConfig.maintenance_mode,
+                    max_file_size: platformConfig.max_file_size,
+                    allowed_video_formats: platformConfig.allowed_video_formats,
+                    api_enabled: platformConfig.api_enabled,
+                    api_rate_limit: platformConfig.api_rate_limit
+                })
+                .eq('id', 1);
+
+            if (error) throw error;
+
+            setSuccess('Configuration plateforme sauvegardée');
+        } catch (error) {
+            console.error('Erreur sauvegarde config:', error);
+            setError(error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
 
     // ============================================
     // 5. STATISTIQUES PLATEFORME
@@ -119,7 +140,6 @@ export default function SuperAdminSettings() {
             emailNotifications: localStorage.getItem('emailNotifications') !== 'false',
             newCompanyAlert: localStorage.getItem('newCompanyAlert') !== 'false',
             newUserAlert: localStorage.getItem('newUserAlert') !== 'false',
-            language: localStorage.getItem('language') || 'fr',
             sessionTimeout: localStorage.getItem('sessionTimeout') || '30'
         });
     };
@@ -152,7 +172,6 @@ export default function SuperAdminSettings() {
             
             if (data) {
                 setPlatformConfig({
-                    default_limits: data.default_limits || platformConfig.default_limits,
                     trial_days: data.trial_days || 14,
                     allow_registration: data.allow_registration ?? true,
                     maintenance_mode: data.maintenance_mode ?? false,
@@ -276,34 +295,6 @@ export default function SuperAdminSettings() {
         setSuccess('Préférences sauvegardées');
     };
 
-    const handleSavePlatformConfig = async () => {
-        setSaving(true);
-        setError('');
-        setSuccess('');
-
-        try {
-            const { error } = await supabase
-                .rpc('update_system_settings', {
-                    p_default_limits: platformConfig.default_limits,
-                    p_trial_days: platformConfig.trial_days,
-                    p_allow_registration: platformConfig.allow_registration,
-                    p_maintenance_mode: platformConfig.maintenance_mode,
-                    p_max_file_size: platformConfig.max_file_size,
-                    p_allowed_video_formats: platformConfig.allowed_video_formats,
-                    p_api_enabled: platformConfig.api_enabled,
-                    p_api_rate_limit: platformConfig.api_rate_limit
-                });
-
-            if (error) throw error;
-
-            setSuccess('Configuration plateforme sauvegardée');
-        } catch (error) {
-            console.error('Erreur sauvegarde config:', error);
-            setError(error.message);
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const formatStorage = (mb) => {
         if (mb > 1024) {
@@ -653,7 +644,7 @@ export default function SuperAdminSettings() {
                                 </div>
                             </div>
 
-                            {/* Thème et langue */}
+                            {/* Thème */}
                             <div className="mb-6">
                                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Apparence</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -683,19 +674,6 @@ export default function SuperAdminSettings() {
                                                 <span className="text-xs dark:text-gray-300">Sombre</span>
                                             </button>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Langue</p>
-                                        <select
-                                            value={preferences.language}
-                                            onChange={(e) => setPreferences({...preferences, language: e.target.value})}
-                                            className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
-                                        >
-                                            <option value="fr">Français</option>
-                                            <option value="en">English</option>
-                                            <option value="de">Deutsch</option>
-                                            <option value="ar">العربية</option>
-                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -739,101 +717,6 @@ export default function SuperAdminSettings() {
                                 Configuration plateforme
                             </h2>
 
-                            {/* Limites par défaut */}
-                            <div className="mb-6">
-                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Limites par défaut</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {['free', 'starter', 'business'].map(plan => (
-                                        <div key={plan} className="p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                                            <p className="font-bold text-gray-800 dark:text-white capitalize mb-3 flex items-center gap-2">
-                                                {plan === 'free' && <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"></span>}
-                                                {plan === 'starter' && <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></span>}
-                                                {plan === 'business' && <span className="w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full"></span>}
-                                                {plan}
-                                            </p>
-                                            <div className="space-y-2 text-sm">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-gray-500 dark:text-gray-400">Utilisateurs:</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            type="number"
-                                                            value={platformConfig.default_limits[plan]?.users === -1 ? '' : platformConfig.default_limits[plan]?.users}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value === '' ? -1 : parseInt(e.target.value);
-                                                                setPlatformConfig({
-                                                                    ...platformConfig,
-                                                                    default_limits: {
-                                                                        ...platformConfig.default_limits,
-                                                                        [plan]: {
-                                                                            ...platformConfig.default_limits[plan],
-                                                                            users: value
-                                                                        }
-                                                                    }
-                                                                });
-                                                            }}
-                                                            className="w-16 p-1 text-right border border-gray-200 dark:border-gray-700 rounded focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
-                                                            placeholder="∞"
-                                                        />
-                                                        {platformConfig.default_limits[plan]?.users === -1 && (
-                                                            <span className="text-xs text-gray-400 dark:text-gray-500">(illimité)</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-gray-500 dark:text-gray-400">Vidéos:</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            type="number"
-                                                            value={platformConfig.default_limits[plan]?.videos === -1 ? '' : platformConfig.default_limits[plan]?.videos}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value === '' ? -1 : parseInt(e.target.value);
-                                                                setPlatformConfig({
-                                                                    ...platformConfig,
-                                                                    default_limits: {
-                                                                        ...platformConfig.default_limits,
-                                                                        [plan]: {
-                                                                            ...platformConfig.default_limits[plan],
-                                                                            videos: value
-                                                                        }
-                                                                    }
-                                                                });
-                                                            }}
-                                                            className="w-16 p-1 text-right border border-gray-200 dark:border-gray-700 rounded focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
-                                                            placeholder="∞"
-                                                        />
-                                                        {platformConfig.default_limits[plan]?.videos === -1 && (
-                                                            <span className="text-xs text-gray-400 dark:text-gray-500">(illimité)</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-gray-500 dark:text-gray-400">Stockage:</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            type="number"
-                                                            value={platformConfig.default_limits[plan]?.storage}
-                                                            onChange={(e) => {
-                                                                setPlatformConfig({
-                                                                    ...platformConfig,
-                                                                    default_limits: {
-                                                                        ...platformConfig.default_limits,
-                                                                        [plan]: {
-                                                                            ...platformConfig.default_limits[plan],
-                                                                            storage: parseInt(e.target.value)
-                                                                        }
-                                                                    }
-                                                                });
-                                                            }}
-                                                            className="w-16 p-1 text-right border border-gray-200 dark:border-gray-700 rounded focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
-                                                        />
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400">Go</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
 
                             {/* Paramètres généraux */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -29,7 +29,6 @@
   "back_to_list": "Retour à la liste",
   "contact_admin": "Contacter l'administrateur",
   "status_active": "Actif",
-  "status_trial": "Essai",
   "welcome": "Bienvenue",
   "logout": "Déconnexion",
   "darkMode": "Mode sombre",
@@ -42,7 +41,6 @@
     "features": "Fonctionnalités",
     "testimonials": "Témoignages",
     "demo": "Aperçu",
-    "pricing": "Tarifs",
     "faq": "FAQ",
     "contact": "Contact",
     "signup": "Inscription"
@@ -78,31 +76,7 @@
     },
     "badges": {
       "darkMode": "Dark mode inclus",
-      "multilingual": "Multilingue (FR/EN/DE/AR)",
       "security": "Sécurité renforcée (RLS)"
-    }
-  },
-  "pricing": {
-    "title": "Des formules adaptées",
-    "subtitle": "Choisissez le plan qui correspond à la taille de votre équipe.",
-    "monthly": "Mensuel",
-    "annual": "Annuel",
-    "discount": "-20%",
-    "plans": {
-      "free": {
-        "name": "Gratuit",
-        "features": ["5 utilisateurs max", "5 vidéos", "1 Go stockage", "Support email"]
-      },
-      "starter": {
-        "name": "Starter",
-        "features": ["20 utilisateurs", "50 vidéos", "10 Go stockage", "Support prioritaire"]
-      },
-      "business": {
-        "name": "Business",
-        "features": ["Utilisateurs illimités", "Vidéos illimitées", "100 Go stockage", "API publique"]
-      },
-      "choose": "Choisir ce plan",
-      "billedYearly": "Facturé {{price}} / an"
     }
   },
   "testimonials": {
@@ -122,7 +96,7 @@
       "sophie": {
         "name": "Sophie M.",
         "role": "Directrice pédagogique",
-        "content": "Le dark mode et le support multilingue sont un vrai plus pour nos équipes internationales. Un outil moderne et efficace."
+        "content": "Le dark mode est un vrai plus pour nos équipes. Un outil moderne et efficace."
       }
     }
   },
@@ -131,20 +105,8 @@
     "subtitle": "Tout ce que vous devez savoir sur Smiris Learn.",
     "items": [
       {
-        "q": "Puis-je changer de plan en cours de route ?",
-        "a": "Absolument. Vous pouvez upgrader ou downgrader votre forfait à tout moment depuis les paramètres de votre compte. Le montant sera proratisé."
-      },
-      {
         "q": "Les vidéos sont-elles hébergées chez vous ?",
         "a": "Oui, nous hébergeons toutes vos vidéos sur des serveurs sécurisés et optimisés pour une lecture fluide partout dans le monde."
-      },
-      {
-        "q": "Comment fonctionne l'essai gratuit ?",
-        "a": "L'essai gratuit dure 14 jours et vous donne accès à toutes les fonctionnalités du plan Starter. Aucune carte bancaire n'est requise pour l'inscription."
-      },
-      {
-        "q": "Puis-je personnaliser la plateforme ?",
-        "a": "Oui, le plan Business vous permet d'ajouter votre logo, vos couleurs (marque blanche) et d'utiliser un domaine personnalisé."
       }
     ]
   },
@@ -189,13 +151,10 @@
     "title1": "Prêt à révolutionner",
     "title2": "vos formations ?",
     "subtitle": "Rejoignez des milliers d'entreprises qui forment leurs équipes avec Smiris Learn.",
-    "button": "Créer mon compte gratuit"
+    "button": "Créer mon compte"
   },
   "cta": {
-    "login": "Se connecter",
-    "freeTrial": "Essai gratuit",
-    "popular": "Populaire",
-    "trial": "Essai"
+    "login": "Se connecter"
   },
   "unauthorized": {
     "insufficient_permissions": {
@@ -218,11 +177,6 @@
       "message": "Votre organisation n'est plus active.",
       "solution": "Contactez le support pour réactiver votre abonnement."
     },
-    "trial_expired": {
-      "title": "Période d'essai expirée",
-      "message": "La période d'essai de votre organisation est terminée.",
-      "solution": "Choisissez un plan pour continuer à utiliser la plateforme."
-    },
     "maintenance_mode": {
       "title": "Mode maintenance",
       "message": "La plateforme est actuellement en maintenance.",
@@ -235,7 +189,6 @@
     },
     "labels": {
       "requestAccess": "Demander les droits {{role}}",
-      "extendTrial": "Prolonger l'essai ({{days}}j restants)",
       "checkAgain": "Vérifier à nouveau",
       "myDashboard": "Mon dashboard",
       "back": "Retour",

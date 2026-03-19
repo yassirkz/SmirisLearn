@@ -4,7 +4,7 @@ import { Bell, User, Shield, Zap, Sun, Moon, Menu } from 'lucide-react'; // ← 
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
-import LanguageSwitcher from '../ui/LanguageSwitcher';
+import SearchComponent from '../../pages/SearchComponent';
 import SearchComponent from '../../pages/SearchComponent';
 import NotificationDropdown from './NotificationDropdown';
 import { supabase } from '../../lib/supabase';
@@ -78,8 +78,6 @@ export default function Header({ onToggleSidebar }) {
 
                 {/* Actions utilisateur */}
                 <div className="flex items-center gap-3 ml-auto">
-                    {/* Sélecteur de langue */}
-                    <LanguageSwitcher />
 
                     {/* Bouton Dark Mode */}
                     <button
