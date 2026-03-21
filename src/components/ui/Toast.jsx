@@ -55,7 +55,7 @@ const TYPES = {
   },
   error: {
     icon: XCircle,
-    bg: 'bg-gradient-to-r from-red-500 to-pink-500',
+    bg: 'bg-gradient-to-r from-red-500 to-accent-600',
     border: 'border-red-200',
     text: 'text-white',
     progress: 'bg-white/30',
@@ -71,19 +71,19 @@ const TYPES = {
   },
   info: {
     icon: Info,
-    bg: 'bg-gradient-to-r from-blue-500 to-indigo-500',
-    border: 'border-blue-200',
+    bg: 'bg-gradient-to-r from-primary-500 to-accent-600',
+    border: 'border-primary-200',
     text: 'text-white',
     progress: 'bg-white/30',
-    glow: 'shadow-blue-500/20'
+    glow: 'shadow-primary-500/20'
   },
   security: {
     icon: Shield,
-    bg: 'bg-gradient-to-r from-purple-500 to-pink-500',
-    border: 'border-purple-200',
+    bg: 'bg-gradient-to-r from-primary-600 to-accent-500',
+    border: 'border-primary-200',
     text: 'text-white',
     progress: 'bg-white/30',
-    glow: 'shadow-purple-500/20'
+    glow: 'shadow-primary-500/20'
   }
 };
 

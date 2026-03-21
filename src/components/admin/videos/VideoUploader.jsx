@@ -128,8 +128,8 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
                     relative border-2 border-dashed rounded-2xl p-8
                     transition-all duration-300
                     ${dragActive 
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' 
-                        : 'border-gray-300 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30' 
+                        : 'border-gray-300 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }
                     ${error ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/30' : ''}
                 `}
@@ -154,7 +154,7 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
                             </p>
                             <label
                                 htmlFor="video-upload"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all cursor-pointer"
                             >
                                 <FileVideo className="w-4 h-4" />
                                 Sélectionner un fichier
@@ -166,7 +166,7 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
                     ) : (
                         <div className="space-y-4">
                             <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-xl">
-                                <FileVideo className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                                <FileVideo className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                                 <div className="flex-1 text-left">
                                     <p className="font-medium text-gray-800 dark:text-gray-200 truncate">
                                         {escapeText(untrusted(file.name))}
@@ -189,13 +189,13 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600 dark:text-gray-300">Importation en cours...</span>
-                                        <span className="font-medium text-indigo-600 dark:text-indigo-400">{progress}%</span>
+                                        <span className="font-medium text-primary-600 dark:text-primary-400">{progress}%</span>
                                     </div>
                                     <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${progress}%` }}
-                                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-600"
+                                            className="h-full bg-gradient-to-r from-primary-500 to-accent-600"
                                         />
                                     </div>
                                 </div>
@@ -205,7 +205,7 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
                                 <div className="flex gap-3">
                                     <button
                                         onClick={handleUpload}
-                                        className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
+                                        className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
                                     >
                                         Lancer l'importation
                                     </button>

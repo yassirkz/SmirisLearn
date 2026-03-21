@@ -206,7 +206,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     <select
                         value={form.video_id}
                         onChange={(e) => setForm(f => ({ ...f, video_id: e.target.value }))}
-                        className={`w-full p-2 border rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white ${
+                        className={`w-full p-2 border rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white ${
                             errors.video_id ? 'border-red-400 dark:border-red-600' : 'border-gray-200 dark:border-gray-700'
                         }`}
                     >
@@ -236,7 +236,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         max="100"
                         value={form.passing_score}
                         onChange={(e) => setForm(f => ({ ...f, passing_score: e.target.value }))}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
+                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                     {errors.passing_score && (
                         <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.passing_score}</p>
@@ -252,7 +252,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         value={form.timer_minutes}
                         onChange={(e) => setForm(f => ({ ...f, timer_minutes: e.target.value }))}
                         placeholder="Saisir une durée en minutes"
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
+                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                 </div>
                 <div>
@@ -265,7 +265,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                         step="1"
                         value={form.max_attempts}
                         onChange={(e) => setForm(f => ({ ...f, max_attempts: e.target.value }))}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
+                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
                     />
                     {errors.max_attempts && (
                         <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.max_attempts}</p>
@@ -282,7 +282,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     <button
                         type="button"
                         onClick={addQuestion}
-                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
+                        className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1"
                     >
                         <Plus className="w-4 h-4" />
                         Ajouter une question
@@ -322,7 +322,7 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     type="button"
                     onClick={handleSubmit}
                     disabled={saving}
-                    className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-60"
+                    className="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-60"
                 >
                     {saving ? (
                         <Loader className="w-4 h-4 animate-spin" />

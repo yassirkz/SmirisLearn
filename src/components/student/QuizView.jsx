@@ -201,15 +201,15 @@ export default function QuizView() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-                <Loader className="w-12 h-12 animate-spin text-indigo-600 dark:text-indigo-400" />
+            <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+                <Loader className="w-12 h-12 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
         );
     }
 
     if (!quiz) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-gray-500 dark:text-gray-400 italic bg-indigo-50 dark:bg-gray-900">
+            <div className="min-h-screen flex items-center justify-center text-gray-500 dark:text-gray-400 italic bg-primary-50 dark:bg-gray-900">
                 Quiz introuvable
             </div>
         );
@@ -217,7 +217,7 @@ export default function QuizView() {
 
     if (maxAttempts !== -1 && attempts >= maxAttempts && !submitted && !result) {
         return (
-            <div className="min-h-screen bg-indigo-50 dark:bg-gray-900 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-primary-50 dark:bg-gray-900 flex items-center justify-center p-4">
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -243,7 +243,7 @@ export default function QuizView() {
 
     if (submitted && result) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-6 flex flex-col items-center">
+            <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-900 dark:to-gray-800 p-6 flex flex-col items-center">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -277,7 +277,7 @@ export default function QuizView() {
 
                     <div className="space-y-6 mt-12 bg-gray-50/50 dark:bg-gray-900/30 p-8 rounded-3xl border border-gray-100 dark:border-gray-700">
                         <h3 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-2 mb-6">
-                            <HelpCircle className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                            <HelpCircle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                             Correction détaillée
                         </h3>
                         {quiz.questions.map((q, idx) => {
@@ -304,9 +304,9 @@ export default function QuizView() {
                                                     </p>
                                                 </div>
                                                 {!correct && (
-                                                    <div className="p-3 bg-indigo-50/50 dark:bg-indigo-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
-                                                        <p className="text-[10px] text-indigo-400 dark:text-indigo-400 font-black uppercase mb-1">Bonne réponse</p>
-                                                        <p className="font-bold text-indigo-700 dark:text-indigo-300">
+                                                    <div className="p-3 bg-primary-50/50 dark:bg-primary-900/30 rounded-xl border border-primary-100 dark:border-primary-800 shadow-sm">
+                                                        <p className="text-[10px] text-primary-400 dark:text-primary-400 font-black uppercase mb-1">Bonne réponse</p>
+                                                        <p className="font-bold text-primary-700 dark:text-primary-300">
                                                             {q.type === 'single' || q.type === 'truefalse'
                                                                 ? (q.type === 'truefalse' ? (q.answer ? 'Vrai' : 'Faux') : escapeText(untrusted(q.options[q.answer])))
                                                                 : q.answer.map(i => escapeText(untrusted(q.options[i]))).join(', ')
@@ -326,7 +326,7 @@ export default function QuizView() {
                         {!result.passed && (maxAttempts === -1 || attempts < maxAttempts) && (
                             <button
                                 onClick={handleRetry}
-                                className="flex items-center justify-center gap-2 py-5 px-6 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-2xl font-black hover:bg-indigo-100 dark:hover:bg-indigo-800/50 transition-all border-2 border-indigo-100 dark:border-indigo-800 active:scale-95"
+                                className="flex items-center justify-center gap-2 py-5 px-6 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-2xl font-black hover:bg-primary-100 dark:hover:bg-primary-800/50 transition-all border-2 border-primary-100 dark:border-primary-800 active:scale-95"
                             >
                                 <RefreshCw className="w-5 h-5" />
                                 Réessayer
@@ -334,7 +334,7 @@ export default function QuizView() {
                         )}
                         <button
                             onClick={() => result.passed && nextVideoId ? navigate(`/student/video/${nextVideoId}`) : navigate('/student/learning')}
-                            className={`flex items-center justify-center gap-2 py-5 px-6 text-white rounded-2xl font-black shadow-2xl transition-all hover:scale-[1.02] active:scale-95 ${result.passed ? 'bg-indigo-600 hover:bg-indigo-700 col-span-full md:col-span-1 shadow-indigo-200 dark:shadow-indigo-900/30' : 'bg-gray-900 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 col-span-full md:col-span-1 shadow-gray-200 dark:shadow-gray-900/30'}`}
+                            className={`flex items-center justify-center gap-2 py-5 px-6 text-white rounded-2xl font-black shadow-2xl transition-all hover:scale-[1.02] active:scale-95 ${result.passed ? 'bg-primary-600 hover:bg-primary-700 col-span-full md:col-span-1 shadow-primary-200 dark:shadow-primary-900/30' : 'bg-gray-900 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 col-span-full md:col-span-1 shadow-gray-200 dark:shadow-gray-900/30'}`}
                         >
                             {result.passed && nextVideoId ? 'Vidéo suivante' : 'Retour aux modules'}
                             <ArrowRight className="w-5 h-5" />
@@ -349,12 +349,12 @@ export default function QuizView() {
     const currentAnswer = answers[currentQuestionIndex];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6 flex flex-col items-center justify-center font-sans">
+        <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6 flex flex-col items-center justify-center font-sans">
             <div className="max-w-4xl w-full">
                 {/* Header Profile/Timeline */}
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xl">
+                        <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-xl">
                             {currentQuestionIndex + 1}
                         </div>
                         <div>
@@ -364,7 +364,7 @@ export default function QuizView() {
                                     <div 
                                         key={i} 
                                         className={`h-2 rounded-full transition-all duration-500 ${
-                                            i === currentQuestionIndex ? 'w-10 bg-indigo-600 dark:bg-indigo-400' : i < currentQuestionIndex ? 'w-5 bg-green-400 dark:bg-green-600' : 'w-5 bg-gray-200 dark:bg-gray-700'
+                                            i === currentQuestionIndex ? 'w-10 bg-primary-600 dark:bg-primary-400' : i < currentQuestionIndex ? 'w-5 bg-green-400 dark:bg-green-600' : 'w-5 bg-gray-200 dark:bg-gray-700'
                                         }`} 
                                     />
                                 ))}
@@ -372,7 +372,7 @@ export default function QuizView() {
                         </div>
                     </div>
                     {timeLeft !== null && (
-                        <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-mono text-xl font-black shadow-2xl border-2 transition-colors ${timeLeft < 30 ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 animate-pulse' : 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border-indigo-50 dark:border-gray-700'}`}>
+                        <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-mono text-xl font-black shadow-2xl border-2 transition-colors ${timeLeft < 30 ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 animate-pulse' : 'bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 border-primary-50 dark:border-gray-700'}`}>
                             <Clock className="w-6 h-6" />
                             {formatTime(timeLeft)}
                         </div>
@@ -386,10 +386,10 @@ export default function QuizView() {
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -20, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 md:p-14 shadow-2xl border border-indigo-100/50 dark:border-gray-700 relative overflow-hidden"
+                        className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 md:p-14 shadow-2xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-8 opacity-5">
-                            <HelpCircle className="w-48 h-48 text-indigo-600 dark:text-indigo-400" />
+                            <HelpCircle className="w-48 h-48 text-primary-600 dark:text-primary-400" />
                         </div>
 
                         <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-12 leading-tight relative">
@@ -403,14 +403,14 @@ export default function QuizView() {
                                     onClick={() => handleAnswer(idx)}
                                     className={`w-full p-8 text-left rounded-3xl border-2 transition-all duration-300 flex items-center justify-between group ${
                                         currentAnswer === idx
-                                            ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 shadow-inner'
-                                            : 'border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                            ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30 shadow-inner'
+                                            : 'border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                                     }`}
                                 >
-                                    <span className={`text-xl transition-colors ${currentAnswer === idx ? 'text-indigo-900 dark:text-indigo-300 font-bold' : 'text-gray-700 dark:text-gray-300 font-medium'}`}>
+                                    <span className={`text-xl transition-colors ${currentAnswer === idx ? 'text-primary-900 dark:text-primary-300 font-bold' : 'text-gray-700 dark:text-gray-300 font-medium'}`}>
                                         {escapeText(untrusted(opt))}
                                     </span>
-                                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${currentAnswer === idx ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-600 dark:bg-indigo-400' : 'border-gray-300 dark:border-gray-600'}`}>
+                                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${currentAnswer === idx ? 'border-primary-600 dark:border-primary-400 bg-primary-600 dark:bg-primary-400' : 'border-gray-300 dark:border-gray-600'}`}>
                                         {currentAnswer === idx && <div className="w-3.5 h-3.5 rounded-full bg-white dark:bg-gray-900 shadow-sm" />}
                                     </div>
                                 </button>
@@ -422,14 +422,14 @@ export default function QuizView() {
                                     onClick={() => handleMultipleAnswer(idx)}
                                     className={`w-full p-8 text-left rounded-3xl border-2 transition-all duration-300 flex items-center justify-between group ${
                                         (currentAnswer || []).includes(idx)
-                                            ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 shadow-inner'
-                                            : 'border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                            ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30 shadow-inner'
+                                            : 'border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                                     }`}
                                 >
-                                    <span className={`text-xl transition-colors ${(currentAnswer || []).includes(idx) ? 'text-indigo-900 dark:text-indigo-300 font-bold' : 'text-gray-700 dark:text-gray-300 font-medium'}`}>
+                                    <span className={`text-xl transition-colors ${(currentAnswer || []).includes(idx) ? 'text-primary-900 dark:text-primary-300 font-bold' : 'text-gray-700 dark:text-gray-300 font-medium'}`}>
                                         {escapeText(untrusted(opt))}
                                     </span>
-                                    <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${ (currentAnswer || []).includes(idx) ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-600 dark:bg-indigo-400' : 'border-gray-300 dark:border-gray-600'}`}>
+                                    <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${ (currentAnswer || []).includes(idx) ? 'border-primary-600 dark:border-primary-400 bg-primary-600 dark:bg-primary-400' : 'border-gray-300 dark:border-gray-600'}`}>
                                         {(currentAnswer || []).includes(idx) && <CheckCircle className="w-5 h-5 text-white" />}
                                     </div>
                                 </button>
@@ -446,14 +446,14 @@ export default function QuizView() {
                                             onClick={() => handleAnswer(opt.value)}
                                             className={`py-14 flex flex-col items-center justify-center gap-6 rounded-[2.5rem] border-2 transition-all duration-300 ${
                                                 currentAnswer === opt.value
-                                                    ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 shadow-inner'
-                                                    : 'border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                                    ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30 shadow-inner'
+                                                    : 'border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                                             }`}
                                         >
-                                            <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${currentAnswer === opt.value ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-600 dark:bg-indigo-400 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/30' : 'border-gray-300 dark:border-gray-600'}`}>
+                                            <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center ${currentAnswer === opt.value ? 'border-primary-600 dark:border-primary-400 bg-primary-600 dark:bg-primary-400 shadow-lg shadow-primary-100 dark:shadow-primary-900/30' : 'border-gray-300 dark:border-gray-600'}`}>
                                                 {currentAnswer === opt.value && <div className="w-4 h-4 rounded-full bg-white dark:bg-gray-900 shadow-sm" />}
                                             </div>
-                                            <span className={`text-2xl font-black ${currentAnswer === opt.value ? 'text-indigo-900 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                                            <span className={`text-2xl font-black ${currentAnswer === opt.value ? 'text-primary-900 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'}`}>
                                                 {opt.label}
                                             </span>
                                         </button>
@@ -475,7 +475,7 @@ export default function QuizView() {
                             {currentQuestionIndex === quiz.questions.length - 1 ? (
                                 <button
                                     onClick={() => handleSubmit()}
-                                    className="flex items-center gap-3 py-5 px-14 bg-indigo-600 dark:bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 dark:hover:bg-indigo-700 shadow-2xl shadow-indigo-100 dark:shadow-indigo-900/30 transition-all hover:scale-105 active:scale-95"
+                                    className="flex items-center gap-3 py-5 px-14 bg-primary-600 dark:bg-primary-600 text-white rounded-2xl font-black hover:bg-primary-700 dark:hover:bg-primary-700 shadow-2xl shadow-primary-100 dark:shadow-primary-900/30 transition-all hover:scale-105 active:scale-95"
                                 >
                                     Terminer
                                     <ArrowRight className="w-6 h-6" />

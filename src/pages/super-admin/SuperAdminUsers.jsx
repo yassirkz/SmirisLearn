@@ -162,13 +162,13 @@ export default function SuperAdminUsers() {
     const getRoleBadge = (role) => {
         const roles = {
             super_admin: {
-                bg: 'bg-gradient-to-r from-red-500 to-pink-500',
+                bg: 'bg-gradient-to-r from-red-500 to-accent-600',
                 text: 'text-white',
                 label: 'Super Admin',
                 icon: Shield
             },
             org_admin: {
-                bg: 'bg-gradient-to-r from-purple-500 to-indigo-500',
+                bg: 'bg-gradient-to-r from-primary-500 to-accent-500',
                 text: 'text-white',
                 label: 'Admin',
                 icon: UserCog
@@ -345,7 +345,7 @@ export default function SuperAdminUsers() {
                         animate={{ scale: 1 }}
                         className="absolute -top-4 -right-4"
                     >
-                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
+                        <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
                             <Users className="w-3 h-3" />
                             Gestion des utilisateurs
                         </div>
@@ -353,7 +353,7 @@ export default function SuperAdminUsers() {
 
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                            <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                            <Users className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                             Utilisateurs
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -365,10 +365,10 @@ export default function SuperAdminUsers() {
                 {/* Cartes de statistiques */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                    { label: 'Total utilisateurs', value: stats.total, icon: Users, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30' },
-                    { label: 'Administrateurs', value: stats.admins, icon: UserCog, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30' },
+                    { label: 'Total utilisateurs', value: stats.total, icon: Users, color: 'from-primary-500 to-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/30' },
+                    { label: 'Administrateurs', value: stats.admins, icon: UserCog, color: 'from-accent-500 to-accent-600', bg: 'bg-accent-50 dark:bg-accent-900/30' },
                     { label: 'Étudiants', value: stats.students, icon: UserCheck, color: 'from-green-500 to-green-600', bg: 'bg-green-50 dark:bg-green-900/30' },
-                    { label: 'Nouveaux ce mois', value: stats.newThisMonth, icon: Zap, color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50 dark:bg-orange-900/30' }
+                    { label: 'Nouveaux ce mois', value: stats.newThisMonth, icon: Zap, color: 'from-primary-400 to-primary-500', bg: 'bg-primary-50/50 dark:bg-primary-900/20' }
                 ].map((card, index) => (
                     <motion.div
                         key={card.label}
@@ -398,16 +398,16 @@ export default function SuperAdminUsers() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                 >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex items-center gap-2">
-                            <Filter className="w-5 h-5 text-purple-600" />
+                            <Filter className="w-5 h-5 text-primary-600" />
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Filtres</h2>
                             {(searchTerm || selectedOrg !== 'all' || selectedRole !== 'all') && (
                                 <button
                                     onClick={resetFilters}
-                                    className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center gap-1"
+                                    className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1"
                                 >
                                     <X className="w-3 h-3" />
                                     Réinitialiser
@@ -427,7 +427,7 @@ export default function SuperAdminUsers() {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
                                     }}
-                                    className="w-full pl-9 pr-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all"
+                                    className="w-full pl-9 pr-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 transition-all"
                                 />
                                 {searchTerm && (
                                     <button
@@ -446,7 +446,7 @@ export default function SuperAdminUsers() {
                                     setSelectedOrg(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white min-w-[200px]"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white min-w-[200px]"
                             >
                                 <option value="all">Toutes les entreprises</option>
                                 {organizations.map(org => (
@@ -463,7 +463,7 @@ export default function SuperAdminUsers() {
                                     setSelectedRole(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 bg-white min-w-[150px]"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white min-w-[150px]"
                             >
                                 <option value="all">Tous les rôles</option>
                                 <option value="super_admin">Super Admin</option>
@@ -488,7 +488,7 @@ export default function SuperAdminUsers() {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleExportUsers}
                                 disabled={exporting}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50"
                             >
                                 {exporting ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -503,7 +503,7 @@ export default function SuperAdminUsers() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowInviteModal(true)}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                             >
                                 <UserPlus className="w-4 h-4" />
                                 <span>Inviter</span>
@@ -517,11 +517,11 @@ export default function SuperAdminUsers() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white/90 backdrop-blur-sm dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 rounded-2xl shadow-xl border border-purple-100 overflow-hidden"
+                    className="bg-white/90 backdrop-blur-sm dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 rounded-2xl shadow-xl border border-primary-100 overflow-hidden"
                 >
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-800">
+                            <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Utilisateur</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
@@ -560,9 +560,9 @@ export default function SuperAdminUsers() {
                                                     : 'Commencez par inviter des utilisateurs'}
                                             </p>
                                             {(searchTerm || selectedOrg !== 'all' || selectedRole !== 'all') && (
-                                                <button
+                                            <button
                                                     onClick={resetFilters}
-                                                    className="text-purple-600 hover:text-purple-700 font-medium"
+                                                    className="text-primary-600 hover:text-primary-700 font-medium"
                                                 >
                                                     Effacer les filtres
                                                 </button>
@@ -580,11 +580,11 @@ export default function SuperAdminUsers() {
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: index * 0.05 }}
-                                                className="hover:bg-purple-50/50 dark:hover:bg-gray-700/50 transition-colors group"
+                                                className="hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors group"
                                             >
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">
+                                                        <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">
                                                             {user.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                                                         </div>
                                                         <span className="font-medium text-gray-800 dark:text-gray-200">
@@ -624,7 +624,7 @@ export default function SuperAdminUsers() {
                                                             whileHover={{ scale: 1.1 }}
                                                             whileTap={{ scale: 0.9 }}
                                                             onClick={() => handleUserAction(user, 'view')}
-                                                            className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600 opacity-0 group-hover:opacity-100"
+                                                            className="p-2 hover:bg-primary-100 rounded-lg transition-colors text-primary-600 opacity-0 group-hover:opacity-100"
                                                             title="Voir détails"
                                                         >
                                                             <Eye className="w-4 h-4" />
@@ -633,7 +633,7 @@ export default function SuperAdminUsers() {
                                                             whileHover={{ scale: 1.1 }}
                                                             whileTap={{ scale: 0.9 }}
                                                             onClick={() => handleUserAction(user, 'edit')}
-                                                            className="p-2 hover:bg-purple-100 rounded-lg transition-colors text-purple-600 opacity-0 group-hover:opacity-100"
+                                                            className="p-2 hover:bg-primary-100 rounded-lg transition-colors text-primary-600 opacity-0 group-hover:opacity-100"
                                                             title="Modifier"
                                                         >
                                                             <Edit className="w-4 h-4" />
@@ -657,7 +657,7 @@ export default function SuperAdminUsers() {
                                                                     >
                                                                         <button
                                                                             onClick={() => handleUserAction(user, 'edit')}
-                                                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-2"
+                                                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 flex items-center gap-2"
                                                                         >
                                                                             <Edit className="w-4 h-4" />
                                                                             Modifier le rôle
@@ -724,8 +724,8 @@ export default function SuperAdminUsers() {
                                                 onClick={() => setPage(pageNum)}
                                                 className={`w-10 h-10 rounded-lg transition-colors ${
                                                     page === pageNum
-                                                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                                                        : 'hover:bg-gray-50 text-gray-600'
+                                                        ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white'
+                                                        : 'hover:bg-primary-50 text-gray-600'
                                                 }`}
                                             >
                                                 {pageNum}
@@ -784,7 +784,7 @@ export default function SuperAdminUsers() {
                                         required
                                         value={inviteEmail}
                                         onChange={(e) => setInviteEmail(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none"
                                         placeholder="email@exemple.com"
                                     />
                                 </div>
@@ -793,7 +793,7 @@ export default function SuperAdminUsers() {
                                     <select
                                         value={inviteRole}
                                         onChange={(e) => setInviteRole(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none"
                                     >
                                         <option value="student">Étudiant</option>
                                         <option value="org_admin">Admin</option>
@@ -804,7 +804,7 @@ export default function SuperAdminUsers() {
                                     <select
                                         value={inviteOrg}
                                         onChange={(e) => setInviteOrg(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none"
                                         required
                                     >
                                         <option value="">Sélectionner une organisation</option>
@@ -826,7 +826,7 @@ export default function SuperAdminUsers() {
                                     <button
                                         type="submit"
                                         disabled={inviting}
-                                        className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl shadow-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                        className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                                     >
                                         {inviting ? 'Envoi...' : 'Inviter'}
                                     </button>

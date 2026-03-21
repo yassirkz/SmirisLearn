@@ -87,16 +87,16 @@ export default function StatsCards() {
             label: "Entreprises", 
             data: stats.companies,
             icon: Building2, 
-            color: 'from-blue-500 to-blue-600', 
-            bg: 'bg-blue-50 dark:bg-blue-900/30',
+            color: 'from-primary-500 to-primary-600', 
+            bg: 'bg-primary-50 dark:bg-primary-900/30',
             target: 100
         },
         { 
             label: "Utilisateurs", 
             data: stats.users,
             icon: Users, 
-            color: 'from-purple-500 to-purple-600', 
-            bg: 'bg-purple-50 dark:bg-purple-900/30',
+            color: 'from-accent-500 to-accent-600', 
+            bg: 'bg-accent-50 dark:bg-accent-900/30',
             target: 500
         },
         { 

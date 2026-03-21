@@ -77,8 +77,8 @@ export default function RevenueChart() {
             const chartData = [
                 { name: "Essai", value: counts.trial, color: '#10B981', description: "Période d'essai gratuite" },
                 { name: "Gratuit", value: counts.free, color: '#9CA3AF', description: "Plan gratuit sans engagement" },
-                { name: "Starter", value: (counts.starter || 0) - counts.trial, color: '#3B82F6', description: "Plan Starter à 49€/mois" },
-                { name: "Business", value: counts.business, color: '#8B5CF6', description: "Plan Business à 99€/mois" }
+                { name: "Starter", value: (counts.starter || 0) - counts.trial, color: '#8b5cf6', description: "Plan Starter à 49€/mois" },
+                { name: "Business", value: counts.business, color: '#0ea5e9', description: "Plan Business à 99€/mois" }
             ].filter(item => item.value > 0);
 
             const growth = lastMonthCount > 0 
@@ -167,14 +167,14 @@ export default function RevenueChart() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-blue-100 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
         >
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white">Répartition des Plans</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Analyse des abonnements par catégorie</p>
                 </div>
-                <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1">
+                <div className="bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1">
                     <PieChartIcon className="w-3 h-3" />
                 </div>
             </div>
@@ -195,9 +195,9 @@ export default function RevenueChart() {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3">
-                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">Total</p>
-                            <p className="text-lg font-bold text-blue-800 dark:text-blue-300">{stats.totalCompanies}</p>
+                        <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-xl p-3">
+                            <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mb-1">Total</p>
+                            <p className="text-lg font-bold text-primary-800 dark:text-primary-300">{stats.totalCompanies}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">Entreprises</p>
                         </div>
                         
@@ -207,9 +207,9 @@ export default function RevenueChart() {
                             <p className="text-xs text-gray-500 dark:text-gray-400">Période d'essai</p>
                         </div>
 
-                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3">
-                            <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mb-1">Payants</p>
-                            <p className="text-lg font-bold text-purple-800 dark:text-blue-300">{stats.activeCompanies}</p>
+                        <div className="bg-gradient-to-br from-accent-50 to-accent-100 dark:from-accent-900/30 dark:to-accent-800/30 rounded-xl p-3">
+                            <p className="text-xs text-accent-600 dark:text-accent-400 font-medium mb-1">Payants</p>
+                            <p className="text-lg font-bold text-accent-800 dark:text-accent-300">{stats.activeCompanies}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">Abonnements actifs</p>
                         </div>
 
@@ -220,10 +220,10 @@ export default function RevenueChart() {
                         </div>
                     </div>
 
-                    <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border border-blue-100 dark:border-gray-700">
+                    <div className="mt-4 p-3 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-xl border border-primary-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600 dark:text-gray-300">Revenu mensuel potentiel :</span>
-                            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
                                 {new Intl.NumberFormat('fr-FR', { 
                                     style: 'currency', 
                                     currency: 'EUR',

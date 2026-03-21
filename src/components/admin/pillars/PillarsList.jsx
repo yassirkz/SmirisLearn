@@ -289,18 +289,18 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-primary-100 dark:border-gray-700"
             >
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">
                                 {stats.total} Piliers
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                            <div className="w-2 h-2 bg-accent-500 rounded-full" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">
                                 {stats.totalVideos} Vidéos
                             </span>
@@ -323,7 +323,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => handleViewChange('table')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'table'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        ? 'bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                                 title="Vue Tableau"
@@ -334,7 +334,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => handleViewChange('cards')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'cards'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        ? 'bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                                 title="Vue Cartes"
@@ -364,10 +364,10 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center"
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-primary-100 dark:border-gray-700 text-center"
                 >
-                    <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <svg className="w-10 h-10 text-indigo-400 dark:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg className="w-10 h-10 text-primary-400 dark:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
@@ -378,7 +378,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                     {!isReadOnly && (
                         <button
                             onClick={handleCreate}
-                            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all inline-flex items-center gap-2"
+                            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all inline-flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
                             Créer un pilier

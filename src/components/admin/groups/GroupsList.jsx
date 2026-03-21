@@ -180,7 +180,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
           {!isReadOnly && (
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl text-white font-medium hover:shadow-lg transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 rounded-xl text-white font-medium hover:shadow-lg transition-all"
             >
               <Plus className="w-5 h-5" />
               Nouveau groupe
@@ -197,7 +197,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Rechercher un groupe..."
-          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
+          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
         />
       </div>
 
@@ -249,13 +249,13 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-indigo-400 dark:text-indigo-400" />
+                        <Users className="w-4 h-4 text-primary-400 dark:text-primary-400" />
                         <span className="text-gray-700 dark:text-gray-300">{group.group_members?.[0]?.count || 0}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-purple-400 dark:text-purple-400" />
+                        <BookOpen className="w-4 h-4 text-accent-400 dark:text-accent-400" />
                         <span className="text-gray-700 dark:text-gray-300">{group.group_pillar_access?.[0]?.count || 0}</span>
                       </div>
                     </td>
@@ -268,14 +268,14 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                           <>
                             <button
                               onClick={() => setShowMembers(group)}
-                              className="p-2 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-indigo-600 dark:text-indigo-400"
+                              className="p-2 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-primary-600 dark:text-primary-400"
                               title="Gérer les membres"
                             >
                               <UserPlus className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setShowPillarAccess(group)}
-                              className="p-2 hover:bg-purple-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-purple-600 dark:text-purple-400"
+                              className="p-2 hover:bg-accent-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-accent-600 dark:text-accent-400"
                               title="Gérer l'accès aux piliers"
                             >
                               <Shield className="w-4 h-4" />

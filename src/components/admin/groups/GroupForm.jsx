@@ -114,7 +114,7 @@ export default function GroupForm({ isOpen, onClose, onSuccess, group }) {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     maxLength={200}
-                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all resize-none dark:bg-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all resize-none dark:bg-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -129,7 +129,7 @@ export default function GroupForm({ isOpen, onClose, onSuccess, group }) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {loading ? (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

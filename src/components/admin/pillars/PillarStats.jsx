@@ -190,20 +190,20 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
             icon: Video,
             value: stats.videos.total,
             subValue: formatDuration(stats.videos.totalDuration),
-            color: 'from-blue-500 to-indigo-600',
-            bg: 'bg-blue-50 dark:bg-blue-900/30',
-            iconBg: 'bg-blue-100 dark:bg-blue-800/50',
-            iconColor: 'text-blue-600 dark:text-blue-400'
+            color: 'from-primary-500 to-accent-600',
+            bg: 'bg-primary-50 dark:bg-primary-900/30',
+            iconBg: 'bg-primary-100 dark:bg-primary-800/50',
+            iconColor: 'text-primary-600 dark:text-primary-400'
         },
         {
             title: 'Étudiants',
             icon: Users,
             value: stats.students.total,
             subValue: `${stats.students.active} actifs`,
-            color: 'from-purple-500 to-pink-600',
-            bg: 'bg-purple-50 dark:bg-purple-900/30',
-            iconBg: 'bg-purple-100 dark:bg-purple-800/50',
-            iconColor: 'text-purple-600 dark:text-purple-400'
+            color: 'from-accent-500 to-primary-600',
+            bg: 'bg-accent-50 dark:bg-accent-900/30',
+            iconBg: 'bg-accent-100 dark:bg-accent-800/50',
+            iconColor: 'text-accent-600 dark:text-accent-400'
         },
         {
             title: 'Quiz',
@@ -231,12 +231,12 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <BarChart3 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                     Statistiques - {escapeText(untrusted(pillarName))}
                 </h3>
                 <button
                     onClick={fetchStats}
-                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -283,7 +283,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
                 >
                     <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <Video className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <Video className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                         Détail des vidéos
                     </h4>
                     <div className="space-y-2">
@@ -316,7 +316,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
                 >
                     <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <Users className="w-4 h-4 text-accent-600 dark:text-accent-400" />
                         Détail des étudiants
                     </h4>
                     <div className="space-y-2">
@@ -403,7 +403,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                                 initial={{ width: 0 }}
                                 animate={{ width: `${stats.progress.averageCompletion}%` }}
                                 transition={{ delay: 0.6, duration: 1 }}
-                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full"
+                                className="h-full bg-gradient-to-r from-primary-500 to-accent-600 rounded-full"
                             />
                         </div>
                     </div>

@@ -95,8 +95,8 @@ export default function CompaniesTable() {
         }
         const plans = {
             free: 'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700',
-            starter: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800',
-            business: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
+            starter: 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800',
+            business: 'bg-accent-50 dark:bg-accent-900/30 text-accent-600 dark:text-accent-400 border border-accent-200 dark:border-accent-800'
         };
         return plans[plan] || plans.free;
     };
@@ -121,7 +121,7 @@ export default function CompaniesTable() {
     return (
         <>
             <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/40 dark:shadow-gray-900/40 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 opacity-[0.03] rounded-bl-[5rem] -z-0" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 dark:bg-primary-900/20 opacity-[0.03] rounded-bl-[5rem] -z-0" />
                 
                 {/* En-tête */}
                 <div className="p-0 mb-8 relative z-10">
@@ -136,7 +136,7 @@ export default function CompaniesTable() {
                         <div className="flex flex-wrap items-center gap-3">
                             {/* Barre de recherche */}
                             <div className="relative group/search">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within/search:text-blue-500 dark:group-focus-within/search:text-blue-400 transition-colors" size={18} />
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within/search:text-primary-500 dark:group-focus-within/search:text-primary-400 transition-colors" size={18} />
                                 <input
                                     type="text"
                                     placeholder="Rechercher une entreprise..."
@@ -145,7 +145,7 @@ export default function CompaniesTable() {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
                                     }}
-                                    className="pl-12 pr-10 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-2xl focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 focus:bg-white dark:focus:bg-gray-600 w-full sm:w-72 font-medium transition-all text-sm dark:text-white dark:placeholder-gray-400"
+                                    className="pl-12 pr-10 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-2xl focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 focus:bg-white dark:focus:bg-gray-600 w-full sm:w-72 font-medium transition-all text-sm dark:text-white dark:placeholder-gray-400"
                                 />
                                 {searchTerm && (
                                     <button
@@ -167,7 +167,7 @@ export default function CompaniesTable() {
                                     setSelectedPlan(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-2xl focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 focus:bg-white dark:focus:bg-gray-600 font-bold text-xs text-gray-600 dark:text-gray-300 transition-all appearance-none cursor-pointer"
+                                className="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-2xl focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 focus:bg-white dark:focus:bg-gray-600 font-bold text-xs text-gray-600 dark:text-gray-300 transition-all appearance-none cursor-pointer"
                             >
                                 <option value="all">Filtrer par plan</option>
                                 <option value="free">Gratuit</option>
@@ -180,7 +180,7 @@ export default function CompaniesTable() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsModalOpen(true)}
-                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 dark:shadow-blue-900/30 whitespace-nowrap text-sm flex items-center gap-2"
+                                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-2xl font-bold shadow-xl shadow-primary-200 dark:shadow-primary-900/30 whitespace-nowrap text-sm flex items-center gap-2"
                             >
                                 <Building2 size={18} />
                                 Déployer Entreprise
@@ -200,7 +200,7 @@ export default function CompaniesTable() {
                                 <th className="px-6 py-5 text-right text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Gestion</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-blue-100 dark:divide-gray-700">
+                        <tbody className="divide-y divide-primary-100/50 dark:divide-gray-700">
                             {loading ? (
                                 [...Array(3)].map((_, i) => (
                                     <tr key={i}>
@@ -228,7 +228,7 @@ export default function CompaniesTable() {
                                                     setSelectedPlan('all');
                                                     setPage(1);
                                                 }}
-                                                className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                                                className="mt-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                                             >
                                                 Effacer les filtres
                                             </button>
@@ -242,18 +242,18 @@ export default function CompaniesTable() {
                                         initial={{ opacity: 0, scale: 0.98 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="transition-all hover:bg-blue-50/30 dark:hover:bg-gray-700/30 group/row"
+                                        className="transition-all hover:bg-primary-50/30 dark:hover:bg-gray-700/30 group/row"
                                     >
                                         <td className="px-6 py-6">
                                             <div 
                                                 className="flex items-center gap-4 cursor-pointer group/data"
                                                 onClick={() => navigate(`/super-admin/companies/${company.id}`)}
                                             >
-                                                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-200 dark:shadow-blue-900/30 group-hover/data:scale-110 transition-transform">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary-200 dark:shadow-primary-900/30 group-hover/data:scale-110 transition-transform">
                                                     {company.name?.charAt(0).toUpperCase() || '?'}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-gray-900 dark:text-white group-hover/data:text-blue-600 dark:group-hover/data:text-blue-400 transition-colors">
+                                                    <span className="font-bold text-gray-900 dark:text-white group-hover/data:text-primary-600 dark:group-hover/data:text-primary-400 transition-colors">
                                                         {company.name}
                                                     </span>
                                                     <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-0.5">ID: {company.id.slice(0, 8)}</span>
@@ -267,7 +267,7 @@ export default function CompaniesTable() {
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/50 p-2 py-1.5 rounded-2xl w-fit">
-                                                <Users className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                                                <Users className="w-4 h-4 text-primary-500 dark:text-primary-400" />
                                                 <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{company.userCount || 0}</span>
                                             </div>
                                         </td>
@@ -284,10 +284,10 @@ export default function CompaniesTable() {
                                         <td className="px-6 py-6">
                                             <div className="flex items-center justify-end gap-3 translate-x-4 opacity-0 group-hover/row:opacity-100 group-hover/row:translate-x-0 transition-all duration-300">
                                                 <motion.button
-                                                    whileHover={{ scale: 1.1, backgroundColor: '#EFF6FF' }}
+                                                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(var(--color-primary-50), 0.5)' }}
                                                     whileTap={{ scale: 0.9 }}
                                                     onClick={() => navigate(`/super-admin/companies/${company.id}`)}
-                                                    className="p-3 text-blue-600 dark:text-blue-400 rounded-xl transition-colors bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700"
+                                                    className="p-3 text-primary-600 dark:text-primary-400 rounded-xl transition-colors bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700"
                                                     title="Explorer"
                                                 >
                                                     <Eye size={18} />
@@ -296,7 +296,7 @@ export default function CompaniesTable() {
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}
                                                     onClick={() => navigate(`/admin?orgId=${company.id}`)}
-                                                    className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100"
+                                                    className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400 opacity-0 group-hover:opacity-100"
                                                     title="Voir Dashboard Admin"
                                                 >
                                                     <LayoutDashboard size={18} />
@@ -346,7 +346,7 @@ export default function CompaniesTable() {
                                                                         setIsEditModalOpen(true);
                                                                         setShowActions(null);
                                                                     }}
-                                                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2"
+                                                                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-2"
                                                                 >
                                                                     <Edit size={16} />
                                                                     Modifier
@@ -387,7 +387,7 @@ export default function CompaniesTable() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="px-6 py-4 border-t border-blue-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="px-6 py-4 border-t border-primary-100/50 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             Page {page} sur {totalPages}
                         </p>
@@ -395,7 +395,7 @@ export default function CompaniesTable() {
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                className="p-2 border border-blue-200 dark:border-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="p-2 border border-primary-200 dark:border-gray-700 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <ChevronLeft size={20} className="text-gray-600 dark:text-gray-400" />
                             </button>
@@ -411,8 +411,8 @@ export default function CompaniesTable() {
                                                 onClick={() => setPage(pageNum)}
                                                 className={`w-10 h-10 rounded-lg transition-colors ${
                                                     page === pageNum
-                                                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                                                        : 'hover:bg-blue-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                                        ? 'bg-gradient-to-r from-primary-600 to-primary-800 text-white'
+                                                        : 'hover:bg-primary-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
                                                 }`}
                                             >
                                                 {pageNum}
@@ -425,8 +425,8 @@ export default function CompaniesTable() {
                                             onClick={() => setPage(pageNum)}
                                             className={`w-10 h-10 rounded-lg transition-colors ${
                                                 page === pageNum
-                                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                                                    : 'hover:bg-blue-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                                    ? 'bg-gradient-to-r from-primary-600 to-primary-800 text-white'
+                                                    : 'hover:bg-primary-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
                                             }`}
                                         >
                                             {pageNum}
@@ -438,7 +438,7 @@ export default function CompaniesTable() {
                             <button
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                 disabled={page === totalPages}
-                                className="p-2 border border-blue-200 dark:border-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="p-2 border border-primary-200 dark:border-gray-700 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" />
                             </button>

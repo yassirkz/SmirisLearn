@@ -14,7 +14,7 @@ export default function ConfirmationModal({
   const colors = {
     danger: 'bg-red-600 hover:bg-red-700',
     warning: 'bg-yellow-600 hover:bg-yellow-700',
-    info: 'bg-blue-600 hover:bg-blue-700'
+    info: 'bg-primary-600 hover:bg-primary-700'
   };
 
   return (

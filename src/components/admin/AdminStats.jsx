@@ -218,8 +218,8 @@ export default function AdminStats() {
     };
 
     const statCards = [
-        { label: 'Membres', data: stats.members, icon: Users, color: 'from-indigo-500 to-indigo-600' },
-        { label: 'Vidéos', data: stats.videos, icon: Video, color: 'from-purple-500 to-purple-600' },
+        { label: 'Membres', data: stats.members, icon: Users, color: 'from-primary-500 to-primary-600' },
+        { label: 'Vidéos', data: stats.videos, icon: Video, color: 'from-accent-500 to-accent-600' },
         { label: 'Quiz', data: stats.quizzes, icon: Award, color: 'from-pink-500 to-pink-600' },
         { label: 'Complétion', data: stats.completion, icon: TrendingUp, color: 'from-green-500 to-green-600' },
     ];
@@ -270,10 +270,10 @@ export default function AdminStats() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100"
+                    className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl p-4 border border-primary-100"
                 >
                     <div className="flex items-center gap-2 mb-2">
-                        <Shield className="w-4 h-4 text-indigo-600" />
+                        <Shield className="w-4 h-4 text-primary-600" />
                         <h3 className="font-medium text-gray-800">Informations entreprise</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">

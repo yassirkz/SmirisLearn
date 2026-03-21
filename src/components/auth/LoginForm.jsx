@@ -86,10 +86,10 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-blue-100 dark:border-gray-700 relative overflow-hidden transition-colors duration-300">
-      {/* Badge premium - uiverse.io style */}
-      <div className="absolute -top-1 -right-1">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1 animate-pulse">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-primary-100 dark:border-gray-700 relative overflow-hidden transition-colors duration-300">
+        {/* Badge premium - uiverse.io style */}
+        <div className="absolute -top-1 -right-1">
+          <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1 animate-pulse">
           <Sparkles className="w-3 h-3" />
             By Yassir.kz
         </div>
@@ -97,7 +97,7 @@ export default function LoginForm() {
 
       {/* Logo */}
       <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-blue-200 dark:shadow-blue-900/30 animate-bounce-slow">
+        <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-primary-200 dark:shadow-primary-900/30 animate-bounce-slow">
           <span className="text-3xl font-bold text-white">S</span>
         </div>
 
@@ -108,13 +108,13 @@ export default function LoginForm() {
       </div>
 
       {/* Toggle - uiverse.io style */}
-      <div className="flex p-1 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-700 rounded-xl mb-6 border border-blue-100 dark:border-gray-600">
+      <div className="flex p-1 bg-gradient-to-r from-primary-50 to-primary-100/50 dark:from-gray-700 dark:to-gray-700 rounded-xl mb-6 border border-primary-100 dark:border-gray-600">
         <button
           onClick={() => setIsLogin(true)}
           className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
             isLogin
-              ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-md border border-blue-200 dark:border-gray-500"
-              : "text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+              ? "bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-md border border-primary-200 dark:border-gray-500"
+              : "text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
           }`}
         >
           Connexion
@@ -123,8 +123,8 @@ export default function LoginForm() {
           onClick={() => setIsLogin(false)}
           className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
             !isLogin
-              ? "bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-400 shadow-md border border-purple-200 dark:border-gray-500"
-              : "text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400"
+              ? "bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-md border border-primary-200 dark:border-gray-500"
+              : "text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
           }`}
         >
           Inscription
@@ -157,16 +157,16 @@ export default function LoginForm() {
               onChange={(e) => setFullName(e.target.value)}
               onBlur={() => setTouched({ ...touched, fullName: true })}
               className="w-full px-4 py-3.5 bg-white dark:bg-gray-700 border-2 rounded-xl text-gray-800 dark:text-white outline-none transition-all duration-300 peer
-                border-gray-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30
-                hover:border-purple-300 dark:hover:border-purple-500"
+                border-gray-200 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30
+                hover:border-primary-300 dark:hover:border-primary-500"
               placeholder=" "
             />
             <label
               className={`absolute left-4 transition-all duration-300 pointer-events-none
               ${
                 fullName
-                  ? "-top-2 text-xs bg-white dark:bg-gray-700 px-2 text-purple-600 dark:text-purple-400"
-                  : "top-3.5 text-gray-400 dark:text-gray-500 text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white dark:peer-focus:bg-gray-700 peer-focus:px-2 peer-focus:text-purple-600 dark:peer-focus:text-purple-400"
+                  ? "-top-2 text-xs bg-white dark:bg-gray-700 px-2 text-primary-600 dark:text-primary-400"
+                  : "top-3.5 text-gray-400 dark:text-gray-500 text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white dark:peer-focus:bg-gray-700 peer-focus:px-2 peer-focus:text-primary-600 dark:peer-focus:text-primary-400"
               }`}
             >
               <span className="flex items-center gap-1">
@@ -188,16 +188,16 @@ export default function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setTouched({ ...touched, email: true })}
             className="w-full px-4 py-3.5 bg-white dark:bg-gray-700 border-2 rounded-xl text-gray-800 dark:text-white outline-none transition-all duration-300 peer
-              border-gray-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30
-              hover:border-blue-300 dark:hover:border-blue-500"
+              border-gray-200 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30
+              hover:border-primary-300 dark:hover:border-primary-500"
             placeholder=" "
           />
           <label
             className={`absolute left-4 transition-all duration-300 pointer-events-none
             ${
               email
-                ? "-top-2 text-xs bg-white dark:bg-gray-700 px-2 text-blue-600 dark:text-blue-400"
-                : "top-3.5 text-gray-400 dark:text-gray-500 text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white dark:peer-focus:bg-gray-700 peer-focus:px-2 peer-focus:text-blue-600 dark:peer-focus:text-blue-400"
+                ? "-top-2 text-xs bg-white dark:bg-gray-700 px-2 text-primary-600 dark:text-primary-400"
+                : "top-3.5 text-gray-400 dark:text-gray-500 text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white dark:peer-focus:bg-gray-700 peer-focus:px-2 peer-focus:text-primary-600 dark:peer-focus:text-primary-400"
             }`}
           >
             <span className="flex items-center gap-1">
@@ -218,16 +218,16 @@ export default function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             onBlur={() => setTouched({ ...touched, password: true })}
             className="w-full px-4 py-3.5 bg-white dark:bg-gray-700 border-2 rounded-xl text-gray-800 dark:text-white outline-none transition-all duration-300 peer
-              border-gray-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30
-              hover:border-blue-300 dark:hover:border-blue-500"
+              border-gray-200 dark:border-gray-600 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30
+              hover:border-primary-300 dark:hover:border-primary-500"
             placeholder=" "
           />
           <label
             className={`absolute left-4 transition-all duration-300 pointer-events-none
             ${
               password
-                ? "-top-2 text-xs bg-white dark:bg-gray-700 px-2 text-blue-600 dark:text-blue-400"
-                : "top-3.5 text-gray-400 dark:text-gray-500 text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white dark:peer-focus:bg-gray-700 peer-focus:px-2 peer-focus:text-blue-600 dark:peer-focus:text-blue-400"
+                ? "-top-2 text-xs bg-white dark:bg-gray-700 px-2 text-primary-600 dark:text-primary-400"
+                : "top-3.5 text-gray-400 dark:text-gray-500 text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white dark:peer-focus:bg-gray-700 peer-focus:px-2 peer-focus:text-primary-600 dark:peer-focus:text-primary-400"
             }`}
           >
             <span className="flex items-center gap-1">
@@ -252,8 +252,8 @@ export default function LoginForm() {
             ${
               isValid
                 ? isLogin
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-300 dark:hover:shadow-blue-900/50"
-                  : "bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-200 dark:shadow-purple-900/30 hover:shadow-xl hover:shadow-purple-300 dark:hover:shadow-purple-900/50"
+                  ? "bg-gradient-to-r from-primary-600 to-primary-800 shadow-lg shadow-primary-200 dark:shadow-primary-900/30 hover:shadow-xl hover:shadow-primary-300 dark:hover:shadow-primary-900/50"
+                  : "bg-gradient-to-r from-primary-700 to-primary-600 shadow-lg shadow-primary-200 dark:shadow-primary-900/30 hover:shadow-xl hover:shadow-primary-300 dark:hover:shadow-primary-900/50"
                 : "bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
             }
           `}
@@ -281,13 +281,13 @@ export default function LoginForm() {
       <p className="text-center mt-6">
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors relative group"
+          className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline transition-colors relative group"
         >
           <span className="relative">
             {isLogin
               ? "Pas encore de compte ? S'inscrire"
               : "Déjà un compte ? Se connecter"}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 group-hover:w-full transition-all duration-300" />
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 dark:bg-primary-400 group-hover:w-full transition-all duration-300" />
           </span>
         </button>
       </p>
@@ -306,11 +306,11 @@ export default function LoginForm() {
       <button
         onClick={signInWithGoogle}
         disabled={loading}
-        className="group relative w-full overflow-hidden rounded-xl bg-white dark:bg-gray-700 px-6 py-3.5 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="group relative w-full overflow-hidden rounded-xl bg-white dark:bg-gray-700 px-6 py-3.5 border-2 border-gray-200 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="relative flex items-center justify-center gap-3">
-          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-blue-200/50 dark:via-blue-800/30 to-transparent" />
+          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-primary-200/50 dark:via-primary-800/30 to-transparent" />
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
@@ -338,13 +338,13 @@ export default function LoginForm() {
       {/* Badges sécurité - uiverse.io style */}
       <div className="flex justify-center gap-6 mt-6">
         <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500 text-xs group cursor-default">
-          <Shield className="w-3 h-3 text-blue-400 dark:text-blue-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
+          <Shield className="w-3 h-3 text-primary-400 dark:text-primary-500 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors" />
           <span className="group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
             Données chiffrées
           </span>
         </div>
         <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500 text-xs group cursor-default">
-          <Zap className="w-3 h-3 text-purple-400 dark:text-purple-500 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+          <Zap className="w-3 h-3 text-accent-400 dark:text-accent-500 group-hover:text-accent-500 dark:group-hover:text-accent-400 transition-colors" />
           <span className="group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
             Connexion rapide
           </span>

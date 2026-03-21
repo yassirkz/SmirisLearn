@@ -109,14 +109,14 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4"  style={{ transform: "translateZ(20px)" }}>
                 <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
-                        <Video className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-indigo-600 dark:text-indigo-400" />
+                        <Video className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-primary-600 dark:text-primary-400" />
                         <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Vidéos</p>
                     </div>
                     <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.videoCount}</p>
                 </div>
                 <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
-                        <Users className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-purple-600 dark:text-purple-400" />
+                        <Users className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-accent-600 dark:text-accent-400" />
                         <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Étudiants</p>
                     </div>
                     <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.studentCount}</p>
@@ -139,7 +139,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={handleViewDetails}
-                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400"
+                    className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg transition-colors text-primary-600 dark:text-primary-400"
                     title="Voir les détails"
                 >
                     <Eye className="w-4 h-4" />
@@ -152,7 +152,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleEditClick}
-                            className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400"
+                            className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400"
                             title="Modifier"
                         >
                             <Edit className="w-4 h-4" />

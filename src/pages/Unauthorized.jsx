@@ -24,7 +24,7 @@ const REDIRECTS = {
 const ERROR_CONFIG = {
   'insufficient_permissions': {
     icon: ShieldAlert,
-    color: 'from-red-500 to-pink-500',
+    color: 'from-red-500 to-accent-600',
     title: 'Accès Refusé',
     message: "Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.",
     solution: "Contactez votre administrateur pour demander un accès."
@@ -45,7 +45,7 @@ const ERROR_CONFIG = {
   },
   'organization_inactive': {
     icon: Building2,
-    color: 'from-purple-500 to-indigo-500',
+    color: 'from-primary-500 to-accent-500',
     title: 'Organisation Inactive',
     message: "Votre organisation est actuellement inactive.",
     solution: "Contactez le support pour réactiver votre compte."
@@ -59,14 +59,14 @@ const ERROR_CONFIG = {
   },
   'maintenance_mode': {
     icon: Shield,
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-primary-500 to-accent-500',
     title: 'Maintenance en Cours',
     message: "Le système est actuellement en maintenance pour amélioration.",
     solution: "Merci de votre patience, nous serons de retour très bientôt."
   },
   'default': {
     icon: Lock,
-    color: 'from-red-500 to-pink-500',
+    color: 'from-red-500 to-accent-600',
     title: 'Accès Restreint',
     message: "Vous n'êtes pas autorisé à accéder à cette page.",
     solution: "Assurez-vous d'être connecté avec le bon compte."
@@ -133,7 +133,7 @@ export default function Unauthorized() {
               label: "Demander l'accès administrateur",
               action: () => handleRequestAccess('org_admin'),
               icon: Key,
-              color: 'purple'
+              color: 'primary'
             });
           }
 
@@ -255,14 +255,14 @@ export default function Unauthorized() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
       {/* Particules animées dynamiques */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(errorType === 'maintenance_mode' ? 30 : 20)].map((_, i) => (
           <motion.div
             key={i}
             className={`absolute w-1 h-1 rounded-full ${
-              errorType === 'maintenance_mode' ? 'bg-blue-200 dark:bg-blue-800' : 'bg-red-200 dark:bg-red-800'
+              errorType === 'maintenance_mode' ? 'bg-primary-200 dark:bg-primary-800' : 'bg-primary-300 dark:bg-primary-900'
             }`}
             initial={{
               x: Math.random() * window.innerWidth,
@@ -285,17 +285,17 @@ export default function Unauthorized() {
       {/* Blobs flous dynamiques */}
       <div className="absolute inset-0 overflow-hidden">
         <div className={`absolute -top-40 -right-40 w-96 h-96 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-float ${
-          errorType === 'maintenance_mode' ? 'bg-blue-200 dark:bg-blue-900' : 'bg-red-200 dark:bg-red-900'
+          errorType === 'maintenance_mode' ? 'bg-primary-200 dark:bg-primary-900/20' : 'bg-primary-100 dark:bg-primary-900/10'
         }`} />
         <div className={`absolute -bottom-40 -left-40 w-96 h-96 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-float ${
-          errorType === 'maintenance_mode' ? 'bg-cyan-200 dark:bg-cyan-900' : 'bg-orange-200 dark:bg-orange-900'
+          errorType === 'maintenance_mode' ? 'bg-accent-200 dark:bg-accent-900/20' : 'bg-primary-200 dark:bg-primary-800/10'
         }`} style={{ animationDelay: '2s' }} />
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl dark:shadow-gray-900/50 max-w-md w-full border border-red-100 dark:border-gray-700 transition-colors duration-300"
+        className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl dark:shadow-gray-900/50 max-w-md w-full border border-primary-100 dark:border-gray-700 transition-colors duration-300"
       >
         {/* Badge dynamique */}
         <motion.div
@@ -384,7 +384,7 @@ export default function Unauthorized() {
               
               <button
                 onClick={() => setShowDetails(!showDetails)}
-                className="ml-auto text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
+                className="ml-auto text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1"
               >
                 {showDetails ? "Masquer" : "Détails"}
                 <ChevronRight className={`w-3 h-3 transition-transform ${showDetails ? 'rotate-90' : ''}`} />
@@ -436,7 +436,7 @@ export default function Unauthorized() {
             {organization && (
               <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                 <div className="flex items-center gap-2 mb-2">
-                  <Building2 className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                  <Building2 className="w-4 h-4 text-primary-500 dark:text-primary-400" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{organization.name}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
@@ -444,7 +444,7 @@ export default function Unauthorized() {
                     organization.subscription_status === 'active' 
                       ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                       : organization.subscription_status === 'trial'
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                   }`}>
                     {organization.plan_type} • {organization.subscription_status}
@@ -517,7 +517,7 @@ export default function Unauthorized() {
             <button
               onClick={handleRefreshSession}
               disabled={isRefreshing}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all group"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl hover:shadow-lg transition-all group"
             >
               {isRefreshing ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -529,7 +529,7 @@ export default function Unauthorized() {
           ) : (
             <Link
               to={user ? REDIRECTS[role] || '/' : '/login'}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all group"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl hover:shadow-lg transition-all group"
             >
               <Home className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
               {user ? "Aller au Tableau de Bord" : "Se Connecter"}
@@ -540,7 +540,7 @@ export default function Unauthorized() {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all group text-sm"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:border-primary-300 dark:hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group text-sm"
             >
               <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
               Retour
@@ -586,7 +586,7 @@ export default function Unauthorized() {
                     onClick={() => window.location.href = 'mailto:support@smiris-learn.com'}
                     className="w-full flex items-center gap-3 p-2 hover:bg-white dark:hover:bg-gray-600 rounded-lg transition-colors text-left"
                   >
-                    <Mail className="w-4 h-4 text-blue-600" />
+                    <Mail className="w-4 h-4 text-primary-600" />
                     <div>
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Email</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">support@smiris-learn.com</p>
@@ -608,7 +608,7 @@ export default function Unauthorized() {
                     onClick={() => window.open('https://t.me/smiris_support', '_blank')}
                     className="w-full flex items-center gap-3 p-2 hover:bg-white dark:hover:bg-gray-600 rounded-lg transition-colors text-left"
                   >
-                    <MessageCircle className="w-4 h-4 text-purple-600" />
+                    <MessageCircle className="w-4 h-4 text-accent-600" />
                     <div>
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Telegram</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">@smiris_support</p>

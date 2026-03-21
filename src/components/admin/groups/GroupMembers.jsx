@@ -244,7 +244,7 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shrink-0">
+            <div className="p-6 bg-gradient-to-r from-primary-600 to-accent-600 text-white shrink-0">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold">
                   Membres du groupe: {escapeText(untrusted(group.name))}
@@ -271,7 +271,7 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
                         setShowAddDropdown(true);
                       }}
                       onFocus={() => setShowAddDropdown(true)}
-                      className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm dark:bg-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm dark:bg-gray-900 dark:text-white"
                     />
                     <AnimatePresence>
                       {showAddDropdown && searchTerm.length > 0 && (
@@ -290,7 +290,7 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
                                   setSearchTerm('');
                                   setShowAddDropdown(false);
                                 }}
-                                className="w-full px-4 py-3 text-left hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                                className="w-full px-4 py-3 text-left hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
                               >
                                 <div>
                                   <p className="font-medium text-gray-800 dark:text-gray-200">
@@ -298,7 +298,7 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
                                   </p>
                                   <p className="text-xs text-gray-500 dark:text-gray-400">{student.email}</p>
                                 </div>
-                                <Plus className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                <Plus className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                               </button>
                             ))
                           ) : (
@@ -313,7 +313,7 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
                   <button
                     onClick={handleAddMember}
                     disabled={adding}
-                    className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                    className="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center gap-2"
                   >
                     {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     Ajouter
@@ -329,12 +329,12 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
                   </label>
                 </div>
                 {selectedStudent && (
-                  <div className="mt-2 p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-between">
-                    <span className="text-sm text-indigo-800 dark:text-indigo-300 font-medium">
+                  <div className="mt-2 p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl flex items-center justify-between">
+                    <span className="text-sm text-primary-800 dark:text-primary-300 font-medium">
                       Sélectionné: {selectedStudent.full_name || selectedStudent.email}
                     </span>
-                    <button onClick={() => setSelectedStudent(null)} className="p-1 hover:bg-indigo-100 dark:hover:bg-indigo-800 rounded">
-                      <X className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <button onClick={() => setSelectedStudent(null)} className="p-1 hover:bg-primary-100 dark:hover:bg-primary-800 rounded">
+                      <X className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                     </button>
                   </div>
                 )}

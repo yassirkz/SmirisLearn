@@ -100,7 +100,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
             case 'success': return <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />;
             case 'warning': return <AlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400" />;
             case 'error': return <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />;
-            default: return <Info className="w-5 h-5 text-blue-500 dark:text-blue-400" />;
+            default: return <Info className="w-5 h-5 text-primary-500 dark:text-primary-400" />;
         }
     };
 
@@ -126,16 +126,16 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                         className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 md:w-96 max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-blue-100 dark:border-gray-700 z-50 overflow-hidden"
                     >
                         {/* Header */}
-                        <div className="p-4 border-b border-blue-50 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-800 flex items-center justify-between">
+                        <div className="p-4 border-b border-primary-50 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-white dark:from-gray-800 dark:to-gray-800 flex items-center justify-between">
                             <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                <Bell className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                 Notifications
                             </h3>
                             <div className="flex items-center gap-2">
                                 {notifications.some(n => !n.read) && (
                                     <button 
                                         onClick={markAllAsRead}
-                                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                                        className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                                     >
                                         Tout marquer comme lu
                                     </button>

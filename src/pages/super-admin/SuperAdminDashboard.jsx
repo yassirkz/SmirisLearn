@@ -71,8 +71,8 @@ export default function SuperAdminDashboard() {
             <MainLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-20 h-20 border-4 border-blue-200 dark:border-blue-800 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-20 h-20 border-4 border-primary-200 dark:border-primary-800 rounded-full"></div>
+                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
                         <p className="mt-4 text-gray-500 dark:text-gray-400">Chargement de votre dashboard...</p>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ export default function SuperAdminDashboard() {
                     <div>
                         <div className="flex items-center gap-3 mb-1">
                             <h1 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                Control <span className="text-blue-600 dark:text-blue-400">Center</span>
+                                Control <span className="text-primary-600 dark:text-primary-400">Center</span>
                             </h1>
                             <div className="flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800 rounded-full h-fit">
                                 <span className="relative flex h-2 w-2">
@@ -124,7 +124,7 @@ export default function SuperAdminDashboard() {
                             </div>
                         </div>
                         <p className="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                            <Clock className="w-4 h-4 text-primary-500 dark:text-primary-400" />
                             Vue d'ensemble de la plateforme • {lastUpdate.toLocaleTimeString()}
                         </p>
                     </div>
@@ -134,7 +134,7 @@ export default function SuperAdminDashboard() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={fetchDashboardData}
-                            className="p-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-lg dark:hover:shadow-gray-900 transition-all text-gray-600 dark:text-gray-300"
+                            className="p-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl hover:border-primary-200 dark:hover:border-primary-700 hover:shadow-lg dark:hover:shadow-gray-900 transition-all text-gray-600 dark:text-gray-300"
                             title="Rafraîchir les données"
                         >
                             <Zap className="w-5 h-5" />
@@ -164,8 +164,8 @@ export default function SuperAdminDashboard() {
                                 value: global_stats.total_organizations, 
                                 growth: dashboardData.growth?.orgs || 0,
                                 icon: Building2, 
-                                color: 'from-blue-600 to-indigo-600',
-                                shadow: 'shadow-blue-200 dark:shadow-blue-900/30',
+                                color: 'from-primary-600 to-accent-600',
+                                shadow: 'shadow-primary-200 dark:shadow-primary-900/30',
                                 description: "Organisations actives"
                             },
                             { 
@@ -173,8 +173,8 @@ export default function SuperAdminDashboard() {
                                 value: global_stats.total_users, 
                                 growth: dashboardData.growth?.users || 0,
                                 icon: Users, 
-                                color: 'from-purple-600 to-fuchsia-600',
-                                shadow: 'shadow-purple-200 dark:shadow-purple-900/30',
+                                color: 'from-accent-600 to-primary-600',
+                                shadow: 'shadow-accent-200 dark:shadow-accent-900/30',
                                 description: `${global_stats.active_trials} comptes en essai`
                             },
                             { 
@@ -191,7 +191,7 @@ export default function SuperAdminDashboard() {
                                 value: `${global_stats.avg_completion_rate || 0}%`, 
                                 growth: dashboardData.growth?.completion || 0,
                                 icon: Award, 
-                                color: 'from-orange-500 to-rose-500',
+                                color: 'from-amber-500 to-accent-600',
                                 shadow: 'shadow-orange-200 dark:shadow-orange-900/30',
                                 description: "Moyenne de complétion"
                             }
@@ -229,7 +229,7 @@ export default function SuperAdminDashboard() {
                                             <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">{card.label}</p>
                                             <p className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">{card.value}</p>
                                             <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 pt-2 flex items-center gap-1">
-                                                <Zap className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                                                <Zap className="w-3 h-3 text-primary-500 dark:text-primary-400" />
                                                 {card.description}
                                             </p>
                                         </div>
@@ -260,10 +260,10 @@ export default function SuperAdminDashboard() {
                     <section className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                <Building2 className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                 Onboarding Récent
                             </h2>
-                            <button className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                            <button className="text-sm font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                                 Voir tout
                             </button>
                         </div>
@@ -278,14 +278,14 @@ export default function SuperAdminDashboard() {
                                     whileHover={{ y: -5 }}
                                     className="relative group bg-white dark:bg-gray-800 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-100/50 dark:shadow-gray-900/50 overflow-hidden"
                                 >
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-bl-[4rem] group-hover:bg-blue-600 transition-colors duration-500 -z-0 opacity-20 group-hover:opacity-10" />
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary-50 dark:bg-primary-900/20 rounded-bl-[4rem] group-hover:bg-primary-600 transition-colors duration-500 -z-0 opacity-20 group-hover:opacity-10" />
                                     
                                     <div className="relative z-10 flex flex-col gap-4">
                                         <div className="flex items-center justify-between">
-                                            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-200 dark:shadow-blue-900/30">
+                                            <div className="w-14 h-14 bg-gradient-to-br from-primary-600 to-accent-700 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-primary-200 dark:shadow-primary-900/30">
                                                 {org.name?.charAt(0).toUpperCase()}
                                             </div>
-                                            <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                            <div className="px-3 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
                                                 {org.plan}
                                             </div>
                                         </div>

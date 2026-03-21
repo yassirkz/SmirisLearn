@@ -99,10 +99,10 @@ export default function AdminLayout({ children }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
+            <div className="min-h-screen flex items-center justify-center dark:bg-secondary-950">
                 <div className="relative">
-                    <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
-                    <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-16 h-16 border-4 border-primary-100 dark:border-primary-900 rounded-full"></div>
+                    <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </div>
         );
@@ -124,7 +124,7 @@ export default function AdminLayout({ children }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950">
             {/* Banner Impersonation */}
             {isImpersonating && (
                 <div className="bg-amber-500 text-white p-2 text-center text-sm font-bold flex items-center justify-center gap-4 sticky top-0 z-[60]">
@@ -147,7 +147,7 @@ export default function AdminLayout({ children }) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30"
+                        className="lg:hidden fixed inset-0 bg-secondary-950/50 backdrop-blur-sm z-30"
                     />
                 )}
             </AnimatePresence>
@@ -162,18 +162,18 @@ export default function AdminLayout({ children }) {
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         className="fixed top-0 left-0 h-full z-40"
                     >
-                        <aside className="h-full w-72 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-indigo-100 dark:border-gray-800 shadow-2xl flex flex-col">
+                        <aside className="h-full w-72 bg-white/80 dark:bg-secondary-950/80 backdrop-blur-xl border-r border-primary-100 dark:border-gray-800 shadow-2xl flex flex-col">
                             {/* Logo avec badge dynamique */}
-                            <div className="p-6 border-b border-indigo-100 dark:border-gray-800 relative overflow-hidden">
-                                <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full opacity-20 blur-2xl" />
+                            <div className="p-6 border-b border-primary-100 dark:border-gray-800 relative overflow-hidden">
+                                <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full opacity-20 blur-2xl" />
                                 
                                 <div className="relative flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-200 dark:shadow-primary-900/30">
                                         <span className="text-2xl font-bold text-white">S</span>
                                     </div>
                                     <div className="flex-1">
                                         <h2 className="font-bold text-gray-800 dark:text-gray-200 text-lg">Smiris Learn</h2>
-                                        <p className="text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                        <p className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
                                             <Shield className="w-3 h-3" />
                                             {companyName || 'Admin'} • {companyPlan || 'Starter'}
                                         </p>
@@ -208,13 +208,13 @@ export default function AdminLayout({ children }) {
                                         transition={{ delay: index * 0.1 }}
                                     >
                                         <NavLink
-                                            to={item.path}
+                                            to={isImpersonating ? `${item.path}?orgId=${orgId}` : item.path}
                                             onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
                                             className={({ isActive }) =>
                                                 `relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group overflow-hidden
                                                 ${isActive 
-                                                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30' 
-                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400'
+                                                    ? 'bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 text-white shadow-lg shadow-primary-200 dark:shadow-primary-900/30' 
+                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
                                                 }`
                                             }
                                         >
@@ -233,11 +233,11 @@ export default function AdminLayout({ children }) {
                             </nav>
 
                             {/* Bas de la sidebar : bouton Dark Mode et Déconnexion */}
-                            <div className="p-4 border-t border-indigo-100 dark:border-gray-800 space-y-2">
+                            <div className="p-4 border-t border-primary-100 dark:border-gray-800 space-y-2">
                                 {/* Bouton Dark Mode */}
                                 <button
                                     onClick={toggleTheme}
-                                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-gray-800 transition-colors"
+                                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                                     <span className="font-medium">Mode {theme === 'light' ? 'sombre' : 'clair'}</span>

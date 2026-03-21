@@ -37,16 +37,16 @@ export default function RecentActivity() {
         ...(orgs?.map(o => ({
           type: 'org',
           icon: Building2,
-          color: 'text-blue-600 dark:text-blue-400',
-          bg: 'bg-blue-100 dark:bg-blue-900/30',
+          color: 'text-primary-600 dark:text-primary-400',
+          bg: 'bg-primary-100 dark:bg-primary-900/30',
           title: `Nouvelle entreprise: ${o.name}`,
           time: o.created_at
         })) || []),
         ...(users?.map(u => ({
           type: 'user',
           icon: UserPlus,
-          color: 'text-purple-600 dark:text-purple-400',
-          bg: 'bg-purple-100 dark:bg-purple-900/30',
+          color: 'text-accent-600 dark:text-accent-400',
+          bg: 'bg-accent-100 dark:bg-accent-900/30',
           title: `Nouvel utilisateur: ${u.full_name}`,
           time: u.created_at
         })) || []),
@@ -77,7 +77,7 @@ export default function RecentActivity() {
       transition={{ delay: 0.2 }}
       className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/40 dark:shadow-gray-900/40 h-full overflow-hidden relative"
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 opacity-[0.03] rounded-bl-[5rem] -z-0" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 dark:bg-primary-900/20 opacity-[0.03] rounded-bl-[5rem] -z-0" />
       <div className="flex items-center justify-between mb-8 relative z-10">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Activité Récente</h2>

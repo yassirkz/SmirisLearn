@@ -78,7 +78,7 @@ export default function QuizPage() {
                         animate={{ scale: 1 }}
                         className="absolute -top-4 -right-4"
                     >
-                        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
+                        <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
                             Évaluation
                         </div>
@@ -87,7 +87,7 @@ export default function QuizPage() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                <Award className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                                <Award className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                                 Gestion des Quiz
                             </h1>
                             <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function QuizPage() {
                         {!isImpersonating && (
                             <button
                                 onClick={() => handleCreate()}
-                                className="mt-4 md:mt-0 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                className="mt-4 md:mt-0 px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                             >
                                 <Plus className="w-4 h-4" />
                                 Nouveau Quiz
@@ -115,6 +115,8 @@ export default function QuizPage() {
 
                 {/* Liste des quiz */}
                 <QuizList
+                    isReadOnly={!!isImpersonating}
+                    orgId={orgIdFromUrl}
                     refreshTrigger={refreshKey}
                     onEdit={handleEdit}
                     onDelete={handleDelete}

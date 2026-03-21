@@ -95,8 +95,8 @@ export default function SearchComponent({
 
     const getColor = (type) => {
         switch(type) {
-            case 'organization': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30';
-            case 'user': return 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30';
+            case 'organization': return 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30';
+            case 'user': return 'text-accent-600 bg-accent-100 dark:text-accent-400 dark:bg-accent-900/30';
             case 'video': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
             default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800';
         }
@@ -126,7 +126,7 @@ export default function SearchComponent({
                     }}
                     placeholder={displayPlaceholder}
                     autoFocus={autoFocus}
-                    className="w-full pl-10 pr-20 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 outline-none transition-all text-sm dark:text-white dark:placeholder-gray-400"
+                    className="w-full pl-10 pr-20 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm dark:text-white dark:placeholder-gray-400"
                 />
                 
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
@@ -148,7 +148,7 @@ export default function SearchComponent({
                 <button
                     type="submit"
                     disabled={loading || !query.trim()}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-xs font-medium disabled:opacity-50 hover:shadow-md transition-all"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg text-xs font-medium disabled:opacity-50 hover:shadow-md transition-all"
                 >
                     {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Rechercher'}
                 </button>
@@ -180,7 +180,7 @@ export default function SearchComponent({
                                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                                             {results.total_results} résultats trouvés
                                         </p>
-                                        <Sparkles className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                                        <Sparkles className="w-3 h-3 text-primary-500 dark:text-primary-400" />
                                     </div>
                                     
                                     {/* Organisations */}

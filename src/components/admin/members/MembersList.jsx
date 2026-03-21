@@ -28,12 +28,12 @@ const ROLE_CONFIG = {
   org_admin: {
     label: "Administrateur",
     icon: Shield,
-    color: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800'
+    color: 'bg-accent-100 text-accent-700 border-accent-200 dark:bg-accent-900/30 dark:text-accent-300 dark:border-accent-800'
   },
   student: {
     label: "Étudiant",
     icon: GraduationCap,
-    color: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
+    color: 'bg-primary-100 text-primary-700 border-primary-200 dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-800'
   }
 };
 
@@ -259,7 +259,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             placeholder="Rechercher un membre..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm dark:bg-gray-800 dark:text-white"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm dark:bg-gray-800 dark:text-white"
           />
         </div>
 
@@ -269,7 +269,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             <select
               value={selectedGroup}
               onChange={e => setSelectedGroup(e.target.value)}
-              className="pl-10 pr-8 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all text-sm appearance-none bg-white dark:bg-gray-800 dark:text-white"
+              className="pl-10 pr-8 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm appearance-none bg-white dark:bg-gray-800 dark:text-white"
             >
               <option value="all">Tous les groupes</option>
               {groups.map((g, idx) => (
@@ -283,7 +283,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
           {!isReadOnly && (
             <button
               onClick={() => setShowInviteForm(!showInviteForm)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
             >
               <UserPlus className="w-4 h-4" />
               Inviter un membre
@@ -300,28 +300,28 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             onSubmit={handleInvite}
-            className="bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-200 dark:border-indigo-800 rounded-2xl p-5 flex flex-col sm:flex-row gap-3 items-end overflow-hidden"
+            className="bg-primary-50 dark:bg-primary-900/30 border-2 border-primary-200 dark:border-primary-800 rounded-2xl p-5 flex flex-col sm:flex-row gap-3 items-end overflow-hidden"
           >
             <div className="flex-1 space-y-1">
-              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Adresse email</label>
+              <label className="text-xs font-semibold text-primary-700 dark:text-primary-300">Adresse email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 dark:text-indigo-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400 dark:text-primary-400" />
                 <input
                   type="email"
                   required
                   value={inviteEmail}
                   onChange={e => setInviteEmail(e.target.value)}
                   placeholder="exemple@email.com"
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-sm dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-primary-200 dark:border-primary-800 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 outline-none text-sm dark:text-white"
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Rôle</label>
+              <label className="text-xs font-semibold text-primary-700 dark:text-primary-300">Rôle</label>
               <select
                 value={inviteRole}
                 onChange={e => setInviteRole(e.target.value)}
-                className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 outline-none text-sm dark:text-white"
+                className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-primary-200 dark:border-primary-800 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 outline-none text-sm dark:text-white"
               >
                 <option value="student">Étudiant</option>
                 <option value="org_admin">Administrateur</option>
@@ -330,7 +330,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
             <button
               type="submit"
               disabled={inviting}
-              className="flex items-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
             >
               {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               Envoyer l'invitation
@@ -343,8 +343,8 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Total membres", value: stats.total, color: 'text-gray-800 dark:text-gray-200' },
-          { label: "Étudiants", value: stats.students, color: 'text-blue-600 dark:text-blue-400' },
-          { label: "Administrateurs", value: stats.admins, color: 'text-purple-600 dark:text-purple-400' },
+          { label: "Étudiants", value: stats.students, color: 'text-primary-600 dark:text-primary-400' },
+          { label: "Administrateurs", value: stats.admins, color: 'text-accent-600 dark:text-accent-400' },
         ].map((stat, idx) => (
           <div key={idx} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-4 text-center">
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -356,7 +356,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Tableau des membres */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
         </div>
       ) : members.length === 0 ? (
         <div className="text-center py-16">
@@ -394,14 +394,14 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white text-sm shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 flex items-center justify-center font-bold text-white text-sm shrink-0">
                             {initials}
                           </div>
                           <div className="min-w-0">
                             <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">
                               {escapeText(untrusted(member.full_name || "Chargement..."))}
                               {member.id === user.id && (
-                                <span className="ml-2 text-xs text-indigo-500 dark:text-indigo-400">(Vous)</span>
+                                <span className="ml-2 text-xs text-primary-500 dark:text-primary-400">(Vous)</span>
                               )}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
@@ -420,7 +420,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                               <span className="text-xs text-gray-400 dark:text-gray-500">Aucun groupe</span>
                             ) : (
                               member.groups.slice(0, 3).map((g, idx) => (
-                                <span key={g.id || `m-g-${idx}`} className="inline-block px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs">
+                                <span key={g.id || `m-g-${idx}`} className="inline-block px-2 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg text-xs">
                                   {escapeText(untrusted(g.name))}
                                 </span>
                               ))
@@ -443,12 +443,12 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                               onClick={() => handleChangeRole(member)}
                               disabled={updatingId === member.id || member.id === user.id}
                               title={member.role === 'student' ? "Promouvoir administrateur" : "Rétrograder étudiant"}
-                              className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl transition-colors disabled:opacity-30"
+                              className="p-2 hover:bg-accent-50 dark:hover:bg-accent-900/30 rounded-xl transition-colors disabled:opacity-30"
                             >
                               {updatingId === member.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin text-purple-500 dark:text-purple-400" />
+                                <Loader2 className="w-4 h-4 animate-spin text-accent-500 dark:text-accent-400" />
                               ) : (
-                                <Shield className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                                <Shield className="w-4 h-4 text-accent-500 dark:text-accent-400" />
                               )}
                             </button>
  

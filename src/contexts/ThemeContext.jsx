@@ -11,8 +11,8 @@ export const ThemeProvider = ({ children }) => {
   };
 
   const [theme, setTheme] = useState(() => {
-    // Par défaut, système
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Par défaut, dark mode pour tout le monde
+    return 'dark';
   });
 
   // Dès qu'on a le user, on charge sa préférence
@@ -23,8 +23,8 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       setTheme(savedTheme);
     } else {
-      const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      setTheme(systemPreference);
+      // Si aucune préférence n'est sauvegardée, on met dark par défaut
+      setTheme('dark');
     }
   }, [user?.id]);
 

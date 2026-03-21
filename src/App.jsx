@@ -50,7 +50,7 @@ function App() {
 
   if (loading || roleLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-primary-50 dark:from-secondary-950 dark:to-secondary-900 transition-colors duration-300">
         <div className="text-center">
           <LoadingSpinner size="lg" color="primary" />
           <p className="mt-4 text-gray-600 dark:text-gray-400 animate-pulse">
@@ -66,7 +66,20 @@ function App() {
       {/* ============================================
           ROUTES PUBLIQUES
       ============================================ */}
-      <Route path="/" element={<LandingPage />} /> 
+      <Route
+        path="/"
+        element={
+          !user ? (
+            <LandingPage />
+          ) : role === "super_admin" ? (
+            <Navigate to="/super-admin" replace />
+          ) : role === "org_admin" ? (
+            <Navigate to="/admin" replace />
+          ) : (
+            <Navigate to="/student" replace />
+          )
+        }
+      />      
       <Route
         path="/login"
         element={user ? <Navigate to="/" replace /> : <LoginPage />}

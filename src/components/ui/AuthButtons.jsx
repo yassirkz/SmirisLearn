@@ -56,7 +56,7 @@ export default function AuthButtons() {
         onClick={handleGoogleSignIn}
         disabled={loading}
         className="group relative w-full overflow-hidden rounded-2xl bg-white px-6 py-4 
-                   border-2 border-gray-200 hover:border-blue-300 
+                   border-2 border-gray-200 hover:border-primary-300 
                    disabled:opacity-50 disabled:cursor-not-allowed
                    transition-all duration-300 shadow-lg hover:shadow-xl"
       >
@@ -64,12 +64,12 @@ export default function AuthButtons() {
         <motion.div
           animate={loading ? { x: ['-100%', '100%'] } : {}}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200/30 to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-200/30 to-transparent"
         />
 
         {/* Effet de glow */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-accent-500/10 blur-xl" />
         </div>
 
         {/* Contenu */}
@@ -80,9 +80,9 @@ export default function AuthButtons() {
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
             {loading ? (
-              <Loader2 className="w-5 h-5 text-blue-600" />
+              <Loader2 className="w-5 h-5 text-primary-600" />
             ) : (
-              <Chrome className="w-5 h-5 text-blue-600" />
+              <Chrome className="w-5 h-5 text-primary-600" />
             )}
           </motion.div>
 
@@ -158,11 +158,11 @@ export default function AuthButtons() {
             <span>Chiffré</span>
           </div>
           <div className="flex items-center gap-1">
-            <Zap className="w-3 h-3 text-blue-400" />
+            <Zap className="w-3 h-3 text-primary-400" />
             <span>Rapide</span>
           </div>
           <div className="flex items-center gap-1">
-            <CheckCircle className="w-3 h-3 text-purple-400" />
+            <CheckCircle className="w-3 h-3 text-accent-400" />
             <span>Sécurisé</span>
           </div>
         </motion.div>
@@ -170,10 +170,10 @@ export default function AuthButtons() {
         {/* Message de sécurité (apparaît au hover) */}
         <motion.div
           whileHover={{ scale: 1.02 }}
-          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 rounded-full cursor-help"
+          className="inline-flex items-center gap-1 px-3 py-1 bg-primary-50 rounded-full cursor-help"
         >
-          <Sparkles className="w-3 h-3 text-blue-500" />
-          <span className="text-xs text-blue-600">Connexion 2FA disponible</span>
+          <Sparkles className="w-3 h-3 text-primary-500" />
+          <span className="text-xs text-primary-600">Connexion 2FA disponible</span>
         </motion.div>
       </motion.div>
     </div>

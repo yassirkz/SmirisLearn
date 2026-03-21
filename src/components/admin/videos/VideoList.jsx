@@ -231,16 +231,16 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-primary-100 dark:border-gray-700"
             >
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{videos.length} {videos.length > 1 ? 'vidéos' : 'vidéo'}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                            <div className="w-2 h-2 bg-accent-500 rounded-full" />
                             <span className="text-gray-600 dark:text-gray-300 whitespace-nowrap">{pillars.length} {pillars.length > 1 ? 'piliers' : 'pilier'}</span>
                         </div>
                     </div>
@@ -259,7 +259,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => setViewMode('table')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'table'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        ? 'bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                             >
@@ -269,7 +269,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                                 onClick={() => setViewMode('cards')}
                                 className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'cards'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                        ? 'bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                                 }`}
                             >
@@ -289,7 +289,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={handleOpenUploader}
-                                    className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                                    className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     <Plus className="w-4 h-4" />
                                     <span className="hidden xs:inline">Ajouter une vidéo</span>
@@ -440,7 +440,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             {loading ? (
                 <PillarSkeleton viewMode={viewMode} />
             ) : videos.length === 0 ? (
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-primary-100 dark:border-gray-700 text-center">
                     <Film className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
                         Aucune vidéo
@@ -451,17 +451,17 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
                     {!isReadOnly && (
                         <button
                             onClick={handleOpenUploader}
-                            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+                            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
                         >
                             Ajouter une vidéo
                         </button>
                     )}
                 </div>
             ) : viewMode === 'table' ? (
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
+                            <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
                                     <th className="px-6 py-4 text-left dark:text-gray-300">Vidéo</th>
                                     <th className="px-6 py-4 text-left dark:text-gray-300">Pilier</th>

@@ -54,8 +54,9 @@ export default function AdminSettings() {
     // Chargement des paramètres
     // ============================================
     useEffect(() => {
+        if (!role) return;
         fetchSettings();
-    }, [user]);
+    }, [user, role, isReadOnly]);
 
     const fetchSettings = async () => {
         try {
@@ -235,8 +236,8 @@ export default function AdminSettings() {
             <AdminLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-16 h-16 border-4 border-primary-200 dark:border-primary-800 rounded-full"></div>
+                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 </div>
             </AdminLayout>
@@ -253,7 +254,7 @@ export default function AdminSettings() {
                 {/* En-tête */}
                 <div>
                     <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                        <Settings className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                        <Settings className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                         Paramètres
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -303,10 +304,10 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Building className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                <Building className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Informations générales
                             </h2>
 
@@ -326,7 +327,7 @@ export default function AdminSettings() {
                                 <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl">
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Email de l'organisation</p>
                                     <p className="text-lg font-medium text-gray-800 dark:text-white flex items-center gap-2">
-                                        <Mail className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                        <Mail className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                         {settings.companyEmail}
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -352,15 +353,15 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                <Bell className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Notifications
                             </h2>
 
                             <div className="space-y-3">
-                                <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors">
+                                <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-gray-600 transition-colors">
                                     <div>
                                         <p className="font-medium text-gray-700 dark:text-gray-300">Notifications par email</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Recevoir des alertes pour les activités importantes</p>
@@ -373,7 +374,7 @@ export default function AdminSettings() {
                                             className="sr-only"
                                         />
                                         <div className={`w-12 h-6 rounded-full transition-colors ${
-                                            settings.emailNotifications ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                                            settings.emailNotifications ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
                                         }`}>
                                             <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
                                                 settings.emailNotifications ? 'translate-x-6' : 'translate-x-1'
@@ -394,7 +395,7 @@ export default function AdminSettings() {
                                                     type="checkbox"
                                                     checked={settings[item.key]}
                                                     onChange={(e) => setSettings({...settings, [item.key]: e.target.checked})}
-                                                    className="rounded text-indigo-600 dark:bg-gray-700 dark:border-gray-600"
+                                                    className="rounded text-primary-600 dark:bg-gray-700 dark:border-gray-600"
                                                     disabled={isReadOnly}
                                                 />
                                                 <span className="text-sm text-gray-600 dark:text-gray-300">{item.label}</span>
@@ -410,10 +411,10 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                <Globe className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Apparence
                             </h2>
 
@@ -425,8 +426,8 @@ export default function AdminSettings() {
                                             onClick={() => setTheme('light')}
                                             className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                                                 theme === 'light'
-                                                    ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
-                                                    : 'border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-700'
+                                                    ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-700'
                                             }`}
                                         >
                                             <Sun className="w-5 h-5 mx-auto mb-1 text-yellow-500" />
@@ -436,11 +437,11 @@ export default function AdminSettings() {
                                             onClick={() => setTheme('dark')}
                                             className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                                                 theme === 'dark'
-                                                    ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
-                                                    : 'border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-700'
+                                                    ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-700'
                                             }`}
                                         >
-                                            <Moon className="w-5 h-5 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
+                                            <Moon className="w-5 h-5 mx-auto mb-1 text-primary-600 dark:text-primary-400" />
                                             <span className="text-xs dark:text-gray-300">Sombre</span>
                                         </button>
                                     </div>
@@ -456,10 +457,10 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                <Lock className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Sécurité
                             </h2>
 
@@ -468,7 +469,7 @@ export default function AdminSettings() {
                                 <select
                                     value={settings.sessionTimeout}
                                     onChange={(e) => setSettings({...settings, sessionTimeout: e.target.value})}
-                                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white"
                                     disabled={isReadOnly}
                                 >
                                     <option value="15">15 minutes</option>
@@ -485,10 +486,10 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Key className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                <Key className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Modifier le mot de passe
                             </h2>
 
@@ -507,7 +508,7 @@ export default function AdminSettings() {
                                                     ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400'
                                                     : passwordData.current && !passwordErrors.current
                                                         ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-400'
-                                                        : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
                                             }`}
                                             placeholder="********"
                                         />
@@ -537,7 +538,7 @@ export default function AdminSettings() {
                                                 ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400'
                                                 : passwordData.new && !passwordErrors.new
                                                     ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-400'
-                                                    : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500'
+                                                    : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
                                         }`}
                                         placeholder="********"
                                     />
@@ -559,7 +560,7 @@ export default function AdminSettings() {
                                                 ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400'
                                                 : passwordData.confirm && !passwordErrors.confirm
                                                     ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-400'
-                                                    : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500'
+                                                    : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
                                         }`}
                                         placeholder="********"
                                     />
@@ -573,7 +574,7 @@ export default function AdminSettings() {
                                     disabled={!isPasswordValid || saving}
                                     className={`w-full py-3 rounded-xl font-medium transition-all ${
                                         isPasswordValid && !saving
-                                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg'
+                                            ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white hover:shadow-lg'
                                             : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
@@ -594,7 +595,7 @@ export default function AdminSettings() {
                         <button
                             onClick={handleSaveSettings}
                             disabled={saving}
-                            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 group"
+                            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 group"
                         >
                             {saving ? (
                                 <>

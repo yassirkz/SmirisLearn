@@ -96,7 +96,7 @@ export default function PillarDetailPage() {
                             </button>
                             <div className="min-w-0">
                                 <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
-                                    <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                                    <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-primary-600 dark:text-primary-400 shrink-0" />
                                     <span className="truncate">{pillar.safeName}</span>
                                 </h1>
                                 {pillar.safeDescription && (
@@ -105,7 +105,7 @@ export default function PillarDetailPage() {
                                     </p>
                                 )}
                                 <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">
+                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 whitespace-nowrap">
                                         <Video className="w-4 h-4" />
                                         {pillar.videoCount} vidéo{pillar.videoCount > 1 ? 's' : ''}
                                     </span>
@@ -119,7 +119,7 @@ export default function PillarDetailPage() {
                             </div>
                         </div>
 
-                        <div className="hidden sm:flex bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg items-center gap-1 shrink-0">
+                        <div className="hidden sm:flex bg-gradient-to-r from-primary-600 to-accent-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg items-center gap-1 shrink-0">
                             <Sparkles className="w-3 h-3" />
                             Détails du pilier
                         </div>
@@ -135,7 +135,7 @@ export default function PillarDetailPage() {
                     {/* Liste simple des vidéos associées */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6">
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                            <Video className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            <Video className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                             Vidéos du pilier
                         </h2>
                         {pillar.videos && pillar.videos.length > 0 ? (
@@ -143,7 +143,7 @@ export default function PillarDetailPage() {
                                 {pillar.videos.map((video) => (
                                     <li key={video.id} className="py-3 flex items-center justify-between gap-3">
                                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                                            <Video className="w-4 h-4 text-indigo-400 dark:text-indigo-500 shrink-0" />
+                                            <Video className="w-4 h-4 text-primary-400 dark:text-primary-500 shrink-0" />
                                             <span className="text-sm text-gray-800 dark:text-gray-200 truncate">
                                                 {escapeText(untrusted(video.title || 'Vidéo sans titre'))}
                                             </span>

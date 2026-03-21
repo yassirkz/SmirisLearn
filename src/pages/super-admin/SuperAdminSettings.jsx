@@ -367,8 +367,8 @@ export default function SuperAdminSettings() {
             <MainLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-20 h-20 border-4 border-purple-200 dark:border-purple-800 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-purple-600 dark:border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-20 h-20 border-4 border-primary-200 dark:border-primary-800 rounded-full"></div>
+                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin"></div>
                         <p className="mt-4 text-gray-500 dark:text-gray-400">Chargement des paramètres...</p>
                     </div>
                 </div>
@@ -390,7 +390,7 @@ export default function SuperAdminSettings() {
                         animate={{ scale: 1 }}
                         className="absolute -top-4 -right-4"
                     >
-                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
+                        <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
                             Administration
                         </div>
@@ -398,7 +398,7 @@ export default function SuperAdminSettings() {
 
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                            <Settings className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                            <Settings className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                             Paramètres
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -449,10 +449,10 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <User className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                                <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Mon profil
                             </h2>
 
@@ -464,13 +464,13 @@ export default function SuperAdminSettings() {
                                     validate="text"
                                     minLength={3}
                                     required
-                                    className="dark:text-white dark:bg-gray-900 dark:border-gray-700 dark:focus:border-purple-500 dark:focus:bg-gray-900 dark:focus:text-white dark:placeholder-gray-400 dark:focus:placeholder-gray-500 dark:focus:ring-purple-500 dark:focus:ring-offset-purple-500 dark:focus:ring-offset-gray-900 dark:focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                                    className="dark:text-white dark:bg-gray-900 dark:border-gray-700 dark:focus:border-primary-500 dark:focus:bg-gray-900 dark:focus:text-white dark:placeholder-gray-400 dark:focus:placeholder-gray-500 dark:focus:ring-primary-500 dark:focus:ring-offset-primary-500 dark:focus:ring-offset-gray-900 dark:focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                                 />
 
                                 <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-xl">
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Email</p>
                                     <p className="text-lg font-medium text-gray-800 dark:text-white flex items-center gap-2">
-                                        <Mail className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                        <Mail className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                         {profile.email}
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -481,7 +481,7 @@ export default function SuperAdminSettings() {
                                 <button
                                     onClick={handleSaveProfile}
                                     disabled={saving}
-                                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all"
+                                    className="px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all"
                                 >
                                     Mettre à jour le profil
                                 </button>
@@ -493,10 +493,10 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Key className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                                <Key className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Changer le mot de passe
                             </h2>
 
@@ -515,7 +515,7 @@ export default function SuperAdminSettings() {
                                                     ? 'border-red-300 dark:border-red-600 focus:border-red-500'
                                                     : passwordData.current && !passwordErrors.current
                                                         ? 'border-green-300 dark:border-green-600 focus:border-green-500'
-                                                        : 'border-gray-200 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
                                             }`}
                                             placeholder="********"
                                         />
@@ -546,7 +546,7 @@ export default function SuperAdminSettings() {
                                                     ? 'border-red-300 dark:border-red-600 focus:border-red-500'
                                                     : passwordData.new && !passwordErrors.new
                                                         ? 'border-green-300 dark:border-green-600 focus:border-green-500'
-                                                        : 'border-gray-200 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
                                             }`}
                                             placeholder="********"
                                         />
@@ -577,7 +577,7 @@ export default function SuperAdminSettings() {
                                                     ? 'border-red-300 dark:border-red-600 focus:border-red-500'
                                                     : passwordData.confirm && !passwordErrors.confirm
                                                         ? 'border-green-300 dark:border-green-600 focus:border-green-500'
-                                                        : 'border-gray-200 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500'
+                                                        : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
                                             }`}
                                             placeholder="********"
                                         />
@@ -592,7 +592,7 @@ export default function SuperAdminSettings() {
                                     disabled={!isPasswordValid || saving}
                                     className={`px-4 py-2 rounded-lg font-medium transition-all ${
                                         isPasswordValid && !saving
-                                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+                                            ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white hover:shadow-lg'
                                             : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
@@ -606,10 +606,10 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                                <Bell className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Préférences
                             </h2>
 
@@ -622,7 +622,7 @@ export default function SuperAdminSettings() {
                                         { key: 'newCompanyAlert', label: 'Nouvelle entreprise créée' },
                                         { key: 'newUserAlert', label: 'Nouvel utilisateur inscrit' }
                                     ].map(item => (
-                                        <label key={item.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
+                                        <label key={item.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
                                             <span className="text-sm text-gray-700 dark:text-gray-300">{item.label}</span>
                                             <div className="relative">
                                                 <input
@@ -632,7 +632,7 @@ export default function SuperAdminSettings() {
                                                     className="sr-only"
                                                 />
                                                 <div className={`w-12 h-6 rounded-full transition-colors ${
-                                                    preferences[item.key] ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
+                                                    preferences[item.key] ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
                                                 }`}>
                                                     <div className={`w-5 h-5 bg-white dark:bg-gray-200 rounded-full shadow transform transition-transform ${
                                                         preferences[item.key] ? 'translate-x-6' : 'translate-x-1'
@@ -655,8 +655,8 @@ export default function SuperAdminSettings() {
                                                 onClick={() => setTheme('light')}
                                                 className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                                                     theme === 'light'
-                                                        ? 'border-purple-600 dark:border-purple-400 bg-purple-50 dark:bg-purple-900/30'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700'
+                                                        ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                                                        : 'border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-700'
                                                 }`}
                                             >
                                                 <Sun className="w-5 h-5 mx-auto mb-1 text-yellow-500" />
@@ -666,11 +666,11 @@ export default function SuperAdminSettings() {
                                                 onClick={() => setTheme('dark')}
                                                 className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                                                     theme === 'dark'
-                                                        ? 'border-purple-600 dark:border-purple-400 bg-purple-50 dark:bg-purple-900/30'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700'
+                                                        ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30'
+                                                        : 'border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-700'
                                                 }`}
                                             >
-                                                <Moon className="w-5 h-5 mx-auto mb-1 text-indigo-600 dark:text-indigo-400" />
+                                                <Moon className="w-5 h-5 mx-auto mb-1 text-primary-600 dark:text-primary-400" />
                                                 <span className="text-xs dark:text-gray-300">Sombre</span>
                                             </button>
                                         </div>
@@ -686,7 +686,7 @@ export default function SuperAdminSettings() {
                                     <select
                                         value={preferences.sessionTimeout}
                                         onChange={(e) => setPreferences({...preferences, sessionTimeout: e.target.value})}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                     >
                                         <option value="15">15 minutes</option>
                                         <option value="30">30 minutes</option>
@@ -699,7 +699,7 @@ export default function SuperAdminSettings() {
 
                             <button
                                 onClick={handleSavePreferences}
-                                className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all"
+                                className="mt-4 px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg hover:shadow-lg transition-all"
                             >
                                 Sauvegarder les préférences
                             </button>
@@ -710,10 +710,10 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Server className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                                <Server className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Configuration plateforme
                             </h2>
 
@@ -728,7 +728,7 @@ export default function SuperAdminSettings() {
                                         type="number"
                                         value={platformConfig.trial_days}
                                         onChange={(e) => setPlatformConfig({...platformConfig, trial_days: parseInt(e.target.value)})}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                         min="0"
                                         max="90"
                                     />
@@ -742,7 +742,7 @@ export default function SuperAdminSettings() {
                                         type="number"
                                         value={platformConfig.max_file_size}
                                         onChange={(e) => setPlatformConfig({...platformConfig, max_file_size: parseInt(e.target.value)})}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
                                         min="1"
                                         max="10240"
                                     />
@@ -751,7 +751,7 @@ export default function SuperAdminSettings() {
 
                             {/* Toggles */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
+                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
                                     <div>
                                         <p className="font-medium text-gray-700 dark:text-gray-300">Autoriser les inscriptions</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Les nouveaux utilisateurs peuvent s'inscrire</p>
@@ -773,7 +773,7 @@ export default function SuperAdminSettings() {
                                     </div>
                                 </label>
 
-                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
+                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
                                     <div>
                                         <p className="font-medium text-gray-700 dark:text-gray-300">Mode maintenance</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">La plateforme est en maintenance</p>
@@ -803,7 +803,7 @@ export default function SuperAdminSettings() {
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {['mp4', 'webm', 'mov', 'avi', 'mkv'].map(format => (
-                                        <label key={format} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
+                                        <label key={format} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
                                             <input
                                                 type="checkbox"
                                                 checked={platformConfig.allowed_video_formats?.includes(format)}
@@ -813,7 +813,7 @@ export default function SuperAdminSettings() {
                                                         : (platformConfig.allowed_video_formats || []).filter(f => f !== format);
                                                     setPlatformConfig({...platformConfig, allowed_video_formats: newFormats});
                                                 }}
-                                                className="rounded text-purple-600 dark:text-purple-400 focus:ring-purple-200 dark:focus:ring-purple-800"
+                                                className="rounded text-primary-600 dark:text-primary-400 focus:ring-primary-200 dark:focus:ring-primary-800"
                                             />
                                             <span className="text-sm text-gray-700 dark:text-gray-300 uppercase">{format}</span>
                                         </label>
@@ -822,7 +822,7 @@ export default function SuperAdminSettings() {
                             </div>
 
                             {/* API */}
-                            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-100 dark:border-purple-800">
+                            <div className="mt-6 p-4 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/30 dark:to-accent-900/30 rounded-xl border border-primary-100 dark:border-primary-800">
                                 <label className="flex items-center justify-between cursor-pointer">
                                     <div>
                                         <p className="font-medium text-gray-700 dark:text-gray-300">Activer l'API</p>
@@ -836,7 +836,7 @@ export default function SuperAdminSettings() {
                                             className="sr-only"
                                         />
                                         <div className={`w-14 h-7 rounded-full transition-colors ${
-                                            platformConfig.api_enabled ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
+                                            platformConfig.api_enabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
                                         }`}>
                                             <div className={`w-6 h-6 bg-white dark:bg-gray-200 rounded-full shadow transform transition-transform mt-0.5 ${
                                                 platformConfig.api_enabled ? 'translate-x-7' : 'translate-x-1'
@@ -854,7 +854,7 @@ export default function SuperAdminSettings() {
                                             type="number"
                                             value={platformConfig.api_rate_limit}
                                             onChange={(e) => setPlatformConfig({...platformConfig, api_rate_limit: parseInt(e.target.value)})}
-                                            className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-purple-400 dark:focus:border-purple-500 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/30 outline-none dark:bg-gray-900 dark:text-white"
+                                            className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
                                             min="1"
                                         />
                                     </div>
@@ -866,7 +866,7 @@ export default function SuperAdminSettings() {
                                 <button
                                     onClick={handleSavePlatformConfig}
                                     disabled={saving}
-                                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                                 >
                                     {saving ? (
                                         <>
@@ -891,7 +891,7 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 shadow-xl text-white"
+                            className="bg-gradient-to-br from-primary-600 to-accent-600 rounded-2xl p-6 shadow-xl text-white"
                         >
                             <div className="flex items-center gap-2 mb-4">
                                 <Activity className="w-5 h-5" />
@@ -930,14 +930,14 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-100 dark:border-gray-700"
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
                         >
                             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Actions rapides</h3>
                             <div className="space-y-2">
                                 <button
                                     onClick={handleRefreshStats}
                                     disabled={refreshing || exporting}
-                                    className="w-full px-4 py-2 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800/50 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
+                                    className="w-full px-4 py-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800/50 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
                                 >
                                     <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                                     <span>{refreshing ? 'Mise à jour...' : 'Rafraîchir les stats'}</span>

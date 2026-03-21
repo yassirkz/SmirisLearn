@@ -29,7 +29,7 @@ export default function MembersPage() {
             animate={{ scale: 1 }}
             className="absolute -top-4 -right-4"
           >
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
+            <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
               Membres
             </div>
@@ -37,7 +37,7 @@ export default function MembersPage() {
 
           <div>
             <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-              <Users className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+              <Users className="w-8 h-8 text-primary-600 dark:text-primary-400" />
               Gestion des Membres
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">

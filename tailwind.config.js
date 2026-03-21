@@ -9,17 +9,17 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6', // Electric Violet
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+          950: '#2e1065',
         },
         secondary: {
           50: '#f8fafc',
@@ -32,12 +32,20 @@ export default {
           700: '#334155',
           800: '#1e293b',
           900: '#0f172a',
-          950: '#020617',
+          950: '#020617', // Midnight
         },
         accent: {
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
+          400: '#38bdf8', // Sky blue
+          500: '#0ea5e9',
+          600: '#0284c7',
+        },
+        surface: {
+          50: '#ffffff',
+          100: '#fcfcfd',
+          200: '#f4f4f5',
+          800: '#111827',
+          900: '#030712',
+          950: '#020617',
         },
         glass: {
           light: 'rgba(255, 255, 255, 0.7)',
@@ -175,7 +183,7 @@ export default {
         },
         cardHover: {
           '0%': { transform: 'scale(1)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' },
-          '100%': { transform: 'scale(1.05)', boxShadow: '0 20px 40px -10px rgba(99, 102, 241, 0.3)' },
+          '100%': { transform: 'scale(1.05)', boxShadow: '0 20px 40px -10px rgba(139, 92, 246, 0.3)' },
         },
         cardEnter: {
           '0%': { opacity: '0', transform: 'scale(0.8) translateY(20px)' },
@@ -190,8 +198,8 @@ export default {
           '100%': { opacity: '0', transform: 'scale(0.7)' },
         },
         buttonPulse: {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(99, 102, 241, 0.4)' },
-          '50%': { boxShadow: '0 0 0 10px rgba(99, 102, 241, 0)' },
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(139, 92, 246, 0.4)' },
+          '50%': { boxShadow: '0 0 0 10px rgba(139, 92, 246, 0)' },
         },
         buttonShake: {
           '0%, 100%': { transform: 'translateX(0)' },

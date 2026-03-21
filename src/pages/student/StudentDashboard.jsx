@@ -326,10 +326,10 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-primary-50 dark:from-secondary-950 dark:to-secondary-900 flex items-center justify-center">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-primary-100 dark:border-primary-900 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     );
@@ -366,7 +366,7 @@ export default function StudentDashboard() {
             animate={{ scale: 1 }}
             className="absolute -top-4 -right-4"
           >
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
+            <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
               Espace Étudiant
             </div>
@@ -380,8 +380,8 @@ export default function StudentDashboard() {
               <div className="flex items-center gap-3 mt-1">
                 {orgName && (
                   <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    Organisation : <span className="font-medium text-indigo-600 dark:text-indigo-400">{orgName}</span>
+                    <Shield className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                    Organisation : <span className="font-medium text-primary-600 dark:text-primary-400">{orgName}</span>
                   </p>
                 )}
                 <button 
@@ -395,11 +395,11 @@ export default function StudentDashboard() {
             </div>
 
             {/* Progression globale avec cercle */}
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-indigo-100 dark:border-gray-700 flex items-center gap-4">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-primary-100 dark:border-gray-700 flex items-center gap-4">
               <div className="text-right">
                 <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">Progression Globale</p>
                 <div className="flex items-center justify-end gap-1">
-                  <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.overallProgress}%</p>
+                  <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">{stats.overallProgress}%</p>
                   {stats.overallProgress > 0 && <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400 animate-pulse" />}
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function StudentDashboard() {
                     fill="transparent"
                     strokeDasharray={2 * Math.PI * 24}
                     strokeDashoffset={2 * Math.PI * 24 * (1 - stats.overallProgress / 100)}
-                    className="text-indigo-600 dark:text-indigo-400 transition-all duration-500"
+                    className="text-primary-600 dark:text-primary-400 transition-all duration-500"
                   />
                 </svg>
               </div>
@@ -437,10 +437,10 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-              <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <BookOpen className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">Piliers accessibles</p>
@@ -452,10 +452,10 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Hourglass className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <Hourglass className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">Temps de formation</p>
@@ -467,10 +467,10 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
           >
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-2 bg-accent-100 dark:bg-accent-900/30 rounded-lg">
+              <Zap className="w-5 h-5 text-accent-600 dark:text-accent-400" />
             </div>
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">Quiz réussis</p>
@@ -482,7 +482,7 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-indigo-100 dark:border-gray-700 flex items-center gap-3"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
           >
             <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
               <PlayCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
@@ -501,10 +501,10 @@ export default function StudentDashboard() {
             animate={{ opacity: 1, rotateX: 0, scale: 1 }}
             transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
             whileHover={{ rotateX: 2, rotateY: -2 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-indigo-100 dark:border-gray-700 transition-shadow hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/30"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-primary-100 dark:border-gray-700 transition-shadow hover:shadow-primary-200/50 dark:hover:shadow-primary-900/30"
           >
             <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <TrendingUp className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Progression par pilier</h2>
             </div>
             <div className="h-80 w-full relative" style={{ minHeight: '320px' }}>
@@ -561,7 +561,7 @@ export default function StudentDashboard() {
               {progressByPillar.length === 1 && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="text-center translate-y-[-10px]">
-                    <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">{progressByPillar[0].value}%</p>
+                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 animate-pulse">{progressByPillar[0].value}%</p>
                     <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">Progression Globale</p>
                   </div>
                 </div>
@@ -576,10 +576,10 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
-              <PlayCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <PlayCircle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               Reprendre l'apprentissage
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -587,10 +587,10 @@ export default function StudentDashboard() {
                 <motion.div
                   key={rec.videoId}
                   whileHover={{ scale: 1.02 }}
-                  className="flex items-center gap-3 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800 cursor-pointer hover:shadow-md transition-shadow"
+                  className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-xl border border-primary-100 dark:border-primary-800 cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => navigate(`/student/video/${rec.videoId}`)}
                 >
-                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-800/50 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-800/50 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
                     <PlayCircle className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -611,16 +611,16 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-                <PlayCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <PlayCircle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                 Vidéos récentes
               </h3>
               <button
                 onClick={() => navigate('/student/learning')}
-                className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+                className="text-sm text-primary-600 dark:text-primary-400 font-semibold hover:underline"
               >
                 Voir tout
               </button>
@@ -637,14 +637,14 @@ export default function StudentDashboard() {
                   <motion.div
                     key={video.id}
                     whileHover={{ x: 5 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800"
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer border border-transparent hover:border-primary-200 dark:hover:border-primary-800"
                     onClick={() => navigate(`/student/video/${video.id}`)}
                   >
-                    <div className="w-20 h-14 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <div className="w-20 h-14 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
                       {video.thumbnail_url ? (
                         <img src={video.thumbnail_url} alt={video.title} className="w-full h-full object-cover" />
                       ) : (
-                        <PlayCircle className="w-6 h-6 text-indigo-400 dark:text-indigo-400" />
+                        <PlayCircle className="w-6 h-6 text-primary-400 dark:text-primary-400" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -663,7 +663,7 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-indigo-100 dark:border-gray-700"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
               <Award className="w-5 h-5 text-green-600 dark:text-green-400" />

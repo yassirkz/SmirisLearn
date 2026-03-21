@@ -90,10 +90,10 @@ export default function StudentVideoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-primary-50 dark:from-secondary-950 dark:to-secondary-900 flex items-center justify-center">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-16 h-16 border-4 border-primary-100 dark:border-primary-900 rounded-full"></div>
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export default function StudentVideoPage() {
       >
         <button
           onClick={() => navigate('/student/learning')}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span>Retour aux modules</span>
@@ -122,10 +122,10 @@ export default function StudentVideoPage() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="p-4 bg-indigo-50/80 dark:bg-indigo-900/30 backdrop-blur-sm border border-indigo-200 dark:border-indigo-800 rounded-xl flex items-start gap-3"
+              className="p-4 bg-primary-50/80 dark:bg-primary-900/30 backdrop-blur-sm border border-primary-100 dark:border-gray-800 rounded-xl flex items-start gap-3"
             >
-              <Info className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-indigo-800 dark:text-indigo-300">
+              <Info className="w-5 h-5 text-primary-600 dark:text-primary-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-primary-800 dark:text-primary-300">
                 <span className="font-semibold">Lecture linéaire</span> Vous devez visionner la vidéo en entier pour passer à la suite.
               </p>
             </motion.div>
@@ -135,7 +135,7 @@ export default function StudentVideoPage() {
                     rotateY: 2, 
                     rotateX: -1, 
                     scale: 1.01,
-                    boxShadow: "0 50px 100px -20px rgba(79, 70, 229, 0.2)"
+                    boxShadow: "0 50px 100px -20px rgba(99, 102, 241, 0.2)"
                 }}
                 style={{ transformStyle: "preserve-3d" }}
             >
@@ -149,18 +149,18 @@ export default function StudentVideoPage() {
             <motion.div 
                 whileHover={{ z: 30, y: -5 }}
                 style={{ transformStyle: "preserve-3d" }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primary-100 dark:border-gray-700"
             >
               <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-3" style={{ transform: "translateZ(20px)" }}>
                 {escapeText(untrusted(video.title))}
               </h1>
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400" style={{ transform: "translateZ(10px)" }}>
-                <span className="flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
-                  <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="flex items-center gap-2 px-3 py-1 bg-primary-50 dark:bg-primary-900/30 rounded-full">
+                  <BookOpen className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                   {video.pillars?.name}
                 </span>
-                <span className="flex items-center gap-2 px-3 py-1 bg-purple-50 dark:bg-purple-900/30 rounded-full">
-                  <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span className="flex items-center gap-2 px-3 py-1 bg-primary-50/50 dark:bg-primary-800/20 rounded-full">
+                  <Clock className="w-4 h-4 text-primary-500 dark:text-primary-300" />
                   {formatDuration(video.duration)}
                 </span>
               </div>
@@ -178,7 +178,7 @@ export default function StudentVideoPage() {
             <motion.div 
                 whileHover={{ rotateY: -5, scale: 1.02 }}
                 style={{ transformStyle: "preserve-3d" }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700 sticky top-24"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primary-100 dark:border-gray-700 sticky top-24"
             >
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2" style={{ transform: "translateZ(20px)" }}>
                 <span className="text-xl">{video.pillars?.icon || '📚'}</span>
@@ -196,7 +196,7 @@ export default function StudentVideoPage() {
                           navigate(`/student/video/${nextVideoId}`);
                         }
                       }}
-                      className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
+                      className="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
                     >
                       <span>Passer à la suite</span>
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

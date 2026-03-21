@@ -9,7 +9,7 @@ const generateParticles = () => {
     id: i,
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight,
-    color: i % 3 === 0 ? "#3B82F6" : i % 3 === 1 ? "#8B5CF6" : "#EC4899",
+    color: i % 3 === 0 ? "#8B5CF6" : i % 3 === 1 ? "#a78bfa" : "#06b6d4",
     duration: Math.random() * 10 + 8,
     offsetX: Math.random() * 80 - 40,
   }));
@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   return (
     <div className="dark">
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
       {/* Particules animées */}
       <div className="absolute inset-0 overflow-hidden">
         {particles.map((particle) => (
@@ -51,9 +51,9 @@ export default function LoginPage() {
 
       {/* Éléments flous */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-float" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-200 dark:bg-primary-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-float" />
         <div
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-200 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-float"
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-300 dark:bg-primary-800/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 dark:opacity-20 animate-float"
           style={{ animationDelay: "2s" }}
         />
       </div>

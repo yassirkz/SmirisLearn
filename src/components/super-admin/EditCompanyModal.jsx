@@ -77,11 +77,11 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                             <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                                 
                                 {/* Header */}
-                                <div className="px-8 pt-8 pb-6 bg-gradient-to-br from-blue-600 to-indigo-600 text-white relative">
+                                <div className="px-8 pt-8 pb-6 bg-gradient-to-br from-primary-600 to-primary-800 text-white relative">
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <h2 className="text-2xl font-bold">Modifier l'entreprise</h2>
-                                            <p className="text-blue-100 text-sm mt-1">Mettez à jour les informations</p>
+                                            <p className="text-primary-100 text-sm mt-1">Mettez à jour les informations</p>
                                         </div>
                                         <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-xl transition-all">
                                             <X className="w-5 h-5" />
@@ -101,7 +101,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                                                 value={formData.name}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 outline-none transition-all dark:text-white"
+                                                className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
                                             />
                                         </div>
                                     </div>
@@ -112,7 +112,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                                             name="plan_type"
                                             value={formData.plan_type}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 outline-none transition-all dark:text-white"
+                                            className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
                                         >
                                             <option value="free">Gratuit</option>
                                             <option value="starter">Starter</option>
@@ -138,7 +138,7 @@ export default function EditCompanyModal({ isOpen, onClose, company, onSuccess }
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="flex-1 py-4 bg-blue-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                            className="flex-1 py-4 bg-primary-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:bg-primary-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                                         >
                                             {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
                                             <span>Enregistrer</span>

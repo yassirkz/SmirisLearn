@@ -106,7 +106,7 @@ export default function VideoDetailPage() {
         return (
             <AdminLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
-                    <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full border-t-indigo-600 animate-spin" />
+                    <div className="w-16 h-16 border-4 border-primary-200 dark:border-primary-800 rounded-full border-t-primary-600 animate-spin" />
                 </div>
             </AdminLayout>
         );
@@ -142,7 +142,7 @@ export default function VideoDetailPage() {
                 </button>
 
                 {/* En-tête */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-primary-100 dark:border-gray-700">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                         <div className="min-w-0">
                             <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white truncate">
@@ -157,7 +157,7 @@ export default function VideoDetailPage() {
                         <div className="flex gap-2 self-end sm:self-start">
                             <button
                                 onClick={() => setShowEditModal(true)}
-                                className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400 transition-colors"
+                                className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg text-accent-600 dark:text-accent-400 transition-colors"
                                 title="Modifier"
                             >
                                 <Edit className="w-5 h-5" />
@@ -209,16 +209,16 @@ export default function VideoDetailPage() {
                 </div>
 
                 {/* Section Quiz associé */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-indigo-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-primary-100 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-                            <Award className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            <Award className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                             Quiz associé
                         </h2>
                         {!quiz && (
                             <button
                                 onClick={() => setShowQuizModal(true)}
-                                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm shadow hover:shadow-md transition-all flex items-center gap-2"
+                                className="px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl text-sm shadow hover:shadow-md transition-all flex items-center gap-2"
                             >
                                 <Plus className="w-4 h-4" />
                                 Créer un quiz
@@ -229,7 +229,7 @@ export default function VideoDetailPage() {
                     {quiz ? (
                         <div className="space-y-3">
                             <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-300 flex-wrap">
-                                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium">
+                                <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full font-medium">
                                     {quiz.questions?.length || 0} questions
                                 </span>
                                 <span className="flex items-center gap-1">
@@ -248,7 +248,7 @@ export default function VideoDetailPage() {
                             </div>
                             <button
                                 onClick={() => setShowQuizModal(true)}
-                                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline"
+                                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline"
                             >
                                 Modifier le quiz
                             </button>

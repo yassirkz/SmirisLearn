@@ -71,11 +71,11 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={handleCardClick}
-                className="hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors group cursor-pointer"
+                className="hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors group cursor-pointer"
             >
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-600 rounded-lg flex items-center justify-center text-white">
                             <Film className="w-5 h-5" />
                         </div>
                         <div>
@@ -118,7 +118,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleView}
-                            className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400 sm:opacity-0 sm:group-hover:opacity-100"
+                            className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg transition-colors text-primary-600 dark:text-primary-400 sm:opacity-0 sm:group-hover:opacity-100"
                             title="Voir les détails"
                         >
                             <Eye className="w-4 h-4" />
@@ -130,7 +130,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleEdit}
-                                    className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 sm:opacity-0 sm:group-hover:opacity-100"
+                                    className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400 sm:opacity-0 sm:group-hover:opacity-100"
                                     title="Modifier"
                                 >
                                     <Edit className="w-4 h-4" />
@@ -161,7 +161,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
             transition={{ delay: index * 0.1 }}
             whileHover={{ y: -5 }}
             onClick={handleCardClick}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-indigo-100 dark:border-gray-700 relative overflow-hidden group cursor-pointer"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-primary-100 dark:border-gray-700 relative overflow-hidden group cursor-pointer"
         >
             {/* Effet de shine */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
@@ -175,8 +175,8 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
             </div>
 
             {/* Miniature placeholder */}
-            <div className="w-full h-32 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl mb-4 flex items-center justify-center">
-                <Play className="w-8 h-8 text-indigo-400 dark:text-indigo-400" />
+            <div className="w-full h-32 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-xl mb-4 flex items-center justify-center">
+                <Play className="w-8 h-8 text-primary-400 dark:text-primary-400" />
             </div>
 
             {/* Contenu */}
@@ -215,7 +215,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={handleView}
-                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400"
+                        className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg transition-colors text-primary-600 dark:text-primary-400"
                         title="Voir les détails"
                     >
                         <Eye className="w-4 h-4" />
@@ -227,7 +227,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={handleEdit}
-                                className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400"
+                                className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400"
                                 title="Modifier"
                             >
                                 <Edit className="w-4 h-4" />

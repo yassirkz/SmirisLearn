@@ -66,7 +66,7 @@ export default function PillarFilters({ filters, onChange }) {
                         value={filters.search}
                         onChange={handleSearchChange}
                         placeholder="Rechercher un pilier..."
-                        className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
+                        className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
                     />
                     {filters.search && (
                         <button
@@ -85,7 +85,7 @@ export default function PillarFilters({ filters, onChange }) {
                     onClick={() => setShowFilters(!showFilters)}
                     className={`p-2 rounded-lg transition-all ${
                         showFilters || filters.sortBy !== 'name'
-                            ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                            ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                 >
@@ -128,7 +128,7 @@ export default function PillarFilters({ filters, onChange }) {
                                 <div className="flex items-center gap-1">
                                     {filters.sortBy === option.field && (
                                         <ArrowUpDown className={`w-3 h-3 ${
-                                            filters.sortOrder === 'asc' ? 'text-indigo-600 dark:text-indigo-400' : 'text-indigo-600 dark:text-indigo-400 rotate-180'
+                                            filters.sortOrder === 'asc' ? 'text-primary-600 dark:text-primary-400' : 'text-primary-600 dark:text-primary-400 rotate-180'
                                         }`} />
                                     )}
                                 </div>
@@ -146,7 +146,7 @@ export default function PillarFilters({ filters, onChange }) {
                                 });
                                 setShowFilters(false);
                             }}
-                            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                            className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                         >
                             Réinitialiser
                         </button>

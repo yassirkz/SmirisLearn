@@ -29,7 +29,7 @@ export default function MainLayout({ children }) {
     if (!user) return <Navigate to="/login" replace />
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-primary-50 dark:from-secondary-950 dark:to-secondary-900">
             {/* Overlay mobile */}
             <AnimatePresence mode="wait">
                 {sidebarOpen && (
@@ -38,7 +38,7 @@ export default function MainLayout({ children }) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30"
+                        className="lg:hidden fixed inset-0 bg-secondary-950/50 backdrop-blur-sm z-30"
                     />
                 )}
             </AnimatePresence>

@@ -11,7 +11,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
 import { untrusted, escapeText } from '../../../utils/security';
 
-export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, refreshTrigger = 0 }) {
+export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit, onDelete, onDuplicate, onViewStats, refreshTrigger = 0 }) {
     const { user } = useAuth();
     const { success, error: showError } = useToast();
     const showErrorRef = useRef(showError);
@@ -33,21 +33,40 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
     const itemsPerPage = 10;
 
     const userId = user?.id;
+    const [organizationId, setOrganizationId] = useState(null);
 
     useEffect(() => {
-        if (!userId) return;
+        const fetchOrgId = async () => {
+            try {
+                if (propOrgId) {
+                    setOrganizationId(propOrgId);
+                    return;
+                }
+                if (userId) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('organization_id')
+                        .eq('id', userId)
+                        .single();
+                    if (profile?.organization_id) {
+                        setOrganizationId(profile.organization_id);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching orgId:", err);
+            }
+        };
+        fetchOrgId();
+    }, [userId, propOrgId]);
+
+    useEffect(() => {
+        if (!organizationId) return;
         const fetchVideos = async () => {
             try {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('organization_id')
-                    .eq('id', userId)
-                    .single();
-                if (!profile?.organization_id) return;
                 const { data: pillars } = await supabase
                     .from('pillars')
                     .select('id')
-                    .eq('organization_id', profile.organization_id);
+                    .eq('organization_id', organizationId);
                 if (!pillars?.length) return;
                 const pillarIds = pillars.map(p => p.id);
                 const { data } = await supabase
@@ -61,10 +80,10 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
             }
         };
         fetchVideos();
-    }, [userId]);
+    }, [organizationId]);
 
     useEffect(() => {
-        if (!userId) return;
+        if (!organizationId) return;
 
         if (hasLoadedOnce.current) {
             setRefreshing(true);
@@ -74,17 +93,10 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
 
         const load = async () => {
             try {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('organization_id')
-                    .eq('id', userId)
-                    .single();
-                if (!profile?.organization_id) return;
-
                 const { data: pillars, error: pErr } = await supabase
                     .from('pillars')
                     .select('id')
-                    .eq('organization_id', profile.organization_id);
+                    .eq('organization_id', organizationId);
                 if (pErr) throw pErr;
 
                 const pillarIds = (pillars || []).map(p => p.id);
@@ -152,7 +164,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
         };
 
         load();
-    }, [userId, page, filters.video_id, filters.sortBy, filters.sortOrder, filters.search, refreshTrigger, localRefreshKey]);
+    }, [organizationId, page, filters.video_id, filters.sortBy, filters.sortOrder, filters.search, refreshTrigger, localRefreshKey]);
 
     const handleRefresh = () => {
         setLocalRefreshKey(k => k + 1);
@@ -166,7 +178,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
     if (loading && quizzes.length === 0) {
         return (
             <div className="flex justify-center py-12">
-                <div className="w-10 h-10 border-4 border-indigo-200 dark:border-indigo-800 rounded-full border-t-indigo-600 dark:border-t-indigo-400 animate-spin" />
+                <div className="w-10 h-10 border-4 border-primary-200 dark:border-primary-800 rounded-full border-t-primary-600 dark:border-t-primary-400 animate-spin" />
             </div>
         );
     }
@@ -174,10 +186,10 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
     return (
         <div className="space-y-6">
             {/* Barre de filtres */}
-            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-indigo-100 dark:border-gray-700">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-primary-100 dark:border-gray-700">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <Filter className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <Filter className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Gestion des Quiz</h2>
                     </div>
 
@@ -192,7 +204,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                     setFilters({ ...filters, search: e.target.value });
                                     setPage(1);
                                 }}
-                                className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 dark:bg-gray-900 dark:text-white"
+                                className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:bg-gray-900 dark:text-white"
                             />
                         </div>
 
@@ -202,7 +214,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                 setFilters({ ...filters, video_id: e.target.value });
                                 setPage(1);
                             }}
-                            className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 bg-white dark:bg-gray-900 dark:text-white"
+                            className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 bg-white dark:bg-gray-900 dark:text-white"
                         >
                             <option value="all">Toutes les vidéos</option>
                             {videos.map((v, idx) => (
@@ -218,7 +230,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                 const [sortBy, sortOrder] = e.target.value.split(':');
                                 setFilters({ ...filters, sortBy, sortOrder });
                             }}
-                            className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 bg-white dark:bg-gray-900 dark:text-white"
+                            className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 bg-white dark:bg-gray-900 dark:text-white"
                         >
                             <option value="created_at:desc">Plus récents</option>
                             <option value="created_at:asc">Plus anciens</option>
@@ -230,7 +242,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             title="Actualiser"
                         >
-                            <RefreshCw className={`w-5 h-5 text-gray-600 dark:text-gray-300 ${refreshing ? 'animate-spin text-indigo-600 dark:text-indigo-400' : ''}`} />
+                            <RefreshCw className={`w-5 h-5 text-gray-600 dark:text-gray-300 ${refreshing ? 'animate-spin text-primary-600 dark:text-primary-400' : ''}`} />
                         </button>
                     </div>
                 </div>
@@ -238,16 +250,16 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
 
             {/* Liste des quiz */}
             {quizzes.length === 0 ? (
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-indigo-100 dark:border-gray-700 text-center">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-primary-100 dark:border-gray-700 text-center">
                     <Award className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Aucun quiz trouvé</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">Créez des quiz pour évaluer les connaissances de vos étudiants.</p>
                 </div>
             ) : (
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
+                            <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Vidéo / Pilier</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Questions</th>
@@ -265,7 +277,7 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.03 }}
-                                        className="hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors group"
+                                        className="hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors group"
                                     >
                                         <td className="px-6 py-4">
                                             <div className="font-medium text-gray-800 dark:text-gray-200">
@@ -276,19 +288,19 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
+                                            <span className="px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-medium">
                                                 {quiz.questions?.length || 0}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1">
-                                                <Target className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                                <Target className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                                 <span className="text-gray-700 dark:text-gray-300">{quiz.passing_score}%</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1">
-                                                <RefreshCw className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                                <RefreshCw className="w-4 h-4 text-accent-600 dark:text-accent-400" />
                                                 <span className="text-gray-700 dark:text-gray-300">{quiz.max_attempts === -1 ? '∞' : quiz.max_attempts}</span>
                                             </div>
                                         </td>
@@ -309,32 +321,36 @@ export default function QuizList({ onEdit, onDelete, onDuplicate, onViewStats, r
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => onViewStats?.(quiz)}
-                                                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg text-blue-600 dark:text-blue-400"
+                                                    className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg text-primary-600 dark:text-primary-400"
                                                     title="Statistiques"
                                                 >
                                                     <BarChart3 className="w-4 h-4" />
                                                 </button>
-                                                <button
-                                                    onClick={() => onEdit(quiz)}
-                                                    className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400"
-                                                    title="Modifier"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => onDuplicate?.(quiz)}
-                                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
-                                                    title="Dupliquer"
-                                                >
-                                                    <Copy className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => onDelete(quiz)}
-                                                    className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400"
-                                                    title="Supprimer"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                {!isReadOnly && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => onEdit(quiz)}
+                                                            className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg text-accent-600 dark:text-accent-400"
+                                                            title="Modifier"
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => onDuplicate?.(quiz)}
+                                                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+                                                            title="Dupliquer"
+                                                        >
+                                                            <Copy className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => onDelete(quiz)}
+                                                            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400"
+                                                            title="Supprimer"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                     </motion.tr>

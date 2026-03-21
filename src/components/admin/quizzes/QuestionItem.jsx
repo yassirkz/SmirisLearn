@@ -77,7 +77,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
         >
             {/* En-tête avec numéro et actions */}
             <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
+                <span className="text-sm font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-3 py-1 rounded-full">
                     Question {index + 1}
                 </span>
                 <div className="flex gap-1">
@@ -106,7 +106,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                 <select
                     value={question.type}
                     onChange={(e) => handleTypeChange(e.target.value)}
-                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
+                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
                 >
                     {QUESTION_TYPES.map(t_opt => (
                         <option key={t_opt.value} value={t_opt.value}>{t_opt.label}</option>
@@ -144,14 +144,14 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                                     ? handleAnswerChange(optIdx)
                                     : handleMultipleAnswerChange(optIdx)
                                 }
-                                className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
+                                className="w-4 h-4 text-primary-600 dark:text-primary-400"
                             />
                             <input
                                 type="text"
                                 value={opt}
                                 onChange={(e) => handleOptionChange(optIdx, e.target.value)}
                                 placeholder={`Option ${optIdx + 1}`}
-                                className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none dark:bg-gray-900 dark:text-white"
+                                className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
                             />
                             <button
                                 type="button"
@@ -166,7 +166,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                     <button
                         type="button"
                         onClick={addOption}
-                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
+                        className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex items-center gap-1"
                     >
                         <Plus className="w-4 h-4" /> Ajouter une option
                     </button>
@@ -183,7 +183,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                             value="true"
                             checked={question.answer === true}
                             onChange={() => handleAnswerChange(true)}
-                            className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
+                            className="w-4 h-4 text-primary-600 dark:text-primary-400"
                         />
                         <span className="text-gray-700 dark:text-gray-300">Vrai</span>
                     </label>
@@ -194,7 +194,7 @@ export default function QuestionItem({ question, index, onChange, onRemove, onDu
                             value="false"
                             checked={question.answer === false}
                             onChange={() => handleAnswerChange(false)}
-                            className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
+                            className="w-4 h-4 text-primary-600 dark:text-primary-400"
                         />
                         <span className="text-gray-700 dark:text-gray-300">Faux</span>
                     </label>

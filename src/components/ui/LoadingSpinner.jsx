@@ -11,12 +11,12 @@ const sizes = {
 };
 
 const colors = {
-  primary: 'from-blue-500 to-purple-600',
+  primary: 'from-primary-500 to-accent-600',
   secondary: 'from-gray-500 to-gray-600',
   success: 'from-green-500 to-emerald-600',
-  danger: 'from-red-500 to-pink-600',
+  danger: 'from-red-500 to-accent-600',
   warning: 'from-orange-500 to-amber-600',
-  info: 'from-cyan-500 to-blue-600',
+  info: 'from-primary-400 to-accent-500',
   white: 'from-white to-white/80'
 };
 

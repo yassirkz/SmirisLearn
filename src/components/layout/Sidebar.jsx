@@ -50,14 +50,14 @@ export default function Sidebar({ onClose }) {
 
     return (
         <motion.aside 
-            className="h-full w-64 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-blue-100 dark:border-gray-800 shadow-xl flex flex-col"
+            className="h-full w-64 bg-white/80 dark:bg-secondary-950/80 backdrop-blur-xl border-r border-primary-100 dark:border-gray-800 shadow-xl flex flex-col"
             initial={{ x: -20 }}
             animate={{ x: 0 }}
         >
             {/* Logo */}
-            <div className="p-6 border-b border-blue-100 dark:border-gray-800">
+            <div className="p-6 border-b border-primary-100 dark:border-gray-800">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg">
                         <span className="text-xl font-bold text-white">S</span>
                     </div>
                     <div>
@@ -85,8 +85,8 @@ export default function Sidebar({ onClose }) {
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
                                 ${isActive 
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30' 
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
+                                    ? 'bg-gradient-to-r from-primary-600 to-primary-800 text-white shadow-lg shadow-primary-200 dark:shadow-primary-900/30' 
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
                                 }`
                             }
                         >
@@ -101,10 +101,10 @@ export default function Sidebar({ onClose }) {
             </nav>
 
             {/* Bas de la sidebar : bouton Dark Mode et Déconnexion */}
-            <div className="p-4 border-t border-blue-100 dark:border-gray-800 space-y-2">
+            <div className="p-4 border-t border-primary-100 dark:border-gray-800 space-y-2">
                 <button
                     onClick={toggleTheme}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 transition-colors"
                 >
                     {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                     <span className="font-medium">{theme === 'light' ? 'Mode Sombre' : 'Mode Clair'}</span>

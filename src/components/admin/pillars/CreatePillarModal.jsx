@@ -14,12 +14,12 @@ const ICONS = ['📚', '🎓', '💻', '📊', '🎯', '⚡', '🌟', '🔥', '�
 
 // Couleurs disponibles
 const COLORS = [
-    { name: 'blue', class: 'bg-blue-500', gradient: 'from-blue-500 to-indigo-600' },
+    { name: 'primary', class: 'bg-primary-500', gradient: 'from-primary-600 to-primary-800' },
+    { name: 'accent', class: 'bg-accent-500', gradient: 'from-accent-600 to-indigo-600' },
     { name: 'purple', class: 'bg-purple-500', gradient: 'from-purple-500 to-pink-600' },
     { name: 'green', class: 'bg-green-500', gradient: 'from-green-500 to-emerald-600' },
     { name: 'red', class: 'bg-red-500', gradient: 'from-red-500 to-pink-600' },
     { name: 'yellow', class: 'bg-yellow-500', gradient: 'from-yellow-500 to-orange-600' },
-    { name: 'indigo', class: 'bg-indigo-500', gradient: 'from-indigo-500 to-purple-600' },
     { name: 'pink', class: 'bg-pink-500', gradient: 'from-pink-500 to-rose-600' },
     { name: 'orange', class: 'bg-orange-500', gradient: 'from-orange-500 to-red-600' }
 ];
@@ -124,12 +124,12 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                         >
                             <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                                 {/* Éléments décoratifs */}
-                                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
+                                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-primary-400 to-accent-400 rounded-full opacity-20 blur-3xl" />
                                 <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-orange-400 rounded-full opacity-20 blur-3xl" />
 
                                 {/* Badge premium */}
                                 <div className="absolute top-4 right-4 z-10">
-                                    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
+                                    <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
                                         <Sparkles className="w-3 h-3" />
                                         Nouveau pilier
                                     </div>
@@ -200,7 +200,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                             required
                                             error={touched.name ? errors.name : ''}
                                             placeholder="Ex: Management, Communication, Vente..."
-                                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all resize-none dark:text-white"
+                                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all resize-none dark:text-white"
                                         />
 
                                         <div className="space-y-2">
@@ -213,7 +213,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
                                                 onChange={(e) => handleChange('description', e.target.value)}
                                                 onBlur={() => setTouched({ ...touched, description: true })}
                                                 rows={3}
-                                                className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all resize-none dark:text-white"
+                                                className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all resize-none dark:text-white"
                                                 placeholder="Décrivez brièvement ce que contient ce pilier..."
                                             />
                                             <div className="flex justify-end">

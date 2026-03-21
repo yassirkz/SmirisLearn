@@ -59,12 +59,12 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 overflow-hidden"
             style={{ perspective: "1200px" }}
         >
             <div className="overflow-x-auto">
                 <table className="w-full">
-                    <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800">
+                    <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                         <tr>
                             <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                 Pilier
@@ -102,11 +102,11 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                         rotateX: -1, 
                                         scale: 1.005,
                                         z: 10,
-                                        boxShadow: "0 10px 30px -10px rgba(79, 70, 229, 0.2)"
+                                        boxShadow: "0 10px 30px -10px rgba(var(--primary-rgb), 0.2)"
                                     }}
                                     style={{ transformStyle: "preserve-3d" }}
                                     onClick={() => handleRowClick(pillar.id)}
-                                    className="transition-colors group cursor-pointer hover:bg-indigo-50/80 dark:hover:bg-gray-700/80"
+                                    className="transition-colors group cursor-pointer hover:bg-primary-50/80 dark:hover:bg-gray-700/80"
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3 min-w-[200px]">
@@ -152,7 +152,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={(e) => handleViewDetails(e, pillar.id)}
-                                                className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors text-blue-600 dark:text-blue-400 sm:opacity-0 sm:group-hover:opacity-100"
+                                                className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg transition-colors text-primary-600 dark:text-primary-400 sm:opacity-0 sm:group-hover:opacity-100"
                                                 title="Voir les détails"
                                             >
                                                 <Eye className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}
                                                         onClick={(e) => handleEditClick(e, pillar)}
-                                                        className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg transition-colors text-purple-600 dark:text-purple-400 sm:opacity-0 sm:group-hover:opacity-100"
+                                                        className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400 sm:opacity-0 sm:group-hover:opacity-100"
                                                         title="Modifier"
                                                     >
                                                         <Edit className="w-4 h-4" />

@@ -111,19 +111,19 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                             <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800">
                                 
                                 {/* Éléments décoratifs */}
-                                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
-                                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-orange-400 rounded-full opacity-20 blur-3xl" />
+                                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full opacity-20 blur-3xl" />
+                                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-accent-400 to-accent-600 rounded-full opacity-20 blur-3xl" />
                                 
                                 {/* Badge premium */}
                                 <div className="absolute top-4 right-4 z-10">
-                                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
+                                    <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
                                         <Sparkles className="w-3 h-3" />
                                         Nouvelle invitation
                                     </div>
                                 </div>
 
                                 {/* En-tête avec dégradé */}
-                                <div className="relative px-8 pt-8 pb-6 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-t-3xl overflow-hidden">
+                                <div className="relative px-8 pt-8 pb-6 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 rounded-t-3xl overflow-hidden">
                                     <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\&quot;60\&quot; height=\&quot;60\&quot; viewBox=\&quot;0 0 60 60\&quot; xmlns=\&quot;http://www.w3.org/2000/svg\&quot;%3E%3Cg fill=\&quot;none\&quot; fill-rule=\&quot;evenodd\&quot;%3E%3Cg fill=\&quot;%23ffffff\&quot; fill-opacity=\&quot;0.1\&quot;%3E%3Cpath d=\&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20" />
                                     
                                     <div className="relative flex items-center justify-between">
@@ -140,7 +140,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 initial={{ x: -20, opacity: 0 }}
                                                 animate={{ x: 0, opacity: 1 }}
                                                 transition={{ delay: 0.2 }}
-                                                className="text-blue-100 text-sm mt-1"
+                                                className="text-primary-100 text-sm mt-1"
                                             >
                                                 L'entreprise sera créée après validation
                                             </motion.p>
@@ -181,7 +181,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                             <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">
+                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-primary-500 dark:group-focus-within:text-primary-400 transition-colors">
                                                 <Building className="w-5 h-5" />
                                             </div>
                                             <input
@@ -197,7 +197,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                         : formData.name && !nameError
                                                             ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-500 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/30'
-                                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
+                                                            : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30'
                                                     }
                                                 `}
                                                 placeholder="ex: smiris academy"
@@ -252,7 +252,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                             <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">
+                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-primary-500 dark:group-focus-within:text-primary-400 transition-colors">
                                                 <Mail className="w-5 h-5" />
                                             </div>
                                             <input
@@ -268,7 +268,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                         : formData.adminEmail && !emailError
                                                             ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-500 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/30'
-                                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
+                                                            : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30'
                                                     }
                                                 `}
                                                 placeholder="admin@entreprise.com"
@@ -323,7 +323,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                             <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">
+                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-primary-500 dark:group-focus-within:text-primary-400 transition-colors">
                                                 <User className="w-5 h-5" />
                                             </div>
                                             <input
@@ -339,7 +339,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                         ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                         : formData.adminName && !adminNameError
                                                             ? 'border-green-300 dark:border-green-600 focus:border-green-500 dark:focus:border-green-500 focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/30'
-                                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
+                                                            : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30'
                                                     }
                                                 `}
                                                 placeholder="youssef fakir"
@@ -425,7 +425,7 @@ export default function CreateCompanyModal({ isOpen, onClose, onSuccess }) {
                                                 flex-1 px-6 py-4 rounded-2xl font-semibold text-white
                                                 transition-all duration-300 relative overflow-hidden group
                                                 ${isValid && !loading
-                                                    ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 shadow-lg shadow-blue-200 dark:shadow-blue-900/30'
+                                                    ? 'bg-gradient-to-r from-primary-600 via-primary-700 to-accent-600 shadow-lg shadow-primary-200 dark:shadow-primary-900/30'
                                                     : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                                                 }
                                             `}

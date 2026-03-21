@@ -74,8 +74,8 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
 
     const getHeaderGradient = () => {
         if (isDelete) return 'from-red-600 to-pink-600';
-        if (isEdit) return 'from-purple-600 to-indigo-600';
-        return 'from-blue-600 to-indigo-600';
+        if (isEdit) return 'from-primary-600 to-accent-600';
+        return 'from-primary-600 to-primary-800';
     };
 
     return (
@@ -157,7 +157,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase ml-1">Nom complet</label>
                                             <div className="relative group">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-purple-500 dark:group-focus-within:text-purple-400 transition-colors" />
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-primary-500 dark:group-focus-within:text-primary-400 transition-colors" />
                                                 <input
                                                     type="text"
                                                     value={formData.full_name}
@@ -199,7 +199,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase ml-1">Rôle</label>
                                             <div className="relative group">
-                                                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500 dark:text-purple-400" />
+                                                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-500 dark:text-primary-400" />
                                                 <select
                                                     value={formData.role}
                                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -207,7 +207,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                                     className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-2xl outline-none transition-all appearance-none ${
                                                         isView 
                                                         ? 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/30 text-gray-800 dark:text-gray-200'
+                                                        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 text-gray-800 dark:text-gray-200'
                                                     }`}
                                                 >
                                                     <option value="student">Élève</option>
@@ -243,7 +243,7 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                                 <button
                                                     type="submit"
                                                     disabled={loading}
-                                                    className="flex-1 py-4 bg-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:bg-purple-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
+                                                    className="flex-1 py-4 bg-primary-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:bg-primary-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                                                 >
                                                     {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
                                                     <span>Enregistrer</span>

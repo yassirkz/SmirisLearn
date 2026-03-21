@@ -149,12 +149,12 @@ export default function VideoForm({
     const getPillarColor = (pillarId) => {
         const pillar = pillars.find(p => p.id === pillarId);
         const colors = {
-            blue: 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/30',
+            primary: 'border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/30',
+            accent: 'border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900/30',
             purple: 'border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-900/30',
             green: 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/30',
             red: 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/30',
             yellow: 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/30',
-            indigo: 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30',
             pink: 'border-pink-200 bg-pink-50 dark:border-pink-800 dark:bg-pink-900/30',
             orange: 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/30'
         };
@@ -205,7 +205,7 @@ export default function VideoForm({
                     className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-xl focus:outline-none focus:ring-4 transition-all resize-none dark:text-white ${
                         errors.description && touched.description
                             ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-100 dark:focus:ring-red-900/30'
-                            : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
+                            : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
                     }`}
                     placeholder="Décrivez brièvement le contenu de cette vidéo..."
                 />
@@ -229,7 +229,7 @@ export default function VideoForm({
                     className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-xl focus:outline-none focus:ring-4 transition-all dark:text-white ${
                         errors.pillar_id && touched.pillar_id
                             ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-100 dark:focus:ring-red-900/30'
-                            : 'border-gray-200 dark:border-gray-700 focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
+                            : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
                     }`}
                 >
                     <option value="">Sélectionner un pilier</option>
@@ -258,7 +258,7 @@ export default function VideoForm({
                         min="0"
                         value={formData.sequence_order}
                         onChange={(e) => handleChange('sequence_order', parseInt(e.target.value) || 0)}
-                        className="w-24 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
+                        className="w-24 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         Définit la position de la vidéo dans le pilier
@@ -277,7 +277,7 @@ export default function VideoForm({
                         min="0"
                         value={formData.duration}
                         onChange={(e) => handleChange('duration', parseInt(e.target.value) || 0)}
-                        className="w-32 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 outline-none transition-all dark:text-white"
+                        className="w-32 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         Sera détectée automatiquement si vide
@@ -299,7 +299,7 @@ export default function VideoForm({
                     disabled={loading}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 px-6 py-4 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                     {loading ? (
                         <>
