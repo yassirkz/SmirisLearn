@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-4 -right-4"
+                        className="absolute -top-4 -right-4 hidden sm:flex"
                     >
                         <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                                 {organization?.name || 'Tableau de bord'}
                                 {organization?.plan_type === 'starter' && (
                                     <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full">
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Cartes de statistiques */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     {cards.map((card, index) => {
                         const isPositive = card.growth >= 0;
                         return (

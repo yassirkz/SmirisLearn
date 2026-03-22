@@ -63,7 +63,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
             style={{ perspective: "1200px" }}
         >
             <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[640px]">
                     <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                         <tr>
                             <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">

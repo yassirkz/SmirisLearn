@@ -1,2 +1,2 @@
-import { useToast } from '../components/ui/Toast';
+import { useToast } from '../contexts/ToastContext';
 export { useToast };

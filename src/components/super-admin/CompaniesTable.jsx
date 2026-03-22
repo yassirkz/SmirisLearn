@@ -190,7 +190,7 @@ export default function CompaniesTable() {
                 </div>
 
                 <div className="overflow-x-auto relative z-10">
-                    <table className="w-full">
+                    <table className="w-full min-w-[640px]">
                         <thead className="bg-transparent border-b border-gray-100 dark:border-gray-700">
                             <tr>
                                 <th className="px-6 py-5 text-left text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Identification</th>

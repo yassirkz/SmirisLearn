@@ -343,7 +343,7 @@ export default function SuperAdminUsers() {
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-4 -right-4"
+                        className="absolute -top-4 -right-4 hidden sm:flex"
                     >
                         <div className="bg-gradient-to-r from-primary-600 to-accent-600 text-white px-4 py-2 rounded-bl-2xl rounded-tr-2xl text-xs font-bold shadow-lg flex items-center gap-1">
                             <Users className="w-3 h-3" />
@@ -352,7 +352,7 @@ export default function SuperAdminUsers() {
                     </motion.div>
 
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                             <Users className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                             Utilisateurs
                         </h1>
@@ -363,7 +363,7 @@ export default function SuperAdminUsers() {
                 </div>
 
                 {/* Cartes de statistiques */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {[
                     { label: 'Total utilisateurs', value: stats.total, icon: Users, color: 'from-primary-500 to-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/30' },
                     { label: 'Administrateurs', value: stats.admins, icon: UserCog, color: 'from-accent-500 to-accent-600', bg: 'bg-accent-50 dark:bg-accent-900/30' },
@@ -446,7 +446,7 @@ export default function SuperAdminUsers() {
                                     setSelectedOrg(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white min-w-[200px]"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white w-full sm:w-auto sm:min-w-[200px]"
                             >
                                 <option value="all">Toutes les entreprises</option>
                                 {organizations.map(org => (
@@ -463,7 +463,7 @@ export default function SuperAdminUsers() {
                                     setSelectedRole(e.target.value);
                                     setPage(1);
                                 }}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white min-w-[150px]"
+                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white w-full sm:w-auto sm:min-w-[150px]"
                             >
                                 <option value="all">Tous les rôles</option>
                                 <option value="super_admin">Super Admin</option>
@@ -495,7 +495,7 @@ export default function SuperAdminUsers() {
                                 ) : (
                                     <Download className="w-4 h-4" />
                                 )}
-                                <span>{exporting ? 'Exportation...' : 'Exporter'}</span>
+                                <span className="hidden sm:inline">{exporting ? 'Exportation...' : 'Exporter'}</span>
                             </motion.button>
 
                             {/* Bouton inviter */}
@@ -506,7 +506,7 @@ export default function SuperAdminUsers() {
                                 className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                             >
                                 <UserPlus className="w-4 h-4" />
-                                <span>Inviter</span>
+                                <span className="hidden sm:inline">Inviter</span>
                             </motion.button>
                         </div>
                     </div>
@@ -520,7 +520,7 @@ export default function SuperAdminUsers() {
                     className="bg-white/90 backdrop-blur-sm dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 rounded-2xl shadow-xl border border-primary-100 overflow-hidden"
                 >
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        <table className="w-full min-w-[640px]">
                             <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Utilisateur</th>

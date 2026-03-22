@@ -59,6 +59,13 @@ export default function VideoForm({
         fetchPillars();
     }, [user, propOrgId]);
 
+    // Auto-remplir la durée si détectée par le VideoUploader
+    useEffect(() => {
+        if (uploadedVideo?.duration && uploadedVideo.duration > 0) {
+            setFormData(prev => ({ ...prev, duration: uploadedVideo.duration }));
+        }
+    }, [uploadedVideo]);
+
     const validateForm = () => {
         const newErrors = {};
         
@@ -280,7 +287,10 @@ export default function VideoForm({
                         className="w-32 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Sera détectée automatiquement si vide
+                        {uploadedVideo?.duration && uploadedVideo.duration > 0
+                            ? <span className="text-green-600 dark:text-green-400 font-medium">✓ Durée auto-détectée</span>
+                            : 'Sera détectée automatiquement si vide'
+                        }
                     </p>
                 </div>
             </div>

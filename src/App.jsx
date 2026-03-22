@@ -1,48 +1,45 @@
 // src/App.jsx
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
 import { useUserRole } from "./hooks/useUserRole";
-import LoginPage from "./pages/LoginPage";
-import AuthCallback from "./pages/AuthCallback";
-import Unauthorized from "./pages/Unauthorized";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
-import AcceptInvitePage from './pages/AcceptInvitePage';
+
+// Non-lazy (needed before routing)
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 // ============================================
-// LANDING PAGE
+// LAZY-LOADED PAGES (code-split)
 // ============================================
-import LandingPage from './pages/LandingPage'; // ← AJOUT
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+const AcceptInvitePage = lazy(() => import("./pages/AcceptInvitePage"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
-// ============================================
-// SUPER ADMIN PAGES
-// ============================================
-import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
-import SuperAdminCompanies from "./pages/super-admin/SuperAdminCompanies";
-import SuperAdminCompanyDetail from "./pages/super-admin/SuperAdminCompanyDetail";
-import SuperAdminUsers from "./pages/super-admin/SuperAdminUsers";
-import SuperAdminSettings from "./pages/super-admin/SuperAdminSettings";
+// Super Admin
+const SuperAdminDashboard = lazy(() => import("./pages/super-admin/SuperAdminDashboard"));
+const SuperAdminCompanies = lazy(() => import("./pages/super-admin/SuperAdminCompanies"));
+const SuperAdminCompanyDetail = lazy(() => import("./pages/super-admin/SuperAdminCompanyDetail"));
+const SuperAdminUsers = lazy(() => import("./pages/super-admin/SuperAdminUsers"));
+const SuperAdminSettings = lazy(() => import("./pages/super-admin/SuperAdminSettings"));
 
-// ============================================
-// ADMIN ENTREPRISE PAGES
-// ============================================
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminSettings from './pages/admin/AdminSettings';
-import PillarsPage from './pages/admin/PillarsPage';
-import PillarDetailPage from './pages/admin/PillarDetailPage';
-import VideosPage from './pages/admin/VideosPage';
-import VideoDetailPage from './pages/admin/VideoDetailPage';
-import QuizPage from './pages/admin/QuizPage';
-import GroupsPage from './pages/admin/GroupsPage';
-import MembersPage from './pages/admin/MembersPage';
+// Admin
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const PillarsPage = lazy(() => import("./pages/admin/PillarsPage"));
+const PillarDetailPage = lazy(() => import("./pages/admin/PillarDetailPage"));
+const VideosPage = lazy(() => import("./pages/admin/VideosPage"));
+const VideoDetailPage = lazy(() => import("./pages/admin/VideoDetailPage"));
+const QuizPage = lazy(() => import("./pages/admin/QuizPage"));
+const GroupsPage = lazy(() => import("./pages/admin/GroupsPage"));
+const MembersPage = lazy(() => import("./pages/admin/MembersPage"));
 
-// ============================================
-// STUDENT PAGES
-// ============================================
-import StudentDashboard from './pages/student/StudentDashboard';
-import StudentLearningPage from './pages/student/StudentLearningPage';
-import StudentVideoPage from './pages/student/StudentVideoPage';
-import StudentQuizPage from './pages/student/StudentQuizPage';
+// Student
+const StudentDashboard = lazy(() => import("./pages/student/StudentDashboard"));
+const StudentLearningPage = lazy(() => import("./pages/student/StudentLearningPage"));
+const StudentVideoPage = lazy(() => import("./pages/student/StudentVideoPage"));
+const StudentQuizPage = lazy(() => import("./pages/student/StudentQuizPage"));
 
 function App() {
   const { user, loading } = useAuth();
@@ -62,6 +59,11 @@ function App() {
   }
 
   return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-primary-50 dark:from-secondary-950 dark:to-secondary-900">
+        <LoadingSpinner size="lg" color="primary" />
+      </div>
+    }>
     <Routes>
       {/* ============================================
           ROUTES PUBLIQUES
@@ -259,6 +261,7 @@ function App() {
       {/* 404 - Redirection vers l'accueil */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   );
 }
 

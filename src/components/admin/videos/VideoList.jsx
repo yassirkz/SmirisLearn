@@ -460,7 +460,7 @@ export default function VideoList({ isReadOnly = false, orgId: propOrgId }) {
             ) : viewMode === 'table' ? (
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        <table className="w-full min-w-[640px]">
                             <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
                                 <tr>
                                     <th className="px-6 py-4 text-left dark:text-gray-300">Vidéo</th>

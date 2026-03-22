@@ -4,20 +4,23 @@ import {
     Settings, Save, RefreshCw, Mail, 
     Bell, Lock, Globe, Moon, Sun, Eye, EyeOff,
     CheckCircle, AlertCircle, X, Building,
-    User, Key
+    User, Key, CreditCard, ArrowRight, History, Sparkles,
+    Building2
 } from 'lucide-react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useSearchParams } from 'react-router-dom';
 import { useUserRole } from '../../hooks/useUserRole';
-import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
+import { useTheme } from '../../hooks/useTheme';
+import { useStripe } from '../../hooks/useStripe';
+import { useToast } from '../../hooks/useToast';
 import { untrusted, escapeText } from '../../utils/security';
 import SanitizedInput from '../../components/ui/SanitizedInput';
 export default function AdminSettings() {
     const { user } = useAuth();
     const { role } = useUserRole();
-    const { theme, setTheme } = useTheme(); // ← AJOUT
+    const { theme, setTheme } = useTheme(); 
     const [searchParams] = useSearchParams();
     const orgIdFromUrl = searchParams.get('orgId');
     const isReadOnly = role === 'super_admin' && orgIdFromUrl;
@@ -26,6 +29,14 @@ export default function AdminSettings() {
     const [saving, setSaving] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const { createPortalSession, createCheckoutSession, loading: stripeLoading } = useStripe();
+    const { success: showToastSuccess } = useToast();
+
+    const [orgData, setOrgData] = useState({
+        plan_type: 'free',
+        subscription_status: 'none',
+        trial_ends_at: null
+    });
 
     // ============================================
     // État des paramètres
@@ -56,6 +67,14 @@ export default function AdminSettings() {
     useEffect(() => {
         if (!role) return;
         fetchSettings();
+
+        // Vérifier si retour de checkout réussi
+        if (searchParams.get('session_id')) {
+            showToastSuccess("Votre abonnement a été mis à jour avec succès !");
+            // Nettoyer l'URL
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+        }
     }, [user, role, isReadOnly]);
 
     const fetchSettings = async () => {
@@ -91,13 +110,18 @@ export default function AdminSettings() {
             if (resolvedOrgId) {
                 const { data: org, error: orgError } = await supabase
                     .from('organizations')
-                    .select('name')
+                    .select('name, plan_type, subscription_status, trial_ends_at')
                     .eq('id', resolvedOrgId)
                     .maybeSingle();
 
                 if (orgError) throw orgError;
                 if (org) {
                     companyName = org.name || '';
+                    setOrgData({
+                        plan_type: org.plan_type || 'free',
+                        subscription_status: org.subscription_status || 'none',
+                        trial_ends_at: org.trial_ends_at
+                    });
                 }
             }
 
@@ -446,6 +470,86 @@ export default function AdminSettings() {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Abonnement & Facturation */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.35 }}
+                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700 relative overflow-hidden group"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-primary-500/10 transition-colors" />
+                            
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+                                <CreditCard className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                                Abonnement & Facturation
+                            </h2>
+
+                            <div className="space-y-6">
+                                {/* Plan Actuel */}
+                                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-600 rounded-xl flex items-center justify-center shadow-lg">
+                                            <Sparkles className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-tight">Plan actuel</p>
+                                            <p className="text-xl font-bold text-gray-800 dark:text-white capitalize">
+                                                {orgData.plan_type === 'free' ? 'Gratuit' : orgData.plan_type}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                                            orgData.subscription_status === 'active' 
+                                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                                        }`}>
+                                            {orgData.subscription_status === 'active' ? 'Actif' : 'En essai'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Actions Billing */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    { (orgData.plan_type === 'free' || orgData.subscription_status === 'trial') ? (
+                                        <button
+                                            onClick={() => {
+                                                console.log('💳 Tentative Payement - Price ID:', import.meta.env.VITE_STRIPE_STARTER_PRICE_ID);
+                                                createCheckoutSession(import.meta.env.VITE_STRIPE_STARTER_PRICE_ID);
+                                            }}
+                                            disabled={stripeLoading}
+                                            className="col-span-2 flex items-center justify-center gap-2 p-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg transition-all group disabled:opacity-50"
+                                        >
+                                            {stripeLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                                            Passer au plan Starter
+                                        </button>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={createPortalSession}
+                                                disabled={stripeLoading}
+                                                className="flex items-center justify-center gap-2 p-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all disabled:opacity-50"
+                                            >
+                                                {stripeLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <History className="w-5 h-5" />}
+                                                Gérer l'abonnement
+                                            </button>
+                                            <button
+                                                onClick={createPortalSession}
+                                                disabled={stripeLoading}
+                                                className="flex items-center justify-center gap-2 p-4 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
+                                            >
+                                                Voir les factures
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                <p className="text-xs text-center text-gray-400 dark:text-gray-500">
+                                    Paiements sécurisés par Stripe. Aucune donnée bancaire n'est stockée sur nos serveurs.
+                                </p>
                             </div>
                         </motion.div>
                     </div>

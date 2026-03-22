@@ -7,11 +7,12 @@ import {
   CheckCircle, Star, ChevronRight, Menu, X, Send,
   Building, Mail, User, MessageSquare, ArrowRight, Lock,
   Zap, Shield, TrendingUp, PlayCircle, ChevronDown, ChevronUp,
-  Quote, MousePointer, BarChart3, Clock, Headphones
+  Quote, MousePointer, BarChart3, Clock, Headphones, RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../hooks/useToast';
+import { useUserRole } from '../hooks/useUserRole';
 import { supabase } from '../lib/supabase';
 import { untrusted, escapeText, validateEmail } from '../utils/security';
 
@@ -176,7 +177,7 @@ const FaqItem = ({ question, answer, isOpen, onClick }) => (
 );
 
 // Carte de prix
-const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelect }) => (
+const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelect, loading }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -185,7 +186,7 @@ const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelec
     whileHover={{ y: -8 }}
     className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border ${
       isPopular
-        ? 'border-primary-500 dark:border-primary-400 scale-105'
+        ? 'border-primary-500 dark:border-primary-400 lg:scale-105'
         : 'border-primary-100 dark:border-gray-700'
     } overflow-hidden group`}
   >
@@ -220,13 +221,15 @@ const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelec
       </ul>
       <button
         onClick={onSelect}
-        className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-lg hover:shadow-xl ${
+        disabled={loading}
+        className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 ${
           isPopular
             ? 'bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900'
             : 'bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600'
-        }`}
+        } ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
       >
-        Choisir ce plan
+        {loading && <RefreshCw className="w-5 h-5 animate-spin" />}
+        {loading ? 'Redirection...' : 'Choisir ce plan'}
       </button>
     </div>
   </motion.div>
@@ -234,6 +237,7 @@ const PricingCard = ({ name, price, subtext, features, isPopular, delay, onSelec
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const { role } = useUserRole();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const { success, error: showError } = useToast();
@@ -250,6 +254,18 @@ export default function LandingPage() {
   });
   const [formErrors, setFormErrors] = useState({});
   const [sending, setSending] = useState(false);
+
+  // État pour le modal d'inscription
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [signupData, setSignupData] = useState({ 
+    companyName: '', 
+    email: '', 
+    password: '', 
+    confirmPassword: '' 
+  });
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [signupError, setSignupError] = useState('');
 
   const faqs = [
     {
@@ -274,11 +290,11 @@ export default function LandingPage() {
     }
   ];
 
-  // Sections pour la navigation
   const sections = [
     { id: 'hero', label: 'Accueil' },
     { id: 'features', label: 'Fonctionnalités' },
     { id: 'how-it-works', label: 'Comment ça marche' },
+    { id: 'pricing', label: 'Tarifs' },
     { id: 'testimonials', label: 'Témoignages' },
     { id: 'demo', label: 'Aperçu' },
     { id: 'faq', label: 'FAQ' },
@@ -286,7 +302,7 @@ export default function LandingPage() {
     { id: 'cta', label: 'Inscription' }
   ];
 
-  // Détecter la section active lors du scroll (optimisé)
+  // Détecter la section active lors du scroll
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -321,7 +337,7 @@ export default function LandingPage() {
     }
   }, [user, navigate]);
 
-  // Animation parallaxe pour la section hero
+  // Animation parallaxe
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
@@ -349,7 +365,6 @@ export default function LandingPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Effacer l'erreur du champ modifié
     if (formErrors[name]) {
       setFormErrors(prev => ({ ...prev, [name]: null }));
     }
@@ -361,7 +376,6 @@ export default function LandingPage() {
 
     setSending(true);
     try {
-      // Option 1 : stocker dans une table 'contacts' (à créer)
       const { error } = await supabase
         .from('contacts')
         .insert([{
@@ -384,7 +398,41 @@ export default function LandingPage() {
     }
   };
 
-  // Animation pour les particules (optionnel)
+  // Soumission du formulaire d'inscription publique
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    if (signupData.password !== signupData.confirmPassword) {
+      setSignupError('Les mots de passe ne correspondent pas');
+      return;
+    }
+    setSignupLoading(true);
+    setSignupError('');
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-org-and-checkout`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY 
+        },
+        body: JSON.stringify({
+          companyName: signupData.companyName,
+          adminEmail: signupData.email,
+          adminPassword: signupData.password,
+          plan: selectedPlan,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Erreur lors de l\'inscription');
+      if (result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      }
+    } catch (err) {
+      setSignupError(err.message);
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
   const particles = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
@@ -407,7 +455,6 @@ export default function LandingPage() {
       >
         <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-20">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shrink-0">
                 <span className="text-lg sm:text-xl font-bold text-white">S</span>
@@ -415,7 +462,6 @@ export default function LandingPage() {
               <span className="font-bold text-gray-800 dark:text-white text-lg sm:text-xl tracking-tight hidden min-[380px]:block">Smiris Learn</span>
             </div>
 
-            {/* Navigation desktop */}
             <nav className="hidden lg:flex items-center gap-8">
               {sections.map(({ id, label }) => (
                 <button
@@ -432,9 +478,7 @@ export default function LandingPage() {
               ))}
             </nav>
 
-            {/* Boutons */}
             <div className="flex items-center gap-1.5 sm:gap-3">
-
               <button
                 onClick={toggleTheme}
                 className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
@@ -451,20 +495,25 @@ export default function LandingPage() {
               </button>
               
               <button
-                onClick={() => navigate('/login?signup=true')}
+                onClick={() => {
+                  setSelectedPlan('free');
+                  setShowSignupModal(true);
+                }}
                 className="hidden sm:inline-flex px-4 lg:px-6 py-2 lg:py-2.5 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
               >
                 Essai gratuit
               </button>
 
               <button
-                onClick={() => navigate('/login?signup=true')}
+                onClick={() => {
+                  setSelectedPlan('free');
+                  setShowSignupModal(true);
+                }}
                 className="sm:hidden px-3 py-1.5 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-lg font-bold shadow-lg text-sm whitespace-nowrap"
               >
                 Essai
               </button>
               
-              {/* Menu mobile */}
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="lg:hidden p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
@@ -475,7 +524,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Menu mobile déroulant */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
@@ -513,10 +561,8 @@ export default function LandingPage() {
         </AnimatePresence>
       </motion.header>
 
-      {/* Navigation latérale */}
       <SideNav sections={sections} activeSection={activeSection} />
 
-      {/* Particules décoratives (optionnel) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         {particles.map(p => (
           <motion.div
@@ -541,9 +587,8 @@ export default function LandingPage() {
         ))}
       </div>
 
-      {/* Section Hero */}
+      {/* Hero Section */}
       <Section id="hero" className="relative overflow-hidden bg-secondary-50/30 dark:bg-secondary-950/30">
-        {/* Background Particles */}
         <FloatingParticle top="10%" left="5%" size="w-64 h-64" color="bg-primary-300/20 dark:bg-primary-600/10" duration={8} delay={0} />
         <FloatingParticle top="60%" left="15%" size="w-48 h-48" color="bg-primary-400/20 dark:bg-primary-700/10" duration={10} delay={1} />
         <FloatingParticle top="20%" left="80%" size="w-72 h-72" color="bg-primary-500/20 dark:bg-primary-800/10" duration={12} delay={2} />
@@ -554,7 +599,6 @@ export default function LandingPage() {
           className="max-w-7xl mx-auto relative z-10 w-full"
         >
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            {/* Left: Text */}
             <div className="flex-1 text-center lg:text-left">
               <motion.div
                 initial={{ scale: 0, rotate: -10 }}
@@ -610,8 +654,11 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center lg:items-start gap-3">
                   <button
-                    onClick={() => navigate('/login?signup=true')}
-                    className="px-10 py-5 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-2xl text-xl font-bold shadow-[0_20px_50px_-15px_rgba(139,92,246,0.5)] hover:shadow-[0_25px_60px_-15px_rgba(139,92,246,0.6)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group relative overflow-hidden"
+                    onClick={() => {
+                      setSelectedPlan('free');
+                      setShowSignupModal(true);
+                    }}
+                    className="px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-2xl text-lg sm:text-xl font-bold shadow-[0_20px_50px_-15px_rgba(139,92,246,0.5)] hover:shadow-[0_25px_60px_-15px_rgba(139,92,246,0.6)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group relative overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     <span className="relative">Commencer gratuitement</span>
@@ -632,7 +679,6 @@ export default function LandingPage() {
               </motion.div>
             </div>
 
-            {/* Right: Hero Illustration */}
             <motion.div
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
@@ -640,7 +686,6 @@ export default function LandingPage() {
               style={{ y: heroImageY }}
               className="flex-1 relative"
             >
-              {/* Floating UI cards */}
               <FloatingCard className="-top-12 -left-8" delay={1.2}>
                 <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-green-600" />
@@ -673,15 +718,11 @@ export default function LandingPage() {
                 </div>
               </FloatingCard>
 
-              {/* Decorative blobs */}
               <div className="absolute -top-10 -right-10 w-72 h-72 bg-gradient-to-br from-primary-400 to-primary-700 rounded-full opacity-20 blur-3xl animate-pulse" />
               <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-gradient-to-br from-primary-700 to-primary-500 rounded-full opacity-15 blur-3xl" />
-              
-              {/* Glow ring */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-[90%] h-[90%] rounded-3xl bg-gradient-to-br from-primary-500/10 to-primary-700/10 dark:from-primary-500/20 dark:to-primary-700/20 blur-xl" />
               </div>
-
               <img
                 src="/images/hero.png"
                 alt="Smiris Learn - Plateforme de formation en ligne"
@@ -691,7 +732,6 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          {/* Floating Stats Counters */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -704,14 +744,13 @@ export default function LandingPage() {
               { value: '10K+', label: 'Vidéos' },
               { value: '99.9%', label: 'Uptime' },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-primary-100/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800">{stat.value}</div>
-                <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">{stat.label}</div>
+              <div key={i} className="text-center p-3 sm:p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-primary-100/50 dark:border-gray-700/50 shadow-lg">
+                <div className="text-xl sm:text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800">{stat.value}</div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">{stat.label}</div>
               </div>
             ))}
           </motion.div>
 
-          {/* Scroll down indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -729,7 +768,7 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
-      {/* Section Fonctionnalités */}
+      {/* Fonctionnalités */}
       <Section id="features">
         <div className="max-w-7xl mx-auto">
           <motion.h2
@@ -750,7 +789,6 @@ export default function LandingPage() {
             Une suite complète pour créer, gérer et analyser vos formations.
           </motion.p>
 
-          {/* Features illustration */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -819,9 +857,8 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* Section Comment ça marche */}
+      {/* Comment ça marche */}
       <Section id="how-it-works" className="bg-secondary-50/50 dark:bg-secondary-950/50 relative overflow-hidden">
-        {/* Background Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
           <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary-200/20 dark:bg-primary-900/10 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary-300/20 dark:bg-primary-800/10 rounded-full blur-3xl" />
@@ -844,7 +881,6 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-            {/* Connecting line (desktop) */}
             <div className="hidden md:block absolute top-[72px] left-[15%] right-[15%] h-1 bg-gradient-to-r from-primary-200 via-primary-300 to-primary-400 dark:from-primary-900 dark:via-primary-800 dark:to-primary-700 rounded-full opacity-50" />
 
             {[
@@ -882,7 +918,6 @@ export default function LandingPage() {
                 whileHover={{ y: -10 }}
                 className="relative p-10 bg-white/40 dark:bg-gray-800/40 backdrop-blur-md rounded-[40px] border border-white/50 dark:border-gray-700/50 shadow-2xl transition-all duration-300 group"
               >
-                {/* Large Background Number */}
                 <div className="absolute -top-6 -right-2 text-8xl font-black text-gray-900/[0.03] dark:text-white/[0.03] select-none pointer-events-none group-hover:text-primary-500/10 dark:group-hover:text-primary-400/10 transition-colors duration-500">
                   {item.step}
                 </div>
@@ -912,7 +947,97 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* Section Témoignages */}
+      {/* Tarifs */}
+      <Section id="pricing" className="bg-white/30 dark:bg-gray-900/10">
+        <div className="max-w-7xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-6">
+              Une tarification transparente
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10">
+              Choisissez le plan qui correspond le mieux à la taille de votre organisation.
+            </p>
+
+            <div className="flex items-center justify-center gap-4 mb-12">
+              <span className={`text-sm font-bold ${!isAnnual ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500'}`}>Mensuel</span>
+              <button
+                onClick={() => setIsAnnual(!isAnnual)}
+                className="relative w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded-full transition-colors p-1"
+              >
+                <motion.div
+                  animate={{ x: isAnnual ? 32 : 0 }}
+                  className="w-6 h-6 bg-white dark:bg-primary-500 rounded-full shadow-md"
+                />
+              </button>
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-bold ${isAnnual ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500'}`}>Annuel</span>
+                <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-[10px] font-black rounded-full uppercase tracking-wider">-20%</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+            <PricingCard
+              name="Gratuit"
+              price="0€"
+              subtext="Pour tester la plateforme"
+              features={[
+                "Jusqu'à 5 étudiants",
+                "2 piliers de formation",
+                "Gestion des vidéos",
+                "Quiz de base",
+                "Support par email"
+              ]}
+              delay={0.1}
+              onSelect={() => {
+                setSelectedPlan('free');
+                setShowSignupModal(true);
+              }}
+            />
+            <PricingCard
+              name="Starter"
+              price={isAnnual ? '39€' : '49€'}
+              subtext={isAnnual ? 'Facturé annuellement' : null}
+              features={[
+                "Jusqu'à 50 étudiants",
+                "Piliers illimités",
+                "Gestion des groupes & accès",
+                "Dashboards & Statistiques",
+                "Exports XLS/CSV",
+                "Support prioritaire"
+              ]}
+              isPopular={true}
+              delay={0.2}
+              onSelect={() => {
+                setSelectedPlan('starter');
+                setShowSignupModal(true);
+              }}
+              loading={false}
+            />
+            <PricingCard
+              name="Business"
+              price="Sur devis"
+              subtext="Pour les organisations"
+              features={[
+                "Étudiants illimités",
+                "Multi-entreprises (SuperAdmin)",
+                "Whitelabel (Logo/Branding)",
+                "Intégrations sur mesure",
+                "Onboarding & Support dédié"
+              ]}
+              delay={0.3}
+              onSelect={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+            />
+          </div>
+        </div>
+      </Section>
+
+      {/* Témoignages */}
       <Section id="testimonials">
         <div className="max-w-7xl mx-auto">
           <motion.h2
@@ -961,7 +1086,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* Section Démonstration */}
+      {/* Démo */}
       <Section id="demo">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -985,13 +1110,10 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="relative"
           >
-            {/* Decorative blobs */}
             <div className="absolute -top-10 -left-10 w-48 h-48 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full opacity-20 blur-3xl" />
             <div className="absolute -bottom-10 -right-10 w-56 h-56 bg-gradient-to-br from-primary-800 to-primary-950 rounded-full opacity-15 blur-3xl" />
 
-            {/* Browser Chrome Frame */}
             <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-[0_20px_80px_-10px_rgba(139,92,246,0.3)] dark:shadow-[0_20px_80px_-10px_rgba(139,92,246,0.15)] border border-gray-200/60 dark:border-gray-700/60 overflow-hidden hover:shadow-[0_25px_100px_-10px_rgba(139,92,246,0.4)] dark:hover:shadow-[0_25px_100px_-10px_rgba(139,92,246,0.2)] transition-shadow duration-500">
-              {/* Toolbar */}
               <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-850 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400 shadow-sm" />
@@ -1005,7 +1127,6 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              {/* Screenshot */}
               <img
                 src="/images/dashboard-mockup.png"
                 alt="Dashboard Smiris Learn - Panneau d'administration"
@@ -1017,8 +1138,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-
-      {/* Section FAQ */}
+      {/* FAQ */}
       <Section id="faq" className="bg-white/50 dark:bg-gray-800/20">
         <div className="max-w-4xl mx-auto w-full">
           <motion.div
@@ -1054,7 +1174,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* Section Contact */}
+      {/* Contact */}
       <Section id="contact">
         <div className="max-w-4xl mx-auto w-full">
           <motion.div
@@ -1072,7 +1192,6 @@ export default function LandingPage() {
 
             <form onSubmit={handleSubmitContact} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Nom complet */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nom complet <span className="text-red-500">*</span>
@@ -1097,7 +1216,6 @@ export default function LandingPage() {
                   )}
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email <span className="text-red-500">*</span>
@@ -1123,7 +1241,6 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Nom de l'entreprise (optionnel) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Nom de l'entreprise <span className="text-gray-400 dark:text-gray-500 text-xs">(optionnel)</span>
@@ -1141,7 +1258,6 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Message */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Message <span className="text-red-500">*</span>
@@ -1188,9 +1304,8 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* Section CTA finale */}
+      {/* CTA finale */}
       <Section id="cta" className="relative overflow-hidden">
-        {/* Background image + overlay */}
         <div className="absolute inset-0 z-0">
           <img
             src="/images/cta-bg.png"
@@ -1217,7 +1332,10 @@ export default function LandingPage() {
             Rejoignez des milliers d'entreprises qui forment leurs équipes avec Smiris Learn.
           </p>
           <button
-            onClick={() => navigate('/login?signup=true')}
+            onClick={() => {
+              setSelectedPlan('free');
+              setShowSignupModal(true);
+            }}
             className="px-12 py-6 bg-white text-primary-700 rounded-2xl text-xl font-bold shadow-2xl hover:shadow-3xl hover:scale-105 transition-all inline-flex items-center gap-3 group"
           >
             Créer mon compte
@@ -1307,7 +1425,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Bottom bar */}
           <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-400 dark:text-gray-500">
               © 2026 Smiris Learn. Tous droits réservés.
@@ -1318,6 +1435,118 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Modal d'inscription */}
+      <AnimatePresence>
+        {showSignupModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowSignupModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl border border-primary-100 dark:border-gray-700"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                Inscription - Plan {selectedPlan === 'free' ? 'Gratuit' : 'Starter'}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                {selectedPlan === 'free' 
+                  ? "Créez votre compte gratuitement et commencez à former vos équipes."
+                  : "Créez votre compte et choisissez votre abonnement. Vous serez redirigé vers Stripe après validation."}
+              </p>
+
+              <form onSubmit={handleSignupSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Nom de l'entreprise
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                    value={signupData.companyName}
+                    onChange={(e) => setSignupData({ ...signupData, companyName: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                    value={signupData.email}
+                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                    value={signupData.password}
+                    onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Confirmer le mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                    value={signupData.confirmPassword}
+                    onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+                  />
+                </div>
+
+                {signupError && (
+                  <p className="text-sm text-red-500 dark:text-red-400">{signupError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={signupLoading}
+                  className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {signupLoading ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Création en cours...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{selectedPlan === 'free' ? 'Créer mon compte gratuit' : 'Continuer vers le paiement'}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  En vous inscrivant, vous acceptez nos{' '}
+                  <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Conditions d'utilisation</a>
+                  {' '}et notre{' '}
+                  <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Politique de confidentialité</a>.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

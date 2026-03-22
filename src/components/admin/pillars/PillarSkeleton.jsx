@@ -6,7 +6,7 @@ export default function PillarSkeleton({ viewMode = 'table' }) {
         return (
             <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
+                    <table className="w-full min-w-[640px]">
                         <thead className="bg-gray-50 dark:bg-gray-900">
                             <tr>
                                 {[1, 2, 3, 4, 5].map(i => (

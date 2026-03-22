@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import {
   LogIn,
   UserPlus,
@@ -25,6 +26,17 @@ export default function LoginForm() {
   });
 
   const { signIn, signUp, signInWithGoogle } = useAuth();
+  const location = useLocation();
+
+  // Pré-remplir l'email depuis l'URL (après inscription publique)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const emailParam = params.get('email');
+    if (emailParam) {
+      setEmail(emailParam);
+      setTouched(prev => ({ ...prev, email: true }));
+    }
+  }, [location.search]);
 
   // Validation
   const validateEmail = (value) => {

@@ -31,6 +31,7 @@ export default function AdminLayout({ children }) {
 
     const [companyName, setCompanyName] = useState('');
     const [companyPlan, setCompanyPlan] = useState('');
+    const [subscriptionStatus, setSubscriptionStatus] = useState('');
     const [trialDays, setTrialDays] = useState(0);
     const { user, signOut } = useAuth();
     const { theme, toggleTheme } = useTheme(); 
@@ -71,7 +72,7 @@ export default function AdminLayout({ children }) {
                 if (resolvedOrgId) {
                     const { data: org, error: orgError } = await supabase
                         .from('organizations')
-                        .select('name, plan_type, trial_ends_at')
+                        .select('name, plan_type, subscription_status, trial_ends_at')
                         .eq('id', resolvedOrgId)
                         .maybeSingle();
 
@@ -80,6 +81,7 @@ export default function AdminLayout({ children }) {
                     if (org) {
                         setCompanyName(org.name);
                         setCompanyPlan(org.plan_type);
+                        setSubscriptionStatus(org.subscription_status);
 
                         if (org.trial_ends_at) {
                             const days = Math.max(0, Math.ceil(
@@ -175,7 +177,7 @@ export default function AdminLayout({ children }) {
                                         <h2 className="font-bold text-gray-800 dark:text-gray-200 text-lg">Smiris Learn</h2>
                                         <p className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
                                             <Shield className="w-3 h-3" />
-                                            {companyName || 'Admin'} • {companyPlan || 'Starter'}
+                                            {companyName || 'Admin'} • {companyPlan === 'starter' ? 'Starter' : 'Gratuit'} {subscriptionStatus === 'trial' ? '(Essai)' : ''}
                                         </p>
                                     </div>
                                 </div>

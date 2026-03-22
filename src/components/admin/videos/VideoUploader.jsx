@@ -10,12 +10,31 @@ import { STORAGE_CONFIG } from '../../../lib/storage/config';
 import { useToast } from '../../ui/Toast';
 import { untrusted, escapeText } from '../../../utils/security';
 
+// Extraire la durée d'une vidéo via HTMLVideoElement
+const getVideoDuration = (file) => {
+    return new Promise((resolve) => {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        const url = URL.createObjectURL(file);
+        video.src = url;
+        video.onloadedmetadata = () => {
+            URL.revokeObjectURL(url);
+            resolve(Math.round(video.duration));
+        };
+        video.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(0);
+        };
+    });
+};
+
 export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
     const [dragActive, setDragActive] = useState(false);
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState(null);
+    const [duration, setDuration] = useState(0);
     const { success, error: showError } = useToast();
 
     const validateFile = (file) => {
@@ -39,7 +58,7 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
         }
     }, []);
 
-    const handleDrop = useCallback((e) => {
+    const handleDrop = useCallback(async (e) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
@@ -53,10 +72,12 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
         } else {
             setFile(droppedFile);
             setError(null);
+            const dur = await getVideoDuration(droppedFile);
+            setDuration(dur);
         }
     }, [showError]);
 
-    const handleFileSelect = (e) => {
+    const handleFileSelect = async (e) => {
         const selectedFile = e.target.files[0];
         const validationError = validateFile(selectedFile);
         
@@ -66,6 +87,8 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
         } else {
             setFile(selectedFile);
             setError(null);
+            const dur = await getVideoDuration(selectedFile);
+            setDuration(dur);
         }
     };
 
@@ -84,7 +107,8 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
             onUploadSuccess({
                 url: result.url,
                 path: result.path,
-                name: result.name
+                name: result.name,
+                duration: duration
             });
         }
 
