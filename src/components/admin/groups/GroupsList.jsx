@@ -10,7 +10,8 @@ import {
   Shield,
   Plus,
   RefreshCw,
-  Search
+  Search,
+  X
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
@@ -169,11 +170,11 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Barre d'outils */}
       <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="flex items-center gap-3 px-2">
+          <div className="flex items-center gap-3 px-2 h-11">
             <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
               <Users className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
-            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Recherche & Actions</h2>
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 uppercase tracking-tight">Groupes</h2>
           </div>
 
           <div className="flex-1 flex flex-col sm:flex-row gap-3 items-center w-full lg:w-auto lg:max-w-2xl justify-end">
@@ -183,19 +184,20 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Rechercher un groupe..."
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
+                placeholder="Rechercher..."
+                className="w-full pl-11 pr-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
               />
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ rotate: 180 }}
+              transition={{ duration: 0.3 }}
               onClick={handleRefresh}
-              className="p-3 bg-gray-50 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all shadow-sm flex items-center justify-center shrink-0"
+              className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500 rounded-xl shadow-sm transition-all shrink-0"
               title="Actualiser"
+              disabled={loading}
             >
-              <RefreshCw className={`w-5 h-5 text-gray-600 dark:text-gray-300 ${loading ? 'animate-spin text-primary-600 dark:text-primary-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${loading ? 'animate-spin' : ''}`} />
             </motion.button>
 
             {!isReadOnly && (
@@ -203,12 +205,12 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowForm(true)}
-                className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto justify-center"
+                className="group px-6 h-11 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
               >
                 <div className="p-1 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
                   <Plus className="w-4 h-4" />
                 </div>
-                Nouveau groupe
+                Nouveau
               </motion.button>
             )}
           </div>
@@ -383,6 +385,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
             onClose={handleFormClose}
             onSuccess={handleFormSuccess}
             group={editingGroup}
+            orgId={organizationId}
           />
         )}
 

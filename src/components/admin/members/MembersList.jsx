@@ -13,7 +13,10 @@ import {
   AlertCircle,
   Check,
   Filter,
-  Ban
+  Ban,
+  RefreshCw,
+  Plus,
+  X
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
@@ -253,11 +256,11 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       {/* Barre d'outils */}
       <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="flex items-center gap-3 px-2">
+          <div className="flex items-center gap-3 px-2 h-11">
             <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
               <Users className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
-            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Recherche & Filtres</h2>
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Membres</h2>
           </div>
 
           <div className="flex-1 flex flex-col sm:flex-row gap-3 items-center w-full lg:w-auto lg:max-w-3xl justify-end">
@@ -268,7 +271,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                 placeholder="Nom, email..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
+                className="w-full pl-11 pr-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
               />
             </div>
 
@@ -277,7 +280,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
               <select
                 value={selectedGroup}
                 onChange={e => setSelectedGroup(e.target.value)}
-                className="w-full pl-11 pr-8 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium appearance-none"
+                className="w-full pl-11 pr-8 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium appearance-none cursor-pointer"
               >
                 <option value="all">Tous les groupes</option>
                 {groups.map((g, idx) => (
@@ -288,67 +291,120 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
               </select>
             </div>
 
+            <motion.button
+              whileHover={{ rotate: 180 }}
+              transition={{ duration: 0.3 }}
+              onClick={fetchMembers}
+              className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500 rounded-xl shadow-sm transition-all shrink-0"
+              title="Actualiser"
+              disabled={loading}
+            >
+              <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${loading ? 'animate-spin' : ''}`} />
+            </motion.button>
+
             {!isReadOnly && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowInviteForm(!showInviteForm)}
-                className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
+                className="group px-6 h-11 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
               >
                 <div className="p-1 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
-                  <UserPlus className="w-4 h-4" />
+                  <Plus className="w-4 h-4" />
                 </div>
-                Inviter
+                Nouveau
               </motion.button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Formulaire d'invitation */}
+      {/* Modale d'invitation */}
       <AnimatePresence>
         {showInviteForm && !isReadOnly && (
-          <motion.form
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            onSubmit={handleInvite}
-            className="bg-primary-50 dark:bg-primary-900/30 border-2 border-primary-200 dark:border-primary-800 rounded-2xl p-5 flex flex-col sm:flex-row gap-3 items-end overflow-hidden"
-          >
-            <div className="flex-1 space-y-1">
-              <label className="text-xs font-semibold text-primary-700 dark:text-primary-300">Adresse email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400 dark:text-primary-400" />
-                <input
-                  type="email"
-                  required
-                  value={inviteEmail}
-                  onChange={e => setInviteEmail(e.target.value)}
-                  placeholder="exemple@email.com"
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-primary-200 dark:border-primary-800 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 outline-none text-sm dark:text-white"
-                />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-primary-700 dark:text-primary-300">Rôle</label>
-              <select
-                value={inviteRole}
-                onChange={e => setInviteRole(e.target.value)}
-                className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-primary-200 dark:border-primary-800 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 outline-none text-sm dark:text-white"
-              >
-                <option value="student">Étudiant</option>
-                <option value="org_admin">Administrateur</option>
-              </select>
-            </div>
-            <button
-              type="submit"
-              disabled={inviting}
-              className="flex items-center gap-2 px-5 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm" onClick={() => setShowInviteForm(false)}>
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl max-w-md w-full shadow-2xl border border-white/50 dark:border-white/10 ring-1 ring-black/5 relative overflow-hidden"
             >
-              {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-              Envoyer l'invitation
-            </button>
-          </motion.form>
+              {/* En-tête avec dégradé premium (Style Piliers) */}
+              <div className="relative px-8 pt-8 pb-6 bg-gradient-to-br from-primary-600 to-accent-600 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
+                      <UserPlus className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold">Inviter un membre</h2>
+                      <p className="text-white/80 text-sm mt-1">Ajoutez un collaborateur à l'équipe</p>
+                    </div>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowInviteForm(false)}
+                    className="p-2 hover:bg-white/20 rounded-xl transition-all"
+                  >
+                    <X className="w-5 h-5 text-white" />
+                  </motion.button>
+                </div>
+              </div>
+
+              <div className="p-8">
+                <form onSubmit={handleInvite} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Adresse email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="email"
+                        required
+                        value={inviteEmail}
+                        onChange={e => setInviteEmail(e.target.value)}
+                        placeholder="exemple@email.com"
+                        className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-slate-800/50 border-2 border-gray-100 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 outline-none transition-all dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Rôle</label>
+                    <select
+                      value={inviteRole}
+                      onChange={e => setInviteRole(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800/50 border-2 border-gray-100 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 outline-none transition-all dark:text-white cursor-pointer"
+                    >
+                      <option value="student">Étudiant</option>
+                      <option value="org_admin">Administrateur</option>
+                    </select>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowInviteForm(false)}
+                      className="flex-1 px-4 py-3 text-gray-500 dark:text-gray-400 font-bold hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+                    >
+                      Annuler
+                    </button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={inviting}
+                      className="flex-1 items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-bold shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all disabled:opacity-50 flex"
+                    >
+                      {inviting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+                      Envoyer
+                    </motion.button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

@@ -31,7 +31,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
     }, [showFilters]);
 
     const handleSearchChange = (e) => {
-        const value = escapeText(untrusted(e.target.value));
+        const value = untrusted(e.target.value);
         onChange({ ...filters, search: value });
     };
 
@@ -70,7 +70,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                         value={filters.search}
                         onChange={handleSearchChange}
                         placeholder="Rechercher une vidéo..."
-                        className="pl-9 pr-8 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
+                        className="pl-9 pr-8 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 transition-all w-full sm:w-48 md:w-64 dark:bg-gray-800 dark:text-white"
                     />
                     {filters.search && (
                         <button
@@ -86,7 +86,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                 <select
                     value={filters.pillar_id}
                     onChange={handlePillarChange}
-                    className="flex-1 sm:flex-none px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 bg-white dark:bg-gray-800 dark:text-white"
+                    className="flex-1 sm:flex-none px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 bg-white dark:bg-gray-800 dark:text-white"
                 >
                     <option value="all">Tous les piliers</option>
                     {pillars.map(pillar => (
@@ -101,7 +101,7 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`p-2 rounded-lg transition-all ${
+                    className={`p-3 rounded-xl transition-all ${
                         showFilters || filters.sortBy !== 'created_at'
                             ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'

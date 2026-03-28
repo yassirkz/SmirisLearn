@@ -27,7 +27,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
         name: '',
         description: '',
         icon: '📚',
-        color: 'blue'
+        color: 'primary'
     });
     const [touched, setTouched] = useState({});
     const [previewMode, setPreviewMode] = useState(false);
@@ -38,7 +38,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
                 name: pillar.name || '',
                 description: pillar.description || '',
                 icon: pillar.icon || '📚',
-                color: pillar.color || 'blue'
+                color: pillar.color || 'primary'
             });
         }
     }, [pillar]);
@@ -89,7 +89,7 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
 
     if (!isOpen || !pillar) return null;
 
-    const selectedColor = COLORS.find(c => c.name === formData.color);
+    const selectedColor = COLORS.find(c => c.name === formData.color) || COLORS[0];
 
     return (
         <AnimatePresence>

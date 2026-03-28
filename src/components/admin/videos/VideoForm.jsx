@@ -10,6 +10,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
 import { untrusted, escapeText } from '../../../utils/security';
 import SanitizedInput from '../../ui/SanitizedInput';
+import { getVideoDuration } from '../../../utils/video';
 
 export default function VideoForm({
     video = null,
@@ -114,8 +115,8 @@ export default function VideoForm({
                 pillar_id: formData.pillar_id,
                 title: formData.title.trim(),
                 description: formData.description.trim() || null,
-                video_url: uploadedVideo?.url || '',
-                video_path: uploadedVideo?.path || null,
+                video_url: uploadedVideo?.url || video?.video_url || '',
+                video_path: uploadedVideo?.path || video?.video_path || null,
                 duration: formData.duration,
                 sequence_order: formData.sequence_order,
                 thumbnail_url: formData.thumbnail_url || null
@@ -143,6 +144,29 @@ export default function VideoForm({
         } catch (err) {
             console.error('Erreur sauvegarde:', err);
             showError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDetectDuration = async () => {
+        const url = formData.video_url;
+        if (!url) {
+            showError("Aucune URL de vidéo à analyser");
+            return;
+        }
+        
+        setLoading(true);
+        try {
+            const dur = await getVideoDuration(url);
+            if (dur > 0) {
+                setFormData(prev => ({ ...prev, duration: dur }));
+                success(`Durée détectée : ${dur} secondes`);
+            } else {
+                showError("Impossible de détecter la durée (vérifiez l'URL)");
+            }
+        } catch (err) {
+            showError("Erreur lors de la détection de la durée");
         } finally {
             setLoading(false);
         }
@@ -286,10 +310,23 @@ export default function VideoForm({
                         onChange={(e) => handleChange('duration', parseInt(e.target.value) || 0)}
                         className="w-32 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
                     />
+                    
+                    {formData.video_url && (
+                        <button
+                            type="button"
+                            onClick={handleDetectDuration}
+                            disabled={loading}
+                            className="px-3 py-2 text-xs font-bold bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-all flex items-center gap-1"
+                        >
+                            <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                            Détecter
+                        </button>
+                    )}
+
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         {uploadedVideo?.duration && uploadedVideo.duration > 0
                             ? <span className="text-green-600 dark:text-green-400 font-medium">✓ Durée auto-détectée</span>
-                            : 'Sera détectée automatiquement si vide'
+                            : 'Secondes'
                         }
                     </p>
                 </div>

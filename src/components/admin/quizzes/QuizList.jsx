@@ -1,10 +1,11 @@
 // src/components/admin/quizzes/QuizList.jsx
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Filter, X, Edit, Trash2, Copy, Eye,
     RefreshCw, Plus, Sparkles, Award, Clock,
-    BarChart3, ChevronLeft, ChevronRight, Target
+    BarChart3, ChevronLeft, ChevronRight, Target,
+    History as HistoryIcon
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
@@ -16,14 +17,15 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
     const { success, error: showError } = useToast();
     const showErrorRef = useRef(showError);
     useEffect(() => { showErrorRef.current = showError; }, [showError]);
-    const [quizzes, setQuizzes] = useState([]);
+    
+    const [allQuizzes, setAllQuizzes] = useState([]);
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [localRefreshKey, setLocalRefreshKey] = useState(0);
-    const hasLoadedOnce = useRef(false);
+    const fetchingRef = useRef(false);
+    
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [filters, setFilters] = useState({
         search: '',
         video_id: 'all',
@@ -61,7 +63,7 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
 
     useEffect(() => {
         if (!organizationId) return;
-        const fetchVideos = async () => {
+        const fetchVideosList = async () => {
             try {
                 const { data: pillars } = await supabase
                     .from('pillars')
@@ -79,103 +81,128 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
                 console.error('Erreur chargement vidéos filtre:', err);
             }
         };
-        fetchVideos();
+        fetchVideosList();
     }, [organizationId]);
 
-    useEffect(() => {
-        if (!organizationId) return;
-
-        if (hasLoadedOnce.current) {
+    const loadQuizzes = useCallback(async (isSilent = false) => {
+        if (!organizationId || fetchingRef.current) return;
+        
+        fetchingRef.current = true;
+        if (isSilent) {
             setRefreshing(true);
         } else {
             setLoading(true);
         }
 
-        const load = async () => {
-            try {
-                const { data: pillars, error: pErr } = await supabase
-                    .from('pillars')
-                    .select('id')
-                    .eq('organization_id', organizationId);
-                if (pErr) throw pErr;
+        try {
+            const { data: pillars, error: pErr } = await supabase
+                .from('pillars')
+                .select('id')
+                .eq('organization_id', organizationId);
+            if (pErr) throw pErr;
 
-                const pillarIds = (pillars || []).map(p => p.id);
-                if (!pillarIds.length) {
-                    setQuizzes([]);
-                    setTotalPages(1);
-                    return;
-                }
-
-                const { data: videoRows, error: vErr } = await supabase
-                    .from('videos')
-                    .select('id')
-                    .in('pillar_id', pillarIds);
-                if (vErr) throw vErr;
-
-                const videoIds = (videoRows || []).map(v => v.id);
-                if (!videoIds.length) {
-                    setQuizzes([]);
-                    setTotalPages(1);
-                    return;
-                }
-
-                let query = supabase
-                    .from('quizzes')
-                    .select(`
-                        *,
-                        video:videos(
-                            id, title,
-                            pillar:pillars(name)
-                        )
-                    `, { count: 'exact' })
-                    .in('video_id', videoIds);
-
-                if (filters.video_id !== 'all') {
-                    query = query.eq('video_id', filters.video_id);
-                }
-
-                query = query
-                    .order(filters.sortBy, { ascending: filters.sortOrder === 'asc' })
-                    .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
-
-                const { data, error, count } = await query;
-                if (error) throw error;
-
-                setTotalPages(Math.ceil((count || 0) / itemsPerPage));
-
-                let filtered = data || [];
-                if (filters.search) {
-                    const s = filters.search.toLowerCase();
-                    filtered = filtered.filter(q =>
-                        q.video?.title?.toLowerCase().includes(s) ||
-                        q.video?.pillar?.name?.toLowerCase().includes(s)
-                    );
-                }
-
-                setQuizzes(filtered);
-                hasLoadedOnce.current = true;
-            } catch (err) {
-                console.error('Erreur chargement quiz:', err);
-                showErrorRef.current('Échec du chargement des quiz');
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
+            const pillarIds = (pillars || []).map(p => p.id);
+            if (!pillarIds.length) {
+                setAllQuizzes([]);
+                return;
             }
-        };
 
-        load();
-    }, [organizationId, page, filters.video_id, filters.sortBy, filters.sortOrder, filters.search, refreshTrigger, localRefreshKey]);
+            const { data: videoRows, error: vErr } = await supabase
+                .from('videos')
+                .select('id')
+                .in('pillar_id', pillarIds);
+            if (vErr) throw vErr;
+
+            const videoIds = (videoRows || []).map(v => v.id);
+            if (!videoIds.length) {
+                setAllQuizzes([]);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('quizzes')
+                .select(`
+                    *,
+                    video:videos(
+                        id, title,
+                        pillar:pillars(name)
+                    )
+                `)
+                .in('video_id', videoIds)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setAllQuizzes(data || []);
+        } catch (err) {
+            console.error('Erreur chargement quiz:', err);
+            showErrorRef.current('Échec du chargement des quiz');
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+            fetchingRef.current = false;
+        }
+    }, [organizationId]);
+
+    useEffect(() => {
+        loadQuizzes();
+    }, [loadQuizzes, refreshTrigger, localRefreshKey]);
+
+    // Filtrage et tri local
+    const filteredQuizzes = useMemo(() => {
+        let result = allQuizzes.filter(q => {
+            // Filtre par vidéo
+            if (filters.video_id !== 'all' && q.video_id !== filters.video_id) {
+                return false;
+            }
+
+            // Recherche textuelle
+            if (filters.search) {
+                const s = filters.search.toLowerCase();
+                const videoTitle = q.video?.title?.toLowerCase() || '';
+                const pillarName = q.video?.pillar?.name?.toLowerCase() || '';
+                if (!videoTitle.includes(s) && !pillarName.includes(s)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        // Tri
+        const { sortBy, sortOrder } = filters;
+        result.sort((a, b) => {
+            let valA, valB;
+            if (sortBy === 'created_at') {
+                valA = new Date(a.created_at).getTime();
+                valB = new Date(b.created_at).getTime();
+            } else {
+                valA = a[sortBy] || 0;
+                valB = b[sortBy] || 0;
+            }
+
+            if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+            if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return result;
+    }, [allQuizzes, filters]);
+
+    // Pagination locale
+    const totalPages = Math.ceil(filteredQuizzes.length / itemsPerPage);
+    const paginatedQuizzes = useMemo(() => {
+        const start = (page - 1) * itemsPerPage;
+        return filteredQuizzes.slice(start, start + itemsPerPage);
+    }, [filteredQuizzes, page]);
 
     const handleRefresh = () => {
         setLocalRefreshKey(k => k + 1);
     };
 
     const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR');
-
     const getVideoTitle = (quiz) => quiz.video?.title || 'Vidéo inconnue';
     const getPillarName = (quiz) => quiz.video?.pillar?.name || 'Pilier inconnu';
 
-    if (loading && quizzes.length === 0) {
+    if (loading && allQuizzes.length === 0) {
         return (
             <div className="flex justify-center py-12">
                 <div className="w-10 h-10 border-4 border-primary-200 dark:border-primary-800 rounded-full border-t-primary-600 dark:border-t-primary-400 animate-spin" />
@@ -188,25 +215,25 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
             {/* Barre de filtres */}
             <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-5">
-                    <div className="flex items-center gap-3 px-2">
+                    <div className="flex items-center gap-3 px-2 h-11">
                         <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
                             <Filter className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                         </div>
-                        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Filtrer</h2>
+                        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 uppercase tracking-tight">Filtres</h2>
                     </div>
 
-                    <div className="flex-1 flex flex-col sm:flex-row gap-3">
-                        <div className="relative flex-1 group">
+                    <div className="flex-1 flex flex-col sm:flex-row gap-3 items-center">
+                        <div className="relative flex-1 group w-full">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5 group-focus-within:text-primary-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Rechercher par vidéo ou pilier..."
+                                placeholder="Rechercher..."
                                 value={filters.search}
                                 onChange={(e) => {
                                     setFilters({ ...filters, search: e.target.value });
                                     setPage(1);
                                 }}
-                                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
+                                className="w-full pl-11 pr-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
                             />
                         </div>
 
@@ -216,7 +243,7 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
                                 setFilters({ ...filters, video_id: e.target.value });
                                 setPage(1);
                             }}
-                            className="px-4 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium min-w-[200px] cursor-pointer"
+                            className="w-full sm:w-auto px-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium min-w-[200px] cursor-pointer"
                         >
                             <option value="all">Toutes les vidéos</option>
                             {videos.map((v, idx) => (
@@ -226,40 +253,53 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
                             ))}
                         </select>
 
-                        <select
-                            value={`${filters.sortBy}:${filters.sortOrder}`}
-                            onChange={(e) => {
-                                const [sortBy, sortOrder] = e.target.value.split(':');
-                                setFilters({ ...filters, sortBy, sortOrder });
-                            }}
-                            className="px-4 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium cursor-pointer"
-                        >
-                            <option value="created_at:desc">Plus récents</option>
-                            <option value="created_at:asc">Plus anciens</option>
-                        </select>
+                        <div className="flex bg-gray-100/80 dark:bg-slate-800/80 p-1.5 rounded-xl shadow-inner border border-gray-200 dark:border-gray-700 h-11 items-center">
+                            <button
+                                onClick={() => setFilters({ ...filters, sortOrder: 'desc' })}
+                                className={`p-2 rounded-lg transition-all ${
+                                    filters.sortOrder === 'desc'
+                                        ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-md'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                }`}
+                                title="Plus récents"
+                            >
+                                <Clock className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setFilters({ ...filters, sortOrder: 'asc' })}
+                                className={`p-2 rounded-lg transition-all ${
+                                    filters.sortOrder === 'asc'
+                                        ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-md'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                }`}
+                                title="Plus anciens"
+                            >
+                                <HistoryIcon className="w-4 h-4" />
+                            </button>
+                        </div>
 
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ rotate: 180 }}
+                            transition={{ duration: 0.3 }}
                             onClick={handleRefresh}
-                            disabled={refreshing}
-                            className="p-3 bg-gray-50 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all shadow-sm flex items-center justify-center shrink-0"
+                            className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500 rounded-xl shadow-sm transition-all shrink-0"
                             title="Actualiser"
+                            disabled={loading && allQuizzes.length === 0}
                         >
-                            <RefreshCw className={`w-5 h-5 text-gray-600 dark:text-gray-300 ${refreshing ? 'animate-spin text-primary-600 dark:text-primary-400' : ''}`} />
+                            <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-300 ${loading ? 'animate-spin' : ''}`} />
                         </motion.button>
 
                         {!isReadOnly && onCreate && (
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={onCreate}
-                                className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
+                                onClick={() => onCreate?.()}
+                                className="group px-6 h-11 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
                             >
                                 <div className="p-1 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
                                     <Plus className="w-4 h-4" />
                                 </div>
-                                Nouveau Quiz
+                                Nouveau
                             </motion.button>
                         )}
                     </div>
@@ -267,7 +307,7 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
             </div>
 
             {/* Liste des quiz */}
-            {quizzes.length === 0 ? (
+            {filteredQuizzes.length === 0 ? (
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -279,8 +319,12 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
                         <div className="w-24 h-24 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-gray-100 dark:border-gray-700">
                             <Award className="w-12 h-12 text-gray-300 dark:text-gray-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">Aucun quiz trouvé</h3>
-                        <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">Créez des quiz pour évaluer les connaissances de vos étudiants.</p>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            {filters.search || filters.video_id !== 'all' ? "Aucun quiz ne correspond" : "Aucun quiz trouvé"}
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                            {filters.search || filters.video_id !== 'all' ? "Essayez de modifier vos filtres." : "Créez des quiz pour évaluer les connaissances de vos étudiants."}
+                        </p>
                     </div>
                 </motion.div>
             ) : (
@@ -297,7 +341,7 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100/50 dark:divide-gray-800/50">
-                                {quizzes.map((quiz, idx) => (
+                                {paginatedQuizzes.map((quiz, idx) => (
                                     <motion.tr
                                         key={quiz.id || `quiz-${idx}`}
                                         initial={{ opacity: 0, y: 10 }}
@@ -433,4 +477,4 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
             )}
         </div>
     );
-}
+}

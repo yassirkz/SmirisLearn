@@ -99,7 +99,7 @@ export default function CreatePillarModal({ isOpen, onClose, onSuccess, orgId: p
 
     if (!isOpen) return null;
 
-    const selectedColor = COLORS.find(c => c.name === formData.color);
+    const selectedColor = COLORS.find(c => c.name === formData.color) || COLORS[0];
 
     return (
         <AnimatePresence>

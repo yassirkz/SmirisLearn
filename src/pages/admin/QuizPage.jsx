@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Sparkles, Shield, Plus, X } from 'lucide-react';
+import { Award, Sparkles, Shield, Plus, X, Edit } from 'lucide-react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import QuizList from '../../components/admin/quizzes/QuizList';
 import QuizCreator from '../../components/admin/quizzes/QuizCreator';
@@ -136,28 +136,38 @@ export default function QuizPage() {
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/50 dark:border-white/10 ring-1 ring-black/5 relative"
+                            className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/50 dark:border-white/10 ring-1 ring-black/5 relative overflow-hidden"
                         >
-                            <div className="sticky top-0 -mt-6 sm:-mt-8 -mx-6 sm:-mx-8 px-6 sm:px-8 py-5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-20 flex justify-between items-center mb-6">
-                                <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 dark:text-white flex items-center gap-3">
-                                    <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
-                                        {editingQuiz ? <Edit className="w-5 h-5 text-primary-600 dark:text-primary-400" /> : <Plus className="w-5 h-5 text-primary-600 dark:text-primary-400" />}
+                            {/* En-tête avec dégradé premium (Style Piliers) */}
+                            <div className="relative px-8 pt-8 pb-6 bg-gradient-to-br from-primary-600 to-accent-600 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
+                                            {editingQuiz ? <Edit className="w-6 h-6 text-white" /> : <Plus className="w-6 h-6 text-white" />}
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold">
+                                                {editingQuiz ? "Modifier le Quiz" : "Créer un nouveau Quiz"}
+                                            </h2>
+                                            <p className="text-white/80 text-sm mt-1">
+                                                {editingQuiz ? "Ajustez les questions et paramètres" : "Définissez une nouvelle évaluation"}
+                                            </p>
+                                        </div>
                                     </div>
-                                    {editingQuiz ? "Modifier le Quiz" : "Créer un nouveau Quiz"}
-                                </h2>
-                                <motion.button
-                                    whileHover={{ scale: 1.1, rotate: 90 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => {
-                                        setShowCreateModal(false);
-                                        setEditingQuiz(null);
-                                        setSelectedVideoId(null);
-                                    }}
-                                    className="p-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors shadow-inner"
-                                    title="Fermer"
-                                >
-                                    <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                                </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.1, rotate: 90 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => {
+                                            setShowCreateModal(false);
+                                            setEditingQuiz(null);
+                                            setSelectedVideoId(null);
+                                        }}
+                                        className="p-2 hover:bg-white/20 rounded-xl transition-all"
+                                        title="Fermer"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </motion.button>
+                                </div>
                             </div>
                             <QuizCreator
                                 quiz={editingQuiz}

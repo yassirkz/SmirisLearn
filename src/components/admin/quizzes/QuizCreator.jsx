@@ -135,7 +135,6 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
 
             success(quiz?.id ? "Quiz modifié avec succès" : "Quiz créé avec succès");
             onSuccess?.();
-            onSuccess?.();
         } catch (err) {
             console.error('Erreur sauvegarde quiz:', err);
             showError("Erreur lors de la sauvegarde du quiz");

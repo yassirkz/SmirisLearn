@@ -9,24 +9,8 @@ import { uploadVideo } from '../../../lib/storage/videos';
 import { STORAGE_CONFIG } from '../../../lib/storage/config';
 import { useToast } from '../../ui/Toast';
 import { untrusted, escapeText } from '../../../utils/security';
+import { getVideoDuration } from '../../../utils/video';
 
-// Extraire la durée d'une vidéo via HTMLVideoElement
-const getVideoDuration = (file) => {
-    return new Promise((resolve) => {
-        const video = document.createElement('video');
-        video.preload = 'metadata';
-        const url = URL.createObjectURL(file);
-        video.src = url;
-        video.onloadedmetadata = () => {
-            URL.revokeObjectURL(url);
-            resolve(Math.round(video.duration));
-        };
-        video.onerror = () => {
-            URL.revokeObjectURL(url);
-            resolve(0);
-        };
-    });
-};
 
 export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
     const [dragActive, setDragActive] = useState(false);
@@ -103,21 +87,15 @@ export default function VideoUploader({ onUploadSuccess, onClose, orgId }) {
         setError(null);
 
         const result = await uploadVideo(file, orgId, setProgress);
+        
         if (result.success) {
-            onUploadSuccess({
+            success("Vidéo importée avec succès");
+            onUploadSuccess?.({
                 url: result.url,
                 path: result.path,
                 name: result.name,
                 duration: duration
             });
-        }
-
-        if (result.success) {
-            success("Vidéo importée avec succès");
-            onUploadSuccess?.(result);
-            setTimeout(() => {
-                onClose?.();
-            }, 1500);
         } else {
             setError(result.error);
             showError(result.error);

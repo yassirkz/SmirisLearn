@@ -7,7 +7,7 @@ import { useToast } from '../../../hooks/useToast';
 import { supabase } from '../../../lib/supabase';
 import SanitizedInput from '../../ui/SanitizedInput';
 
-export default function GroupForm({ isOpen, onClose, onSuccess, group }) {
+export default function GroupForm({ isOpen, onClose, onSuccess, group, orgId: propOrgId }) {
   const { user } = useAuth();
   const { success, error: showError } = useToast();
   const [loading, setLoading] = useState(false);
@@ -41,10 +41,20 @@ export default function GroupForm({ isOpen, onClose, onSuccess, group }) {
 
     setLoading(true);
     try {
+      let organizationId = propOrgId;
+      if (!organizationId) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single();
+        organizationId = profile?.organization_id;
+      }
+
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
-        organization_id: user.organization_id,
+        organization_id: organizationId,
       };
 
       let error;
@@ -85,24 +95,35 @@ export default function GroupForm({ isOpen, onClose, onSuccess, group }) {
             {/* Background Glows */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             
-            <div className="p-8 relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
-                    {group ? "Modifier le groupe" : "Nouveau groupe"}
-                  </h2>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {group ? "Mettez à jour les informations du groupe." : "Créez un nouveau groupe d'étudiants."}
-                  </p>
+            {/* En-tête avec dégradé premium (Style Piliers) */}
+            <div className="relative px-8 pt-8 pb-6 bg-gradient-to-br from-primary-600 to-accent-600 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
+                    <X className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">
+                      {group ? "Modifier le groupe" : "Nouveau groupe"}
+                    </h2>
+                    <p className="text-white/80 text-sm mt-1">
+                      {group ? "Mettez à jour les informations du groupe." : "Créez un nouveau groupe d'étudiants."}
+                    </p>
+                  </div>
                 </div>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={onClose}
-                  className="p-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-all shadow-sm"
+                  className="p-2 hover:bg-white/20 rounded-xl transition-all"
+                  title="Fermer"
                 >
-                  <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                </button>
+                  <X className="w-5 h-5 text-white" />
+                </motion.button>
               </div>
+            </div>
 
+            <div className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <SanitizedInput
                   label="Nom du groupe"

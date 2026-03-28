@@ -1,9 +1,9 @@
-// src/components/admin/pillars/PillarsList.jsx
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Plus, RefreshCw, Sparkles, Shield,
-    LayoutGrid, Table as TableIcon
+    LayoutGrid, Table as TableIcon,
+    BookOpen
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
@@ -24,10 +24,9 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     
     const isMounted = useRef(true);
     const fetchTimeoutRef = useRef(null);
-    const initialLoadRef = useRef(true);
     const fetchingRef = useRef(false);
     
-    const [pillars, setPillars] = useState([]);
+    const [allPillars, setAllPillars] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [viewMode, setViewMode] = useState(() => {
@@ -41,12 +40,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedPillar, setSelectedPillar] = useState(null);
-    const [stats, setStats] = useState({
-        total: 0,
-        withVideos: 0,
-        totalVideos: 0,
-        totalStudents: 0
-    });
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -80,6 +73,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             fetchTimeoutRef.current = null;
         }
         fetchingRef.current = true;
+        
         if (isRefresh) {
             setRefreshing(true);
         } else {
@@ -103,19 +97,16 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 return;
             }
 
-            let query = supabase
+            // Nous récupérons tous les piliers sans filtrage Supabase pour permettre un tri/recherche local fluide
+            const { data, error } = await supabase
                 .from('pillars')
                 .select(`
                     *,
                     videos: videos(count)
                 `)
-                .eq('organization_id', orgId);
+                .eq('organization_id', orgId)
+                .order('created_at', { ascending: false });
 
-            if (filters.sortBy !== 'videoCount') {
-                query = query.order(filters.sortBy, { ascending: filters.sortOrder === 'asc' });
-            }
-
-            const { data, error } = await query;
             if (error) throw error;
 
             if (!isMounted.current) {
@@ -154,7 +145,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 }
             }
 
-            let pillarsWithStats = data?.map(pillar => ({
+            const pillarsWithStats = data?.map(pillar => ({
                 ...pillar,
                 videoCount: pillar.videos?.[0]?.count || 0,
                 studentCount: studentCountsByPillar[pillar.id] || 0,
@@ -162,26 +153,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 safeDescription: escapeText(untrusted(pillar.description || ''))
             })) || [];
 
-            if (filters.sortBy === 'videoCount') {
-                pillarsWithStats = [...pillarsWithStats].sort((a, b) => {
-                    return filters.sortOrder === 'asc'
-                        ? a.videoCount - b.videoCount
-                        : b.videoCount - a.videoCount;
-                });
-            }
-
-            const filtered = pillarsWithStats.filter(pillar =>
-                pillar.safeName.toLowerCase().includes(filters.search.toLowerCase()) ||
-                pillar.safeDescription.toLowerCase().includes(filters.search.toLowerCase())
-            );
-
-            setPillars(filtered);
-            setStats({
-                total: filtered.length,
-                withVideos: filtered.filter(p => p.videoCount > 0).length,
-                totalVideos: filtered.reduce((acc, p) => acc + p.videoCount, 0),
-                totalStudents: filtered.reduce((acc, p) => acc + p.studentCount, 0)
-            });
+            setAllPillars(pillarsWithStats);
 
         } catch (err) {
             console.error('Erreur chargement piliers:', err);
@@ -195,14 +167,51 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             }
             fetchingRef.current = false;
         }
-    }, [getOrgId, filters.sortBy, filters.sortOrder, filters.search, showError]);
+    }, [getOrgId, showError]);
+
+    // Filtrage et tri local pour une réactivité maximale
+    const filteredPillars = useMemo(() => {
+        let result = allPillars.filter(pillar => {
+            const searchLower = filters.search.toLowerCase();
+            return (pillar.name || '').toLowerCase().includes(searchLower) ||
+                   (pillar.description || '').toLowerCase().includes(searchLower);
+        });
+
+        const { sortBy, sortOrder } = filters;
+        
+        result.sort((a, b) => {
+            let valA, valB;
+            
+            if (sortBy === 'videoCount') {
+                valA = a.videoCount;
+                valB = b.videoCount;
+            } else if (sortBy === 'created_at') {
+                valA = new Date(a.created_at).getTime();
+                valB = new Date(b.created_at).getTime();
+            } else {
+                valA = a[sortBy]?.toString().toLowerCase() || '';
+                valB = b[sortBy]?.toString().toLowerCase() || '';
+            }
+
+            if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+            if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return result;
+    }, [allPillars, filters]);
+
+    // Statistiques calculées à partir des piliers filtrés ou totaux selon besoin
+    // Ici on les calcule sur les filtrés pour refléter la vue actuelle
+    const stats = useMemo(() => ({
+        total: filteredPillars.length,
+        totalVideos: filteredPillars.reduce((acc, p) => acc + p.videoCount, 0),
+        totalStudents: filteredPillars.reduce((acc, p) => acc + p.studentCount, 0)
+    }), [filteredPillars]);
 
     useEffect(() => {
         isMounted.current = true;
-        if (initialLoadRef.current) {
-            initialLoadRef.current = false;
-            fetchPillars(false);
-        }
+        fetchPillars();
         return () => {
             isMounted.current = false;
             if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
@@ -267,11 +276,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                     <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
                     <div>
                         <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                        {error.includes('infinite recursion') && (
-                            <p className="text-xs text-red-500 dark:text-red-400 mt-1 font-medium">
-                                Erreur d'accès à la base de données. Veuillez contacter le support.
-                            </p>
-                        )}
                     </div>
                 </div>
                 <button
@@ -296,19 +300,19 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
 
                 <div className="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
                     <div className="flex flex-wrap items-center gap-6">
-                        <div className="flex items-center gap-3 bg-gray-50/80 dark:bg-slate-800/60 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div className="flex items-center gap-3 bg-gray-50/80 dark:bg-slate-800/60 px-4 h-11 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                             <div className="w-2.5 h-2.5 bg-primary-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
                             <span className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide">
                                 {stats.total} Piliers
                             </span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 px-2">
                             <div className="w-2.5 h-2.5 bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                 {stats.totalVideos} Vidéos
                             </span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 px-2">
                             <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                                 {stats.totalStudents} Étudiants
@@ -321,10 +325,10 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             <PillarFilters filters={filters} onChange={handleFilterChange} />
                         </div>
 
-                        <div className="flex bg-gray-100/80 dark:bg-slate-800/80 p-1 rounded-xl shadow-inner border border-gray-200 dark:border-gray-700">
+                        <div className="flex bg-gray-100/80 dark:bg-slate-800/80 p-1.5 rounded-xl shadow-inner border border-gray-200 dark:border-gray-700 h-11 items-center">
                             <button
                                 onClick={() => handleViewChange('table')}
-                                className={`p-2.5 rounded-lg transition-all ${
+                                className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'table'
                                         ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-md'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
@@ -335,7 +339,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             </button>
                             <button
                                 onClick={() => handleViewChange('cards')}
-                                className={`p-2.5 rounded-lg transition-all ${
+                                className={`p-2 rounded-lg transition-all ${
                                     viewMode === 'cards'
                                         ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-md'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
@@ -350,7 +354,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             whileHover={{ rotate: 180 }}
                             transition={{ duration: 0.3 }}
                             onClick={handleRefresh}
-                            className="p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500 rounded-2xl shadow-sm transition-all"
+                            className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500 rounded-xl shadow-sm transition-all"
                             title="Actualiser"
                             disabled={refreshing || loading}
                         >
@@ -361,22 +365,22 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={handleCreate}
-                                className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
+                                onClick={() => setShowCreateModal(true)}
+                                className="group px-6 h-11 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
                             >
                                 <div className="p-1 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
                                     <Plus className="w-4 h-4" />
                                 </div>
-                                Nouveau pilier
+                                Nouveau
                             </motion.button>
                         )}
                     </div>
                 </div>
             </motion.div>
 
-            {loading && pillars.length === 0 ? (
+            {loading && allPillars.length === 0 ? (
                 <PillarSkeleton viewMode={viewMode} />
-            ) : pillars.length === 0 ? (
+            ) : filteredPillars.length === 0 ? (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -386,11 +390,13 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                     <div className="relative z-10 w-24 h-24 bg-gradient-to-br from-primary-100 to-primary-50 dark:from-primary-900/40 dark:to-primary-800/20 rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-inner border border-white/50 dark:border-gray-700 transform rotate-3">
                         <BookOpen className="w-12 h-12 text-primary-500 drop-shadow-md" />
                     </div>
-                    <h3 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-2 tracking-tight">Aucun pilier trouvé</h3>
+                    <h3 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-2 tracking-tight">
+                        {filters.search ? "Aucun pilier ne correspond à votre recherche" : "Aucun pilier trouvé"}
+                    </h3>
                     <p className="text-gray-500 dark:text-gray-400 font-medium mb-8 max-w-sm mx-auto">
-                        Commencez par créer votre premier pilier de formation pour organiser votre contenu.
+                        {filters.search ? "Essayez d'autres mots-clés ou réinitialisez les filtres." : "Commencez par créer votre premier pilier de formation pour organiser votre contenu."}
                     </p>
-                    {!isReadOnly && (
+                    {!isReadOnly && !filters.search && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -404,14 +410,14 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 </motion.div>
             ) : viewMode === 'table' ? (
                 <PillarTable 
-                    pillars={pillars}
+                    pillars={filteredPillars}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     isReadOnly={isReadOnly}
                 />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {pillars.map((pillar, index) => (
+                    {filteredPillars.map((pillar, index) => (
                         <PillarCard
                             key={pillar.id}
                             pillar={pillar}

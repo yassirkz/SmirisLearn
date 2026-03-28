@@ -11,6 +11,7 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState(null);
+    const [startTime, setStartTime] = useState(null);
     const mediaRecorderRef = useRef(null);
     const chunksRef = useRef([]);
     const streamRef = useRef(null);
@@ -30,30 +31,39 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
         try {
             setError(null);
 
+            // 1. Demander le micro d'abord (plus stable sur certains navigateurs)
+            let voiceStream = null;
+            try {
+                voiceStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    },
+                    video: false
+                });
+            } catch (err) {
+                console.warn("L'accès au micro a été refusé ou a échoué. L'enregistrement se fera sans votre voix.", err);
+            }
+
+            // 2. Demander l'écran
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 throw new Error("Votre navigateur ne supporte pas l'enregistrement d'écran");
             }
 
             const displayStream = await navigator.mediaDevices.getDisplayMedia({
                 video: true,
-                audio: true
+                audio: true // Capturer le son du système si disponible
             });
-
-            let voiceStream = null;
-            try {
-                voiceStream = await navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: false
-                });
-            } catch (err) {
-                console.warn("L'accès au micro a été refusé. L'enregistrement se fera sans votre voix.", err);
-            }
 
             let combinedStream;
             let audioContext = null;
 
             if (voiceStream) {
-                audioContext = new AudioContext();
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
                 const dest = audioContext.createMediaStreamDestination();
 
                 if (displayStream.getAudioTracks().length > 0) {
@@ -97,6 +107,8 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
             mediaRecorder.onstop = async () => {
                 try {
                     const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+                    const recordDuration = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
+                    
                     const file = new File(
                         [blob],
                         `screen-recording-${Date.now()}.webm`,
@@ -117,7 +129,8 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
                     onRecordSuccess?.({
                         url: result.url,
                         path: result.path,
-                        name: result.name
+                        name: result.name,
+                        duration: recordDuration
                     });
                 } catch (err) {
                     console.error('❌ Erreur traitement enregistrement:', err);
@@ -131,6 +144,7 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
 
             mediaRecorderRef.current = mediaRecorder;
             mediaRecorder.start();
+            setStartTime(Date.now());
             setRecording(true);
 
         } catch (err) {
@@ -157,19 +171,6 @@ export default function ScreenRecorder({ orgId, onRecordSuccess, onClose }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
-                    <Monitor className="w-5 h-5" />
-                </div>
-                <div>
-                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        Enregistreur d'écran
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Capturez votre écran et votre voix pour créer une vidéo
-                    </p>
-                </div>
-            </div>
 
             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
                 <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
