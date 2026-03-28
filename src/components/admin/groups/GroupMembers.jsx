@@ -237,20 +237,31 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
           onClick={(e) => e.target === e.currentTarget && onClose()}
         >
           <motion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col"
+            initial={{ scale: 0.9, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, y: 20, opacity: 0 }}
+            className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/50 dark:border-white/10 w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col relative"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Background Glows */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
             {/* Header */}
-            <div className="p-6 bg-gradient-to-r from-primary-600 to-accent-600 text-white shrink-0">
+            <div className="p-8 relative z-10 border-b border-gray-100 dark:border-gray-800/50 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold">
-                  Membres du groupe: {escapeText(untrusted(group.name))}
-                </h2>
-                <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-xl transition-colors">
-                  <X className="w-5 h-5" />
+                <div>
+                  <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
+                    Membres du groupe
+                  </h2>
+                  <p className="text-sm font-medium text-primary-600 dark:text-primary-400 mt-1">
+                    {escapeText(untrusted(group.name))}
+                  </p>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-all shadow-sm"
+                >
+                  <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
             </div>

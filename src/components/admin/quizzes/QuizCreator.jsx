@@ -193,83 +193,110 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
             )}
 
             {/* Sélection vidéo */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <div className="bg-white/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Vidéo associée <span className="text-red-500">*</span>
                 </label>
                 {loadingVideos ? (
-                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm">
-                        <Loader className="w-4 h-4 animate-spin" />
+                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm py-2">
+                        <Loader className="w-5 h-5 animate-spin" />
                         Chargement des vidéos...
                     </div>
                 ) : (
-                    <select
-                        value={form.video_id}
-                        onChange={(e) => setForm(f => ({ ...f, video_id: e.target.value }))}
-                        className={`w-full p-2 border rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white ${
-                            errors.video_id ? 'border-red-400 dark:border-red-600' : 'border-gray-200 dark:border-gray-700'
-                        }`}
-                    >
-                        <option value="">Sélectionner une vidéo</option>
-                        {videos.map(v => (
-                            <option key={v.id} value={v.id}>
-                                {escapeText(untrusted(v.title))}
-                                {v.pillar?.name ? ` (${escapeText(untrusted(v.pillar.name))})` : ''}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="relative group">
+                        <select
+                            value={form.video_id}
+                            onChange={(e) => setForm(f => ({ ...f, video_id: e.target.value }))}
+                            className={`w-full px-4 py-3 bg-white dark:bg-slate-900 border rounded-xl focus:ring-4 outline-none transition-all font-medium appearance-none cursor-pointer ${
+                                errors.video_id 
+                                ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30' 
+                                : 'border-gray-200 dark:border-gray-700 focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
+                            }`}
+                        >
+                            <option value="">Sélectionner une vidéo</option>
+                            {videos.map(v => (
+                                <option key={v.id} value={v.id}>
+                                    {escapeText(untrusted(v.title))}
+                                    {v.pillar?.name ? ` (${escapeText(untrusted(v.pillar.name))})` : ''}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                            <span className="text-gray-400">▼</span>
+                        </div>
+                    </div>
                 )}
                 {errors.video_id && (
-                    <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.video_id}</p>
+                    <p className="text-xs font-semibold text-red-500 dark:text-red-400 mt-2 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.video_id}
+                    </p>
                 )}
             </div>
 
             {/* Paramètres */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Score de réussite (%)
-                    </label>
-                    <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={form.passing_score}
-                        onChange={(e) => setForm(f => ({ ...f, passing_score: e.target.value }))}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
-                    />
-                    {errors.passing_score && (
-                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.passing_score}</p>
-                    )}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Temps limite (minutes)
-                    </label>
-                    <input
-                        type="number"
-                        min="1"
-                        value={form.timer_minutes}
-                        onChange={(e) => setForm(f => ({ ...f, timer_minutes: e.target.value }))}
-                        placeholder="Saisir une durée en minutes"
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Nombre de tentatives <span className="text-xs text-gray-400 dark:text-gray-500">(-1 = illimité)</span>
-                    </label>
-                    <input
-                        type="number"
-                        min="-1"
-                        step="1"
-                        value={form.max_attempts}
-                        onChange={(e) => setForm(f => ({ ...f, max_attempts: e.target.value }))}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-primary-400 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-900 dark:text-white"
-                    />
-                    {errors.max_attempts && (
-                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.max_attempts}</p>
-                    )}
+            <div className="bg-white/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    Paramètres d'évaluation
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+                            Score de réussite (%)
+                        </label>
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={form.passing_score}
+                            onChange={(e) => setForm(f => ({ ...f, passing_score: e.target.value }))}
+                            className={`w-full px-4 py-3 bg-white dark:bg-slate-900 border rounded-xl focus:ring-4 outline-none transition-all font-medium ${
+                                errors.passing_score
+                                ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30'
+                                : 'border-gray-200 dark:border-gray-700 focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
+                            }`}
+                        />
+                        {errors.passing_score && (
+                            <p className="text-xs font-semibold text-red-500 dark:text-red-400 mt-2 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" /> {errors.passing_score}
+                            </p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
+                            Temps limite (minutes)
+                        </label>
+                        <input
+                            type="number"
+                            min="1"
+                            value={form.timer_minutes}
+                            onChange={(e) => setForm(f => ({ ...f, timer_minutes: e.target.value }))}
+                            placeholder="Optionnel"
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all font-medium placeholder:text-gray-400"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                            <span>Tentatives</span>
+                            <span className="text-[10px] bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">-1 = illimité</span>
+                        </label>
+                        <input
+                            type="number"
+                            min="-1"
+                            step="1"
+                            value={form.max_attempts}
+                            onChange={(e) => setForm(f => ({ ...f, max_attempts: e.target.value }))}
+                            className={`w-full px-4 py-3 bg-white dark:bg-slate-900 border rounded-xl focus:ring-4 outline-none transition-all font-medium ${
+                                errors.max_attempts
+                                ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30'
+                                : 'border-gray-200 dark:border-gray-700 focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
+                            }`}
+                        />
+                        {errors.max_attempts && (
+                            <p className="text-xs font-semibold text-red-500 dark:text-red-400 mt-2 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" /> {errors.max_attempts}
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
 

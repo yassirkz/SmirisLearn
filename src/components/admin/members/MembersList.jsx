@@ -251,44 +251,57 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
   return (
     <div className="space-y-6">
       {/* Barre d'outils */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-          <input
-            type="text"
-            placeholder="Rechercher un membre..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm dark:bg-gray-800 dark:text-white"
-          />
-        </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <select
-              value={selectedGroup}
-              onChange={e => setSelectedGroup(e.target.value)}
-              className="pl-10 pr-8 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm appearance-none bg-white dark:bg-gray-800 dark:text-white"
-            >
-              <option value="all">Tous les groupes</option>
-              {groups.map((g, idx) => (
-                <option key={g.id || `grp-${idx}`} value={g.id}>
-                  {escapeText(untrusted(g.name))}
-                </option>
-              ))}
-            </select>
+      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="flex items-center gap-3 px-2">
+            <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+              <Users className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Recherche & Filtres</h2>
           </div>
 
-          {!isReadOnly && (
-            <button
-              onClick={() => setShowInviteForm(!showInviteForm)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
-            >
-              <UserPlus className="w-4 h-4" />
-              Inviter un membre
-            </button>
-          )}
+          <div className="flex-1 flex flex-col sm:flex-row gap-3 items-center w-full lg:w-auto lg:max-w-3xl justify-end">
+            <div className="relative flex-1 group w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5 group-focus-within:text-primary-500 transition-colors" />
+              <input
+                type="text"
+                placeholder="Nom, email..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
+              />
+            </div>
+
+            <div className="relative flex-1 group w-full">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5 group-focus-within:text-primary-500 transition-colors" />
+              <select
+                value={selectedGroup}
+                onChange={e => setSelectedGroup(e.target.value)}
+                className="w-full pl-11 pr-8 py-3 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium appearance-none"
+              >
+                <option value="all">Tous les groupes</option>
+                {groups.map((g, idx) => (
+                  <option key={g.id || `grp-${idx}`} value={g.id}>
+                    {escapeText(untrusted(g.name))}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {!isReadOnly && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowInviteForm(!showInviteForm)}
+                className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
+              >
+                <div className="p-1 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                Inviter
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -340,15 +353,16 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
       </AnimatePresence>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {[
-          { label: "Total membres", value: stats.total, color: 'text-gray-800 dark:text-gray-200' },
-          { label: "Étudiants", value: stats.students, color: 'text-primary-600 dark:text-primary-400' },
-          { label: "Administrateurs", value: stats.admins, color: 'text-accent-600 dark:text-accent-400' },
+          { label: "Total membres", value: stats.total, color: 'text-gray-800 dark:text-white', bg: 'bg-white/80 dark:bg-slate-900/60', glow: 'from-gray-400/20 to-transparent' },
+          { label: "Étudiants", value: stats.students, color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50/80 dark:bg-primary-900/20', glow: 'from-primary-500/20 to-transparent' },
+          { label: "Administrateurs", value: stats.admins, color: 'text-accent-600 dark:text-accent-400', bg: 'bg-accent-50/80 dark:bg-accent-900/20', glow: 'from-accent-500/20 to-transparent' },
         ].map((stat, idx) => (
-          <div key={idx} className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-4 text-center">
-            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.label}</p>
+          <div key={idx} className={`relative backdrop-blur-xl border border-white/50 dark:border-white/5 rounded-3xl p-6 overflow-hidden shadow-lg ${stat.bg}`}>
+            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${stat.glow} rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none`} />
+            <p className={`text-4xl font-black ${stat.color} mb-1 relative z-10`}>{stat.value}</p>
+            <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider relative z-10">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -359,113 +373,124 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
           <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
         </div>
       ) : members.length === 0 ? (
-        <div className="text-center py-16">
-          <Users className="w-12 h-12 mx-auto text-gray-200 dark:text-gray-600 mb-3" />
-          <p className="text-gray-400 dark:text-gray-500">
-            {search || selectedGroup !== 'all' ? "Aucun membre trouvé pour votre recherche" : "Aucun membre dans cette entreprise"}
+        <div className="text-center py-16 bg-white/50 dark:bg-slate-900/40 rounded-3xl border border-white/50 dark:border-white/5 backdrop-blur-sm">
+          <div className="w-20 h-20 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner border border-gray-100 dark:border-gray-700">
+            <Users className="w-10 h-10 text-gray-300 dark:text-gray-600" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">
+            {search || selectedGroup !== 'all' ? "Aucun membre trouvé" : "Aucun membre dans cette entreprise"}
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+            {search || selectedGroup !== 'all' ? "Essayez de modifier vos critères de recherche ou filtres." : "Commencez par inviter des membres à rejoindre votre organisation."}
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 dark:border-white/5 overflow-hidden transition-all duration-300">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px]">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Membre</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rôle</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Groupes</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Date d'arrivée</th>
+            <table className="w-full min-w-[800px]">
+              <thead className="bg-gray-50/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-700/50">
+                <tr>
+                  <th className="px-6 py-5 text-left text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap">Membre</th>
+                  <th className="px-6 py-5 text-left text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap">Rôle</th>
+                  <th className="px-6 py-5 text-left text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap hidden lg:table-cell">Groupes</th>
+                  <th className="px-6 py-5 text-left text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap hidden sm:table-cell">Date d'arrivée</th>
                   {!isReadOnly && (
-                    <th className="text-right px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-5 text-right text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap">Actions</th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+              <tbody className="divide-y divide-gray-100/50 dark:divide-gray-800/50">
                 {members.map((member, i) => {
                   const rc = ROLE_CONFIG[member.role] || ROLE_CONFIG.student;
                   const initials = (member.full_name || member.email || '?')[0].toUpperCase();
                   return (
                     <motion.tr
                       key={member.id || `member-${i}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.02 }}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      className="hover:bg-white/60 dark:hover:bg-slate-700/40 transition-all duration-300 group/row cursor-default"
                     >
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 flex items-center justify-center font-bold text-white text-sm shrink-0">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-600 flex items-center justify-center font-bold text-white text-lg shrink-0 shadow-md group-hover/row:scale-105 transition-transform">
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">
+                            <p className="font-bold text-gray-800 dark:text-gray-200 text-sm truncate group-hover/row:text-primary-600 dark:group-hover/row:text-primary-400 transition-colors">
                               {escapeText(untrusted(member.full_name || "Chargement..."))}
                               {member.id === user.id && (
-                                <span className="ml-2 text-xs text-primary-500 dark:text-primary-400">(Vous)</span>
+                                <span className="ml-2 text-xs font-bold text-primary-500 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-md">(Vous)</span>
                               )}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
+                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate mt-0.5">{member.email}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${rc.color}`}>
-                          <rc.icon className="w-3 h-3" />
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border shadow-sm ${rc.color}`}>
+                          <rc.icon className="w-3.5 h-3.5" />
                           {rc.label}
                         </span>
                       </td>
                       <td className="px-6 py-4 hidden lg:table-cell">
-                          <div className="flex flex-wrap gap-1 max-w-xs">
+                          <div className="flex flex-wrap gap-1.5 max-w-xs">
                             {member.groups.length === 0 ? (
-                              <span className="text-xs text-gray-400 dark:text-gray-500">Aucun groupe</span>
+                              <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-lg">Aucun groupe</span>
                             ) : (
                               member.groups.slice(0, 3).map((g, idx) => (
-                                <span key={g.id || `m-g-${idx}`} className="inline-block px-2 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg text-xs">
+                                <span key={g.id || `m-g-${idx}`} className="inline-block px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-medium shadow-sm">
                                   {escapeText(untrusted(g.name))}
                                 </span>
                               ))
                             )}
                           {member.groups.length > 3 && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">+{member.groups.length - 3}</span>
+                            <span className="inline-flex items-center px-2 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-lg text-xs font-bold border border-primary-200/50 dark:border-primary-800/50">
+                              +{member.groups.length - 3}
+                            </span>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4 hidden sm:table-cell">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                           {new Date(member.created_at).toLocaleDateString('fr-FR')}
                         </span>
                       </td>
                       {!isReadOnly && (
                         <td className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover/row:opacity-100 transition-opacity">
                             {/* Changer rôle */}
-                            <button
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
                               onClick={() => handleChangeRole(member)}
                               disabled={updatingId === member.id || member.id === user.id}
                               title={member.role === 'student' ? "Promouvoir administrateur" : "Rétrograder étudiant"}
-                              className="p-2 hover:bg-accent-50 dark:hover:bg-accent-900/30 rounded-xl transition-colors disabled:opacity-30"
+                              className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all disabled:opacity-50 shadow-sm"
                             >
                               {updatingId === member.id ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-accent-500 dark:text-accent-400" />
                               ) : (
-                                <Shield className="w-4 h-4 text-accent-500 dark:text-accent-400" />
+                                <Shield className="w-4 h-4 text-accent-600 dark:text-accent-400" />
                               )}
-                            </button>
+                            </motion.button>
  
                             {/* Supprimer (uniquement étudiants) */}
                             {member.role === 'student' && (
-                              <button
+                              <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
                                 onClick={() => handleRemove(member)}
                                 disabled={deletingId === member.id || member.id === user.id}
                                 title="Retirer de l'entreprise"
-                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-colors disabled:opacity-30"
+                                className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all disabled:opacity-50 shadow-sm"
                               >
                                 {deletingId === member.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin text-red-400 dark:text-red-400" />
+                                  <Loader2 className="w-4 h-4 animate-spin text-red-500 dark:text-red-400" />
                                 ) : (
-                                  <Trash2 className="w-4 h-4 text-red-400 dark:text-red-400" />
+                                  <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                                 )}
-                              </button>
+                              </motion.button>
                             )}
                           </div>
                         </td>

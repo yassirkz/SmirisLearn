@@ -59,61 +59,56 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 overflow-hidden"
-            style={{ perspective: "1200px" }}
+            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/50 dark:border-white/5 overflow-hidden"
         >
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px]">
-                    <thead className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-800">
+                    <thead className="bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-gray-700/50 backdrop-blur-sm">
                         <tr>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest min-w-[200px]">
                                 Pilier
                             </th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                                 Vidéos
                             </th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                                 Étudiants
                             </th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                                 Création
                             </th>
-                            <th className="px-6 py-4 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody className="divide-y divide-gray-100/80 dark:divide-gray-800/80">
                         {currentPillars.map((pillar, index) => {
                             const colorStyle = getColorStyle(pillar.color);
                             
                             return (
                                 <motion.tr
                                     key={pillar.id || `pillar-${index}`}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ 
-                                        delay: index * 0.05,
-                                        type: "spring",
-                                        stiffness: 100
-                                    }}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.05 }}
                                     onClick={() => handleRowClick(pillar.id)}
-                                    className="transition-colors group cursor-pointer hover:bg-primary-50/80 dark:hover:bg-gray-700/80"
+                                    className="transition-colors group cursor-pointer hover:bg-white/60 dark:hover:bg-slate-800/40"
                                 >
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3 min-w-[200px]">
-                                            <div className={`w-10 h-10 ${colorStyle} rounded-xl flex items-center justify-center shadow-sm sm:group-hover:scale-110 transition-transform`}>
-                                                <span className="text-lg">{pillar.icon || '📚'}</span>
+                                    <td className="px-6 py-5">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-12 h-12 ${colorStyle} rounded-2xl flex items-center justify-center shadow-lg transform sm:group-hover:scale-110 sm:group-hover:rotate-3 transition-all duration-300`}>
+                                                <span className="text-xl">{pillar.icon || '📚'}</span>
                                             </div>
                                             <div className="min-w-0">
-                                                <div className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                                <div className="font-bold text-gray-800 dark:text-white flex items-center gap-2 text-base">
                                                     <span className="truncate">{escapeText(untrusted(pillar.safeName))}</span>
-                                                    {pillar.description && (
-                                                        <span className="text-xs text-gray-400 dark:text-gray-500 font-normal hidden sm:inline truncate">
-                                                            {escapeText(untrusted(pillar.safeDescription.substring(0, 30)))}...
-                                                        </span>
-                                                    )}
                                                 </div>
+                                                {pillar.description && (
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5 truncate max-w-[200px] sm:max-w-xs">
+                                                        {escapeText(untrusted(pillar.safeDescription))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </td>

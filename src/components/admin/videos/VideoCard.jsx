@@ -71,19 +71,19 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={handleCardClick}
-                className="hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors group cursor-pointer"
+                className="hover:bg-white/60 dark:hover:bg-slate-700/40 transition-all duration-300 group cursor-pointer border-b border-transparent hover:border-gray-100 dark:hover:border-gray-700/50"
             >
                 <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-600 rounded-lg flex items-center justify-center text-white">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20 group-hover:scale-105 transition-transform">
                             <Film className="w-5 h-5" />
                         </div>
                         <div>
-                            <p className="font-medium text-gray-800 dark:text-gray-200">
+                            <p className="font-bold text-gray-800 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                 {escapeText(untrusted(video.title))}
                             </p>
                             {video.description && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
                                     {escapeText(untrusted(video.description))}
                                 </p>
                             )}
@@ -92,24 +92,24 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                 </td>
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillarColor}`}>
+                        <span className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider ${pillarColor} shadow-sm border border-black/5 dark:border-white/5`}>
                             {escapeText(untrusted(video.pillar?.name))}
                         </span>
                         {video.quizzes?.length > 0 && (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1 shadow-sm">
+                            <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 flex items-center gap-1 shadow-sm">
                                 <Award className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                                Quiz rattaché
+                                Quiz
                             </span>
                         )}
                     </div>
                 </td>
                 <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                        <Clock className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-slate-800/50 w-fit px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700/50">
+                        <Clock className="w-4 h-4 text-gray-400" />
                         <span>{formatDuration(video.duration)}</span>
                     </div>
                 </td>
-                <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                <td className="px-6 py-4 text-sm font-medium text-gray-500 dark:text-gray-400">
                     {formatDate(video.created_at)}
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -118,7 +118,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleView}
-                            className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg transition-colors text-primary-600 dark:text-primary-400 sm:opacity-0 sm:group-hover:opacity-100"
+                            className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
                             title="Voir les détails"
                         >
                             <Eye className="w-4 h-4" />
@@ -130,7 +130,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleEdit}
-                                    className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400 sm:opacity-0 sm:group-hover:opacity-100"
+                                    className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
                                     title="Modifier"
                                 >
                                     <Edit className="w-4 h-4" />
@@ -140,7 +140,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleDelete}
-                                    className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400 sm:opacity-0 sm:group-hover:opacity-100"
+                                    className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
                                     title="Supprimer"
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -159,91 +159,97 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -5 }}
+            whileHover={{ y: -5, scale: 1.01 }}
             onClick={handleCardClick}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-primary-100 dark:border-gray-700 relative overflow-hidden group cursor-pointer"
+            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group cursor-pointer transition-all duration-300"
         >
             {/* Effet de shine */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
             {/* Badge durée */}
-            <div className="absolute top-4 right-4">
-                <div className="bg-black/60 dark:bg-gray-900/80 text-white px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 backdrop-blur-sm">
-                    <Clock className="w-3 h-3" />
+            <div className="absolute top-5 right-5 z-10">
+                <div className="bg-black/70 dark:bg-gray-900/90 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 backdrop-blur-md shadow-lg">
+                    <Clock className="w-3.5 h-3.5 text-gray-300" />
                     {formatDuration(video.duration)}
                 </div>
             </div>
 
             {/* Miniature placeholder */}
-            <div className="w-full h-32 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-xl mb-4 flex items-center justify-center">
-                <Play className="w-8 h-8 text-primary-400 dark:text-primary-400" />
+            <div className="w-full h-40 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/40 dark:to-accent-900/40 rounded-2xl mb-5 flex items-center justify-center relative overflow-hidden group-hover:shadow-inner transition-all border border-white/40 dark:border-white/5">
+                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                <div className="w-14 h-14 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                    <Play className="w-6 h-6 text-primary-500 ml-1" />
+                </div>
             </div>
 
             {/* Contenu */}
-            <div className="space-y-3">
+            <div className="space-y-4 relative z-10">
                 <div>
-                    <h3 className="font-bold text-gray-800 dark:text-gray-200 mb-1 line-clamp-1">
+                    <h3 className="text-lg font-extrabold text-gray-800 dark:text-white mb-1.5 line-clamp-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {escapeText(untrusted(video.title))}
                     </h3>
                     {video.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
                             {escapeText(untrusted(video.description))}
                         </p>
                     )}
                 </div>
 
-                <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillarColor}`}>
+                        <span className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider ${pillarColor} shadow-sm border border-black/5 dark:border-white/5`}>
                             {escapeText(untrusted(video.pillar?.name))}
                         </span>
                         {video.quizzes?.length > 0 && (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1 shadow-sm">
+                            <span className="px-2.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 flex items-center gap-1.5 shadow-sm">
                                 <Award className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                                Quiz rattaché
+                                Quiz
                             </span>
                         )}
                     </div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                        {formatDate(video.created_at)}
-                    </span>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                    <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={handleView}
-                        className="p-2 hover:bg-primary-100 dark:hover:bg-primary-900/50 rounded-lg transition-colors text-primary-600 dark:text-primary-400"
-                        title="Voir les détails"
-                    >
-                        <Eye className="w-4 h-4" />
-                    </motion.button>
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-2">
+                    <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-slate-800/50 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700/50">
+                        {formatDate(video.created_at)}
+                    </span>
                     
-                    {!isReadOnly && (
-                        <>
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={handleEdit}
-                                className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400"
-                                title="Modifier"
-                            >
-                                <Edit className="w-4 h-4" />
-                            </motion.button>
-                            
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={handleDelete}
-                                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors text-red-600 dark:text-red-400"
-                                title="Supprimer"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </motion.button>
-                        </>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={handleView}
+                            className="p-2.5 bg-gray-50 dark:bg-slate-800/50 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 shadow-sm"
+                            title="Voir les détails"
+                        >
+                            <Eye className="w-4 h-4" />
+                        </motion.button>
+                        
+                        {!isReadOnly && (
+                            <>
+                                <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={handleEdit}
+                                    className="p-2.5 bg-gray-50 dark:bg-slate-800/50 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 shadow-sm"
+                                    title="Modifier"
+                                >
+                                    <Edit className="w-4 h-4" />
+                                </motion.button>
+                                
+                                <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={handleDelete}
+                                    className="p-2.5 bg-gray-50 dark:bg-slate-800/50 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 shadow-sm"
+                                    title="Supprimer"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </motion.button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </motion.div>

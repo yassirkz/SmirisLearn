@@ -259,10 +259,14 @@ export default function AdminSettings() {
         return (
             <AdminLayout>
                 <div className="min-h-[60vh] flex items-center justify-center">
-                    <div className="relative">
-                        <div className="w-16 h-16 border-4 border-primary-200 dark:border-primary-800 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 flex flex-col items-center gap-4"
+                    >
+                        <RefreshCw className="w-10 h-10 text-primary-500 animate-spin" />
+                        <p className="text-sm font-bold text-gray-500 dark:text-gray-400">Chargement des paramètres...</p>
+                    </motion.div>
                 </div>
             </AdminLayout>
         );
@@ -273,17 +277,45 @@ export default function AdminSettings() {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="space-y-6"
+                className="space-y-8"
             >
-                {/* En-tête */}
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                        <Settings className="w-8 h-8 text-primary-600 dark:text-primary-400" />
-                        Paramètres
-                    </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        Gérez vos préférences et informations de compte
-                    </p>
+                {/* En-tête avec Glassmorphism */}
+                <div className="relative bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white/50 dark:border-white/5 overflow-hidden">
+                    {/* Background Glows */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-title-500/10 dark:bg-title-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+                    
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                                <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
+                                    className="p-3 bg-gradient-to-br from-primary-500 to-accent-600 rounded-2xl shadow-lg shadow-primary-500/30"
+                                >
+                                    <Settings className="w-8 h-8 text-white" />
+                                </motion.div>
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="px-4 py-1.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800/50 rounded-full text-sm font-bold text-primary-700 dark:text-primary-300 shadow-sm flex items-center gap-2 w-fit"
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    Paramètres
+                                </motion.div>
+                            </div>
+                            
+                            <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight mb-4">
+                                Configuration
+                            </h1>
+                            
+                            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium max-w-2xl flex items-center gap-2">
+                                Gérez vos préférences et informations de compte
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Messages */}
@@ -323,17 +355,22 @@ export default function AdminSettings() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Colonne principale */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Informations générales */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Building className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                                Informations générales
-                            </h2>
+                            {/* Glow Effect */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
+                            
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                                    <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+                                        <Building className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    </div>
+                                    Informations générales
+                                </h2>
 
                             <div className="space-y-4">
                                 <SanitizedInput
@@ -370,19 +407,25 @@ export default function AdminSettings() {
                                     className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                                 />
                             </div>
+                            </div>
                         </motion.div>
 
-                        {/* Notifications */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                                Notifications
-                            </h2>
+                            {/* Glow Effect */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
+                            
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                                    <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+                                        <Bell className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    </div>
+                                    Notifications
+                                </h2>
 
                             <div className="space-y-3">
                                 <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-gray-600 transition-colors">
@@ -428,19 +471,25 @@ export default function AdminSettings() {
                                     </div>
                                 )}
                             </div>
+                            </div>
                         </motion.div>
 
-                        {/* Apparence */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Globe className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                                Apparence
-                            </h2>
+                            {/* Glow Effect */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
+                            
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                                    <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+                                        <Globe className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    </div>
+                                    Apparence
+                                </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -471,21 +520,25 @@ export default function AdminSettings() {
                                     </div>
                                 </div>
                             </div>
+                            </div>
                         </motion.div>
 
-                        {/* Abonnement & Facturation */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.35 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700 relative overflow-hidden group"
+                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-primary-500/10 transition-colors" />
+                            {/* Glow Effect */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
                             
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                                Abonnement & Facturation
-                            </h2>
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                                    <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+                                        <CreditCard className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    </div>
+                                    Abonnement & Facturation
+                                </h2>
 
                             <div className="space-y-6">
                                 {/* Plan Actuel */}
@@ -551,22 +604,28 @@ export default function AdminSettings() {
                                     Paiements sécurisés par Stripe. Aucune donnée bancaire n'est stockée sur nos serveurs.
                                 </p>
                             </div>
+                            </div>
                         </motion.div>
                     </div>
 
                     {/* Colonne latérale */}
                     <div className="space-y-6">
-                        {/* Sécurité */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Lock className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                                Sécurité
-                            </h2>
+                            {/* Glow Effect */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
+                            
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                                    <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+                                        <Lock className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    </div>
+                                    Sécurité
+                                </h2>
 
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Délai d'expiration de session</p>
@@ -583,19 +642,25 @@ export default function AdminSettings() {
                                     <option value="240">4 heures</option>
                                 </select>
                             </div>
+                            </div>
                         </motion.div>
 
-                        {/* Changement de mot de passe */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Key className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                                Modifier le mot de passe
-                            </h2>
+                            {/* Glow Effect */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
+                            
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                                    <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
+                                        <Key className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    </div>
+                                    Mot de passe
+                                </h2>
 
                             <div className="space-y-4">
                                 {/* Mot de passe actuel */}
@@ -684,6 +749,7 @@ export default function AdminSettings() {
                                 >
                                     Mettre à jour le mot de passe
                                 </button>
+                            </div>
                             </div>
                         </motion.div>
                     </div>

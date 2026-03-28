@@ -245,7 +245,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {statCards.map((card, index) => {
                     const Icon = card.icon;
                     return (
@@ -254,19 +254,19 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            whileHover={{ y: -2 }}
-                            className={`${card.bg} rounded-xl p-4 shadow-sm border border-white/50 dark:border-gray-700 relative overflow-hidden group`}
+                            whileHover={{ y: -4, scale: 1.02 }}
+                            className={`${card.bg} rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 backdrop-blur-md relative overflow-hidden group transition-all duration-300`}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                             
-                            <div className="relative flex items-start justify-between">
+                            <div className="relative flex items-start justify-between z-10">
                                 <div>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{card.title}</p>
-                                    <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{card.value}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{card.subValue}</p>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1">{card.title}</p>
+                                    <p className="text-3xl font-extrabold text-gray-800 dark:text-white drop-shadow-sm">{card.value}</p>
+                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{card.subValue}</p>
                                 </div>
-                                <div className={`p-2 ${card.iconBg} rounded-lg`}>
-                                    <Icon className={`w-5 h-5 ${card.iconColor}`} />
+                                <div className={`p-3 ${card.iconBg} rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300`}>
+                                    <Icon className={`w-6 h-6 ${card.iconColor}`} />
                                 </div>
                             </div>
                         </motion.div>
@@ -274,35 +274,37 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                 })}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Détail vidéos */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
+                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-primary-200 dark:hover:border-primary-900/50 transition-colors"
                 >
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <Video className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                        Détail des vidéos
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <div className="p-1.5 bg-primary-100 dark:bg-primary-900/50 rounded-lg">
+                            <Video className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                        </div>
+                        Détails Vidéos
                     </h4>
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Durée totale</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Durée totale</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
                                 {formatDuration(stats.videos.totalDuration)}
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Durée moyenne</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                        <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Durée moyenne</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
                                 {formatDuration(stats.videos.averageDuration)}
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Avec quiz</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
-                                {stats.quizzes.total}/{stats.videos.total}
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Avec quiz</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                                {stats.quizzes.total} / {stats.videos.total}
                             </span>
                         </div>
                     </div>
@@ -310,31 +312,33 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
 
                 {/* Détail étudiants */}
                 <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
+                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-accent-200 dark:hover:border-accent-900/50 transition-colors"
                 >
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <Users className="w-4 h-4 text-accent-600 dark:text-accent-400" />
-                        Détail des étudiants
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <div className="p-1.5 bg-accent-100 dark:bg-accent-900/50 rounded-lg">
+                            <Users className="w-4 h-4 text-accent-600 dark:text-accent-400" />
+                        </div>
+                        Détails Étudiants
                     </h4>
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Total</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Total</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
                                 {stats.students.total}
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Terminé</span>
-                            <span className="font-medium text-green-600 dark:text-green-400">
+                        <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Terminé</span>
+                            <span className="font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 px-2 py-0.5 rounded text-xs">
                                 {stats.students.completed}
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">En cours</span>
-                            <span className="font-medium text-orange-600 dark:text-orange-400">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">En cours</span>
+                            <span className="font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50 px-2 py-0.5 rounded text-xs">
                                 {stats.students.inProgress}
                             </span>
                         </div>
@@ -343,31 +347,33 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
 
                 {/* Détail quiz */}
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
+                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-green-200 dark:hover:border-green-900/50 transition-colors"
                 >
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <Award className="w-4 h-4 text-green-600 dark:text-green-400" />
-                        Performance quiz
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <div className="p-1.5 bg-green-100 dark:bg-green-900/50 rounded-lg">
+                            <Award className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        Performance Quiz
                     </h4>
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Score moyen</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Score moyen</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
                                 {stats.quizzes.averageScore}%
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Taux réussite</span>
-                            <span className="font-medium text-green-600 dark:text-green-400">
+                        <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Taux réussite</span>
+                            <span className="font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 px-2 py-0.5 rounded text-xs">
                                 {stats.quizzes.passRate}%
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Tentatives</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Tentatives</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
                                 {stats.quizzes.totalAttempts}
                             </span>
                         </div>
@@ -379,32 +385,42 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
+                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 border-b-4 border-b-primary-500"
                 >
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                        Temps & Progression
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <div className="p-1.5 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
+                            <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        Progression Générale
                     </h4>
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Temps total</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Temps Total</span>
+                            <span className="font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800/50 px-2 py-0.5 rounded text-xs">
                                 {formatDuration(stats.progress.totalTimeSpent)}
                             </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 dark:text-gray-400">Vidéos vues</span>
-                            <span className="font-medium text-gray-800 dark:text-gray-200">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-500 dark:text-gray-400 font-medium">Vidéos Vues</span>
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
                                 {stats.progress.totalWatched}
                             </span>
                         </div>
-                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mt-2">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${stats.progress.averageCompletion}%` }}
-                                transition={{ delay: 0.6, duration: 1 }}
-                                className="h-full bg-gradient-to-r from-primary-500 to-accent-600 rounded-full"
-                            />
+                        <div className="pt-2">
+                            <div className="flex justify-between text-xs mb-1.5">
+                                <span className="font-medium text-gray-500">Avancement</span>
+                                <span className="font-bold text-primary-600 dark:text-primary-400">{stats.progress.averageCompletion}%</span>
+                            </div>
+                            <div className="h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-200/50 dark:border-gray-700/50">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${stats.progress.averageCompletion}%` }}
+                                    transition={{ delay: 0.6, duration: 1, type: "spring", stiffness: 50 }}
+                                    className="h-full bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 rounded-full relative"
+                                >
+                                    <div className="absolute inset-0 bg-white/20 dark:bg-white/10" style={{ backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent)' }} />
+                                </motion.div>
+                            </div>
                         </div>
                     </div>
                 </motion.div>

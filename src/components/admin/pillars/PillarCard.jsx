@@ -71,34 +71,35 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
                 rotateX: window.innerWidth > 768 ? -5 : 0, 
                 scale: 1.05, 
                 z: 20,
-                boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
+                boxShadow: "0 20px 40px rgba(0,0,0,0.15)"
             }}
             style={{ transformStyle: "preserve-3d" }}
             onClick={handleCardClick}
-            className={`${getBgLight(pillar.color)} rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50 dark:border-gray-700 backdrop-blur-sm relative overflow-hidden group cursor-pointer`}
+            className={`${getBgLight(pillar.color)} rounded-3xl p-4 sm:p-6 shadow-xl border border-white/50 dark:border-white/5 backdrop-blur-xl relative overflow-hidden group cursor-pointer`}
         >
-            {/* Effet de shine */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+            {/* Effet de shine et de fond premium */}
+            <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-full opacity-0 dark:opacity-20 blur-3xl group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity duration-700 pointer-events-none`} />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 dark:via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
             {/* Badge premium */}
             <div className="absolute top-4 right-4" style={{ transform: "translateZ(30px)" }}>
-                <div className={`bg-gradient-to-r ${getColorGradient(pillar.color)} text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg flex items-center gap-1`}>
-                    <Sparkles className="w-3 h-3" />
-                    {pillar.videoCount} Vidéos
+                <div className={`bg-gradient-to-r ${getColorGradient(pillar.color)} text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5 shadow-${pillar.color}-500/30`}>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {pillar.videoCount} Vidéo{pillar.videoCount !== 1 ? 's' : ''}
                 </div>
             </div>
 
             {/* En-tête avec icône */}
-            <div className="flex items-start gap-3 sm:gap-4 mb-4" style={{ transform: "translateZ(40px)" }}>
-                <div className={`w-12 h-12 sm:w-16 sm:h-16 shrink-0 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-lg sm:group-hover:scale-110 transition-transform`}>
+            <div className="flex items-start gap-4 mb-6" style={{ transform: "translateZ(40px)" }}>
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-${pillar.color}-500/30 sm:group-hover:scale-110 sm:group-hover:rotate-6 transition-all duration-500`}>
                     {pillar.icon || '📚'}
                 </div>
-                <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-200 mb-1 truncate">
+                <div className="flex-1 min-w-0 pt-1">
+                    <h3 className="text-lg sm:text-xl font-extrabold text-gray-800 dark:text-white mb-1.5 truncate tracking-tight">
                         {escapeText(untrusted(pillar.safeName))}
                     </h3>
                     {pillar.description && (
-                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium line-clamp-2 leading-relaxed">
                             {escapeText(untrusted(pillar.safeDescription))}
                         </p>
                     )}
@@ -106,27 +107,27 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* Statistiques */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4"  style={{ transform: "translateZ(20px)" }}>
-                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" style={{ transform: "translateZ(20px)" }}>
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-slate-800">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
-                        <Video className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-primary-600 dark:text-primary-400" />
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Vidéos</p>
+                        <Video className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1.5 text-primary-500 sm:group-hover:scale-110 transition-transform" />
+                        <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Vidéos</p>
                     </div>
-                    <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.videoCount}</p>
+                    <p className="text-sm sm:text-xl font-black text-gray-800 dark:text-white">{pillar.videoCount}</p>
                 </div>
-                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-slate-800">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
-                        <Users className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-accent-600 dark:text-accent-400" />
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Étudiants</p>
+                        <Users className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1.5 text-accent-500 sm:group-hover:scale-110 transition-transform" />
+                        <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Apprenants</p>
                     </div>
-                    <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-gray-200">{pillar.studentCount}</p>
+                    <p className="text-sm sm:text-xl font-black text-gray-800 dark:text-white">{pillar.studentCount}</p>
                 </div>
-                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-slate-800">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
-                        <Calendar className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1 text-green-600 dark:text-green-400" />
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Création</p>
+                        <Calendar className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1.5 text-emerald-500 sm:group-hover:scale-110 transition-transform" />
+                        <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Création</p>
                     </div>
-                    <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
+                    <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white">
                         {new Date(pillar.created_at).toLocaleDateString('fr-FR')}
                     </p>
                 </div>

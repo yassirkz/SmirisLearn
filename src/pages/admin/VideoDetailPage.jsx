@@ -133,58 +133,66 @@ export default function VideoDetailPage() {
                 className="space-y-6"
             >
                 {/* Navigation */}
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.05, x: -5 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => navigate('/admin/videos')}
-                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-slate-800/80 shadow-sm backdrop-blur-md rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium text-sm"
                 >
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="w-4 h-4" />
                     Retour aux vidéos
-                </button>
+                </motion.button>
 
                 {/* En-tête */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-primary-100 dark:border-gray-700">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                        <div className="min-w-0">
-                            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white truncate">
+                <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                    
+                    <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start gap-6">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 tracking-tight mb-3">
                                 {escapeText(untrusted(video.title))}
                             </h1>
                             {video.description && (
-                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 line-clamp-2 sm:line-clamp-none">
+                                <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-w-3xl">
                                     {escapeText(untrusted(video.description))}
                                 </p>
                             )}
                         </div>
-                        <div className="flex gap-2 self-end sm:self-start">
-                            <button
+                        <div className="flex gap-2 self-end sm:self-start shrink-0">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                                 onClick={() => setShowEditModal(true)}
-                                className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg text-accent-600 dark:text-accent-400 transition-colors"
+                                className="p-2.5 bg-accent-50 dark:bg-accent-900/20 text-accent-600 dark:text-accent-400 hover:bg-accent-100 dark:hover:bg-accent-900/40 rounded-xl transition-colors shadow-sm border border-accent-200/50 dark:border-accent-800/50"
                                 title="Modifier"
                             >
                                 <Edit className="w-5 h-5" />
-                            </button>
-                            <button
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                                 onClick={handleDelete}
-                                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400 transition-colors"
+                                className="p-2.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl transition-colors shadow-sm border border-red-200/50 dark:border-red-800/50"
                                 title="Supprimer"
                             >
                                 <Trash2 className="w-5 h-5" />
-                            </button>
+                            </motion.button>
                         </div>
                     </div>
 
                     {/* Métadonnées */}
-                    <div className="flex flex-wrap gap-3 sm:gap-6 mt-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        <div className="flex items-center gap-2 whitespace-nowrap">
-                            <Clock className="w-4 h-4" />
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-6 text-xs sm:text-sm font-semibold relative z-10">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <Clock className="w-4 h-4 text-gray-500" />
                             <span>{formatDuration(video.duration)}</span>
                         </div>
-                        <div className="flex items-center gap-2 whitespace-nowrap">
-                            <Calendar className="w-4 h-4" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <Calendar className="w-4 h-4 text-gray-500" />
                             <span>Ajouté le {formatDate(video.created_at)}</span>
                         </div>
                         {pillar && (
-                            <div className="flex items-center gap-2 whitespace-nowrap">
-                                <Film className="w-4 h-4" />
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 shadow-sm border border-primary-200/50 dark:border-primary-800/50">
+                                <Film className="w-4 h-4 text-primary-500" />
                                 <span>Pilier : {escapeText(untrusted(pillar.name))}</span>
                             </div>
                         )}
@@ -192,69 +200,82 @@ export default function VideoDetailPage() {
                 </div>
 
                 {/* Lecteur vidéo */}
-                <div className="bg-black rounded-2xl overflow-hidden aspect-video" style={{ maxHeight: '70vh' }}>
+                <div className="bg-black/95 rounded-3xl overflow-hidden aspect-video shadow-2xl border border-gray-800/50" style={{ maxHeight: '70vh' }}>
                     <video
                         src={video.video_url}
                         controls
                         controlsList="noplaybackrate"
-                        className="w-full h-auto max-h-[70vh] object-contain"
+                        className="w-full h-full object-contain"
                         poster={video.thumbnail_url}
                         onError={(e) => {
                             console.error('❌ Erreur chargement vidéo:', e);
                             console.log('URL tentative:', video.video_url);
-                    }}
-                >
-                    Votre navigateur ne supporte pas la lecture de vidéos.
-                </video>
+                        }}
+                    >
+                        Votre navigateur ne supporte pas la lecture de vidéos.
+                    </video>
                 </div>
 
                 {/* Section Quiz associé */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-primary-100 dark:border-gray-700">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-                            <Award className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-40 h-40 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-xl text-amber-600 dark:text-amber-400">
+                                <Award className="w-5 h-5" />
+                            </div>
                             Quiz associé
                         </h2>
                         {!quiz && (
-                            <button
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                                 onClick={() => setShowQuizModal(true)}
-                                className="px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl text-sm shadow hover:shadow-md transition-all flex items-center gap-2"
+                                className="group px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 transition-all flex items-center justify-center gap-3 font-bold border border-white/10 shrink-0 w-full sm:w-auto"
                             >
-                                <Plus className="w-4 h-4" />
+                                <div className="p-1 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
+                                    <Plus className="w-4 h-4" />
+                                </div>
                                 Créer un quiz
-                            </button>
+                            </motion.button>
                         )}
                     </div>
 
                     {quiz ? (
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-300 flex-wrap">
-                                <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full font-medium">
+                        <div className="relative z-10 space-y-4">
+                            <div className="flex items-center gap-3 sm:gap-4 text-sm text-gray-600 dark:text-gray-300 flex-wrap">
+                                <span className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/50 rounded-xl font-bold shadow-sm">
                                     {quiz.questions?.length || 0} questions
                                 </span>
-                                <span className="flex items-center gap-1">
-                                    Score minimum : <strong>{quiz.passing_score}%</strong>
+                                <span className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl font-medium shadow-sm">
+                                    Score minimum : <strong className="text-gray-900 dark:text-white">{quiz.passing_score}%</strong>
                                 </span>
-                                <span className="flex items-center gap-1">
-                                    <RefreshCw className="w-4 h-4" />
-                                    Tentatives : <strong>{quiz.max_attempts === -1 ? '∞' : quiz.max_attempts}</strong>
+                                <span className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl font-medium shadow-sm">
+                                    <RefreshCw className="w-4 h-4 text-gray-400" />
+                                    Tentatives : <strong className="text-gray-900 dark:text-white">{quiz.max_attempts === -1 ? '∞' : quiz.max_attempts}</strong>
                                 </span>
                                 {quiz.timer_minutes && (
-                                    <span className="flex items-center gap-1">
-                                        <Clock className="w-4 h-4" />
-                                        {quiz.timer_minutes} min
+                                    <span className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl font-medium shadow-sm">
+                                        <Clock className="w-4 h-4 text-gray-400" />
+                                        <strong className="text-gray-900 dark:text-white">{quiz.timer_minutes} min</strong>
                                     </span>
                                 )}
                             </div>
-                            <button
-                                onClick={() => setShowQuizModal(true)}
-                                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline"
-                            >
-                                Modifier le quiz
-                            </button>
+                            <div className="pt-2">
+                                <button
+                                    onClick={() => setShowQuizModal(true)}
+                                    className="text-sm font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1.5 transition-colors"
+                                >
+                                    <Edit className="w-4 h-4" />
+                                    Modifier le quiz
+                                </button>
+                            </div>
                         </div>
                     ) : (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Aucun quiz n'est associé à cette vidéo.</p>
+                        <div className="relative z-10 text-center py-8 px-4 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border border-gray-100 dark:border-gray-700 border-dashed">
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Aucun quiz n'est encore associé à cette vidéo.</p>
+                        </div>
                     )}
                 </div>
 
