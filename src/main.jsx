@@ -9,6 +9,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import { onCLS, onFCP, onLCP, onTTFB } from "web-vitals";
 
+import { HelmetProvider } from "react-helmet-async";
+
 // Configuration DOMPurify (sécurité XSS)
 import DOMPurify from "dompurify";
 
@@ -41,16 +43,18 @@ onTTFB(reportWebVitals);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <UserRoleProvider>
-          <ThemeProvider>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </ThemeProvider>
-        </UserRoleProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <UserRoleProvider>
+            <ThemeProvider>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </ThemeProvider>
+          </UserRoleProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>,
 );

@@ -44,6 +44,23 @@ export default function StudentVideoPage() {
           .single();
 
         if (videoError) throw videoError;
+
+        // --- SÉCURITÉ : Génération d'une URL signée (TTL 1 heure) ---
+        // On suppose que l'URL stockée est soit le path relatif, soit on extrait le path
+        const videoPath = videoData.video_url.includes('storage/v1/object/public/videos/') 
+            ? videoData.video_url.split('storage/v1/object/public/videos/')[1]
+            : videoData.video_url;
+
+        const { data: signedData, error: signedError } = await supabase.storage
+            .from('videos')
+            .createSignedUrl(videoPath, 3600);
+
+        if (signedError) {
+            console.error('Erreur URL signée:', signedError);
+        } else {
+            videoData.video_url = signedData.signedUrl;
+        }
+
         setVideo(videoData);
 
         const { data: progress } = await supabase

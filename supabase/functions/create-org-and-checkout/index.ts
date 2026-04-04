@@ -23,9 +23,35 @@ serve(async (req) => {
   try {
     const { companyName, adminEmail, adminPassword, plan } = await req.json();
 
-    if (!companyName || !adminEmail || !adminPassword || !plan) {
-      throw new Error('Missing required fields');
+    // --- SÉCURITÉ 1 : RATE LIMITING SERVEUR ---
+    const ip = req.headers.get('x-real-ip') || 'unknown';
+    const { data: isAllowed, error: rateError } = await supabase.rpc('check_rate_limit', {
+        p_key: `signup:${ip}`,
+        p_action: 'create_org',
+        p_max_attempts: 3,
+        p_window_interval: '1 hour'
+    });
+
+    if (rateError || !isAllowed) {
+        throw new Error('Trop de tentatives de création de compte. Veuillez réessayer dans une heure.');
     }
+
+    // --- SÉCURITÉ 2 : VALIDATION D'ENTRÉE STRICTE ---
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!adminEmail || !emailRegex.test(adminEmail)) {
+        throw new Error('Email invalide');
+    }
+    
+    if (!adminPassword || adminPassword.length < 8) {
+        throw new Error('Le mot de passe doit faire au moins 8 caractères');
+    }
+
+    if (!companyName || companyName.length < 3) {
+        throw new Error('Le nom d\'entreprise doit faire au moins 3 caractères');
+    }
+
+    // --- SÉCURITÉ 3 : AUDIT LOG INITIAL ---
+    console.log(`Tentative de création d'organisation: ${companyName} (${adminEmail})`);
 
     // Créer l'utilisateur dans auth.users
     const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
