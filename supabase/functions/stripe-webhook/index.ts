@@ -16,14 +16,10 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const signature = req.headers.get('stripe-signature');
-  if (!signature) {
-    return new Response(JSON.stringify({ error: 'Missing stripe-signature' }), { status: 400 });
-  }
+  if (!signature) return new Response(JSON.stringify({ error: 'Missing stripe-signature' }), { status: 400 });
 
   const body = await req.text();
   let event;
@@ -39,27 +35,31 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: err.message }), { status: 400 });
   }
 
-  console.log(`Processing webhook event: ${event.type}`);
+  // --- OPTIMISATION 1 : IDEMPOTENCE (Vérification atomique) ---
+  const { data: isNew, error: registerError } = await supabase.rpc('register_stripe_event', {
+    p_event_id: event.id,
+    p_type: event.type
+  });
+
+  if (registerError || !isNew) {
+    console.log(`Event ${event.id} already processed or error registering. Skipping.`);
+    return new Response(JSON.stringify({ received: true, duplication: true }), { status: 200 });
+  }
+
+  console.log(`Processing high-priority event: ${event.type}`);
 
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const organizationId = session.metadata.organization_id;
-        const customerId = session.customer;
-        const subscriptionId = session.subscription;
-
-        // Récupérer le plan depuis le prix (Starter par défaut)
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
-        const priceId = lineItems.data[0]?.price?.id;
-        const starterPriceId = Deno.env.get('STRIPE_STARTER_PRICE_ID');
-        const planType = priceId === starterPriceId ? 'starter' : 'free';
+        const planType = session.metadata.plan_type || 'starter'; // Prioriser la metadata
 
         const { error: updateError } = await supabase
           .from('organizations')
           .update({
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: session.customer,
+            stripe_subscription_id: session.subscription,
             subscription_status: 'active',
             plan_type: planType,
             trial_ends_at: null,
@@ -67,20 +67,23 @@ serve(async (req) => {
           .eq('id', organizationId);
 
         if (updateError) throw updateError;
-        console.log(`Organization ${organizationId} updated to ${planType}`);
         break;
       }
 
+      case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
         const customerId = subscription.customer;
+        const status = subscription.status === 'active' ? 'active' : 
+                     subscription.status === 'canceled' ? 'canceled' : 'past_due';
 
         const { error: updateError } = await supabase
           .from('organizations')
           .update({
-            subscription_status: 'canceled',
-            plan_type: 'free',
-            stripe_subscription_id: null,
+            subscription_status: status,
+            stripe_subscription_id: subscription.status === 'canceled' ? null : subscription.id,
+            // Mise à jour optionnelle du plan si présent dans metadata
+            plan_type: subscription.metadata?.plan_type || undefined 
           })
           .eq('stripe_customer_id', customerId);
 
@@ -90,24 +93,25 @@ serve(async (req) => {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
-        const customerId = invoice.customer;
-
         const { error: updateError } = await supabase
           .from('organizations')
           .update({ subscription_status: 'past_due' })
-          .eq('stripe_customer_id', customerId);
+          .eq('stripe_customer_id', invoice.customer);
 
         if (updateError) throw updateError;
         break;
       }
     }
 
-    return new Response(JSON.stringify({ received: true }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (err) {
-    console.error(`Webhook processing failed: ${err.message}`);
-    return new Response(JSON.stringify({ error: err.message }), { status: 400 });
+    // Si échec du traitement, on pourrait retirer l'event du log d'idempotence
+    // ou marquer comme "failed" pour re-tentative Stripe
+    console.error(`Webhook processing error for ${event.id}:`, err.message);
+    return new Response(JSON.stringify({ error: 'Processing failed' }), { status: 500 });
   }
 });

@@ -1,24 +1,35 @@
 // src/pages/student/StudentDashboard.jsx
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  BookOpen, PlayCircle, Award, Clock, ChevronRight, 
-  TrendingUp, Sparkles, Shield, Users, Video, RefreshCw,
-  Flame, Hourglass, Zap
-} from 'lucide-react';
-import { Cell, RadialBar, RadialBarChart, PolarAngleAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../hooks/useTheme';
-import { supabase } from '../../lib/supabase';
-import { untrusted, escapeText } from '../../utils/security';
-import MainLayout from '../../components/layout/MainLayout';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  BookOpen,
+  PlayCircle,
+  Award,
+  Clock,
+  ChevronRight,
+  TrendingUp,
+  Sparkles,
+  Shield,
+  Users,
+  Video,
+  RefreshCw,
+  Flame,
+  Hourglass,
+  Zap,
+} from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from "../../hooks/useTheme";
+import { supabase } from "../../lib/supabase";
+import { untrusted, escapeText } from "../../utils/security";
+import MainLayout from "../../components/layout/MainLayout";
+import ProgressChart from "../../components/ui/ProgressChart";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [orgName, setOrgName] = useState('');
+  const [orgName, setOrgName] = useState("");
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     pillarsCount: 0,
@@ -27,7 +38,7 @@ export default function StudentDashboard() {
     overallProgress: 0,
     totalVideos: 0,
     totalQuizzes: 0,
-    pendingQuizzes: 0
+    pendingQuizzes: 0,
   });
   const [recentVideos, setRecentVideos] = useState([]);
   const [upcomingQuizzes, setUpcomingQuizzes] = useState([]);
@@ -42,35 +53,35 @@ export default function StudentDashboard() {
       try {
         // 1. Récupérer le nom de l'organisation
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('id, organization_id')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("id, organization_id")
+          .eq("id", user.id)
           .single();
 
         if (profile?.organization_id) {
           const { data: org } = await supabase
-            .from('organizations')
-            .select('name')
-            .eq('id', profile.organization_id)
+            .from("organizations")
+            .select("name")
+            .eq("id", profile.organization_id)
             .single();
           if (org) setOrgName(escapeText(untrusted(org.name)));
         }
 
         // 2. Récupérer les groupes de l'étudiant et les piliers accessibles
         const { data: memberships } = await supabase
-          .from('group_members')
-          .select('group_id')
-          .eq('user_id', user.id);
+          .from("group_members")
+          .select("group_id")
+          .eq("user_id", user.id);
 
-        const groupIds = memberships?.map(m => m.group_id) || [];
+        const groupIds = memberships?.map((m) => m.group_id) || [];
 
         let pillarIds = [];
         if (groupIds.length > 0) {
           const { data: pillarAccess } = await supabase
-            .from('group_pillar_access')
-            .select('pillar_id')
-            .in('group_id', groupIds);
-          pillarIds = [...new Set(pillarAccess?.map(p => p.pillar_id) || [])];
+            .from("group_pillar_access")
+            .select("pillar_id")
+            .in("group_id", groupIds);
+          pillarIds = [...new Set(pillarAccess?.map((p) => p.pillar_id) || [])];
         }
 
         // 3. Récupérer toutes les vidéos accessibles avec leur durée
@@ -80,97 +91,110 @@ export default function StudentDashboard() {
         let allVideos = [];
         if (pillarIds.length > 0) {
           const { data: pillarsWithVideos } = await supabase
-            .from('pillars')
-            .select(`
+            .from("pillars")
+            .select(
+              `
               id,
               name,
               videos ( id, duration, sequence_order )
-            `)
-            .in('id', pillarIds);
-          
+            `,
+            )
+            .in("id", pillarIds);
+
           pillarsWithVideosData = pillarsWithVideos || [];
 
           const { data: videos } = await supabase
-            .from('videos')
-            .select('id, duration, pillar_id, sequence_order')
-            .in('pillar_id', pillarIds);
+            .from("videos")
+            .select("id, duration, pillar_id, sequence_order")
+            .in("pillar_id", pillarIds);
           allVideos = videos || [];
 
           if (pillarsWithVideos) {
-            videosByPillar = pillarsWithVideos.map(p => ({
+            videosByPillar = pillarsWithVideos.map((p) => ({
               id: p.id,
               name: p.name,
               total: p.videos?.length || 0,
-              videos: p.videos || []
+              videos: p.videos || [],
             }));
           }
 
           const { count } = await supabase
-            .from('videos')
-            .select('*', { count: 'exact', head: true })
-            .in('pillar_id', pillarIds);
+            .from("videos")
+            .select("*", { count: "exact", head: true })
+            .in("pillar_id", pillarIds);
           totalVideos = count || 0;
         }
 
         // 4. Récupérer la progression de l'utilisateur
         const { data: progress, error: progressError } = await supabase
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', user.id);
+          .from("user_progress")
+          .select("*")
+          .eq("user_id", user.id);
 
         if (progressError) {
-          console.error('Erreur SQL progression:', progressError);
+          console.error("Erreur SQL progression:", progressError);
         }
-        
+
         const progressData = progress || [];
-        const watchedVideos = progressData.filter(p => p.watched === true || p.watched === 1);
-        const watchedVideoIds = watchedVideos.map(p => p.video_id);
+        const watchedVideos = progressData.filter(
+          (p) => p.watched === true || p.watched === 1,
+        );
+        const watchedVideoIds = watchedVideos.map((p) => p.video_id);
         const completedVideos = watchedVideoIds.length;
-        const passedQuizzes = progressData.filter(p => p.quiz_passed === true || p.quiz_passed === 1).length;
+        const passedQuizzes = progressData.filter(
+          (p) => p.quiz_passed === true || p.quiz_passed === 1,
+        ).length;
 
         // Nombre total de quiz accessibles
         let totalQuizzes = 0;
         if (pillarIds.length > 0) {
           const { data: allAccessibleVideos } = await supabase
-            .from('videos')
-            .select('id')
-            .in('pillar_id', pillarIds);
-          const videoIds = allAccessibleVideos?.map(v => v.id) || [];
+            .from("videos")
+            .select("id")
+            .in("pillar_id", pillarIds);
+          const videoIds = allAccessibleVideos?.map((v) => v.id) || [];
           if (videoIds.length > 0) {
             const { count } = await supabase
-              .from('quizzes')
-              .select('*', { count: 'exact', head: true })
-              .in('video_id', videoIds);
+              .from("quizzes")
+              .select("*", { count: "exact", head: true })
+              .in("video_id", videoIds);
             totalQuizzes = count || 0;
           }
         }
 
         // Quiz en attente
         const pendingQuizVideoIds = progressData
-          .filter(p => (p.watched === true || p.watched === 1) && !(p.quiz_passed === true || p.quiz_passed === 1))
-          .map(p => p.video_id);
+          .filter(
+            (p) =>
+              (p.watched === true || p.watched === 1) &&
+              !(p.quiz_passed === true || p.quiz_passed === 1),
+          )
+          .map((p) => p.video_id);
 
         let pendingQuizzes = 0;
         if (pendingQuizVideoIds.length > 0) {
           const { count } = await supabase
-            .from('quizzes')
-            .select('*', { count: 'exact', head: true })
-            .in('video_id', pendingQuizVideoIds);
+            .from("quizzes")
+            .select("*", { count: "exact", head: true })
+            .in("video_id", pendingQuizVideoIds);
           pendingQuizzes = count || 0;
         }
 
         // 5. Progression par pilier
         const pillarProgress = videosByPillar.map((pillar) => {
-          const pillarVideoIds = pillar.videos.map(v => v.id);
-          const watchedInPillar = watchedVideos.filter(p =>
-            pillarVideoIds.includes(p.video_id)
+          const pillarVideoIds = pillar.videos.map((v) => v.id);
+          const watchedInPillar = watchedVideos.filter((p) =>
+            pillarVideoIds.includes(p.video_id),
           ).length;
           return {
             id: pillar.id,
             name: pillar.name,
-            value: pillar.total > 0 ? Math.round((watchedInPillar / pillar.total) * 100) : 0,
+            value:
+              pillar.total > 0
+                ? Math.round((watchedInPillar / pillar.total) * 100)
+                : 0,
             total: pillar.total,
-            watched: watchedInPillar
+            watched: watchedInPillar,
           };
         });
         setProgressByPillar(pillarProgress);
@@ -179,24 +203,30 @@ export default function StudentDashboard() {
         if (watchedVideoIds.length > 0) {
           const recent = watchedVideos
             .sort((a, b) => {
-              const dateA = a.completed_at ? new Date(a.completed_at) : new Date(0);
-              const dateB = b.completed_at ? new Date(b.completed_at) : new Date(0);
+              const dateA = a.completed_at
+                ? new Date(a.completed_at)
+                : new Date(0);
+              const dateB = b.completed_at
+                ? new Date(b.completed_at)
+                : new Date(0);
               return dateB - dateA;
             })
             .slice(0, 3)
-            .map(p => p.video_id);
+            .map((p) => p.video_id);
 
           if (recent.length > 0) {
             const { data: videosData } = await supabase
-              .from('videos')
-              .select(`
+              .from("videos")
+              .select(
+                `
                 id,
                 title,
                 duration,
                 thumbnail_url,
                 pillar:pillars(name)
-              `)
-              .in('id', recent);
+              `,
+              )
+              .in("id", recent);
             setRecentVideos(videosData || []);
           }
         }
@@ -204,13 +234,15 @@ export default function StudentDashboard() {
         // 7. Quiz à venir
         if (pendingQuizVideoIds.length > 0) {
           const { data: quizzesData } = await supabase
-            .from('quizzes')
-            .select(`
+            .from("quizzes")
+            .select(
+              `
               id,
               video_id,
               video:videos(title)
-            `)
-            .in('video_id', pendingQuizVideoIds)
+            `,
+            )
+            .in("video_id", pendingQuizVideoIds)
             .limit(3);
           setUpcomingQuizzes(quizzesData || []);
         }
@@ -218,17 +250,21 @@ export default function StudentDashboard() {
         // 8. Calcul des recommandations
         const recs = [];
         for (const pillar of videosByPillar) {
-          const sortedVideos = pillar.videos.sort((a, b) => a.sequence_order - b.sequence_order);
-          const nextVideo = sortedVideos.find(v => !watchedVideoIds.includes(v.id));
+          const sortedVideos = pillar.videos.sort(
+            (a, b) => a.sequence_order - b.sequence_order,
+          );
+          const nextVideo = sortedVideos.find(
+            (v) => !watchedVideoIds.includes(v.id),
+          );
           if (nextVideo) {
-            const videoInfo = allVideos.find(v => v.id === nextVideo.id);
+            const videoInfo = allVideos.find((v) => v.id === nextVideo.id);
             recs.push({
               pillarId: pillar.id,
               pillarName: pillar.name,
               videoId: nextVideo.id,
               title: videoInfo?.title || "Sans titre",
               sequence: nextVideo.sequence_order,
-              duration: videoInfo?.duration
+              duration: videoInfo?.duration,
             });
           }
         }
@@ -237,7 +273,7 @@ export default function StudentDashboard() {
         // 9. Calcul du temps total passé
         let totalTime = 0;
         for (const vid of watchedVideos) {
-          const videoInfo = allVideos.find(v => v.id === vid.video_id);
+          const videoInfo = allVideos.find((v) => v.id === vid.video_id);
           if (videoInfo?.duration) {
             totalTime += videoInfo.duration;
           }
@@ -246,8 +282,10 @@ export default function StudentDashboard() {
 
         // 10. Calcul du streak
         const dates = watchedVideos
-          .map(p => p.completed_at ? new Date(p.completed_at).toDateString() : null)
-          .filter(d => d !== null);
+          .map((p) =>
+            p.completed_at ? new Date(p.completed_at).toDateString() : null,
+          )
+          .filter((d) => d !== null);
         const uniqueDates = [...new Set(dates)];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
         let currentStreak = 0;
@@ -289,14 +327,16 @@ export default function StudentDashboard() {
           pillarsCount: pillarIds.length,
           completedVideos,
           passedQuizzes,
-          overallProgress: totalVideos > 0 ? Math.round((completedVideos / totalVideos) * 100) : 0,
+          overallProgress:
+            totalVideos > 0
+              ? Math.round((completedVideos / totalVideos) * 100)
+              : 0,
           totalVideos,
           totalQuizzes,
-          pendingQuizzes
+          pendingQuizzes,
         });
-
       } catch (err) {
-        console.error('Error fetching dashboard data:', err);
+        console.error("Error fetching dashboard data:", err);
       } finally {
         setLoading(false);
       }
@@ -304,18 +344,18 @@ export default function StudentDashboard() {
     fetchDashboardData();
 
     const channel = supabase
-      .channel('dashboard-updates')
+      .channel("dashboard-updates")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'user_progress',
-          filter: `user_id=eq.${user.id}`
+          event: "*",
+          schema: "public",
+          table: "user_progress",
+          filter: `user_id=eq.${user.id}`,
         },
         () => {
           fetchDashboardData();
-        }
+        },
       )
       .subscribe();
 
@@ -336,10 +376,10 @@ export default function StudentDashboard() {
   }
 
   const formatDuration = (seconds) => {
-    if (!seconds) return '--:--';
+    if (!seconds) return "--:--";
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   const formatTimeSpent = (seconds) => {
@@ -349,7 +389,14 @@ export default function StudentDashboard() {
     return `${minutes} minutes`;
   };
 
-  const COLORS = ['#4f46e5', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#6366f1'];
+  const COLORS = [
+    "#4f46e5",
+    "#8b5cf6",
+    "#ec4899",
+    "#10b981",
+    "#f59e0b",
+    "#6366f1",
+  ];
 
   return (
     <MainLayout>
@@ -375,17 +422,24 @@ export default function StudentDashboard() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
-                Bonjour, {escapeText(untrusted(user?.email?.split('@')[0] || "étudiant"))} 👋
+                Bonjour,{" "}
+                {escapeText(
+                  untrusted(user?.email?.split("@")[0] || "étudiant"),
+                )}{" "}
+                👋
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 {orgName && (
                   <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                     <Shield className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                    Organisation : <span className="font-medium text-primary-600 dark:text-primary-400">{orgName}</span>
+                    Organisation :{" "}
+                    <span className="font-medium text-primary-600 dark:text-primary-400">
+                      {orgName}
+                    </span>
                   </p>
                 )}
-                <button 
-                  onClick={() => window.location.reload()} 
+                <button
+                  onClick={() => window.location.reload()}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-400 dark:text-gray-500"
                   title="Rafraîchir"
                 >
@@ -397,10 +451,16 @@ export default function StudentDashboard() {
             {/* Progression globale avec cercle */}
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-primary-100 dark:border-gray-700 flex items-center gap-4">
               <div className="text-right">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">Progression Globale</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+                  Progression Globale
+                </p>
                 <div className="flex items-center justify-end gap-1">
-                  <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">{stats.overallProgress}%</p>
-                  {stats.overallProgress > 0 && <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400 animate-pulse" />}
+                  <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    {stats.overallProgress}%
+                  </p>
+                  {stats.overallProgress > 0 && (
+                    <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400 animate-pulse" />
+                  )}
                 </div>
               </div>
               <div className="relative w-14 h-14">
@@ -422,7 +482,9 @@ export default function StudentDashboard() {
                     strokeWidth="4"
                     fill="transparent"
                     strokeDasharray={2 * Math.PI * 24}
-                    strokeDashoffset={2 * Math.PI * 24 * (1 - stats.overallProgress / 100)}
+                    strokeDashoffset={
+                      2 * Math.PI * 24 * (1 - stats.overallProgress / 100)
+                    }
                     className="text-primary-600 dark:text-primary-400 transition-all duration-500"
                   />
                 </svg>
@@ -443,8 +505,12 @@ export default function StudentDashboard() {
               <BookOpen className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Piliers accessibles</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">{stats.pillarsCount}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Piliers accessibles
+              </p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">
+                {stats.pillarsCount}
+              </p>
             </div>
           </motion.div>
 
@@ -458,8 +524,12 @@ export default function StudentDashboard() {
               <Hourglass className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Temps de formation</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">{formatTimeSpent(totalTimeSpent)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Temps de formation
+              </p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">
+                {formatTimeSpent(totalTimeSpent)}
+              </p>
             </div>
           </motion.div>
 
@@ -473,8 +543,12 @@ export default function StudentDashboard() {
               <Zap className="w-5 h-5 text-accent-600 dark:text-accent-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Quiz réussis</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">{stats.passedQuizzes}/{stats.totalQuizzes}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Quiz réussis
+              </p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">
+                {stats.passedQuizzes}/{stats.totalQuizzes}
+              </p>
             </div>
           </motion.div>
 
@@ -488,8 +562,12 @@ export default function StudentDashboard() {
               <PlayCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Vidéos terminées</p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">{stats.completedVideos}/{stats.totalVideos}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Vidéos terminées
+              </p>
+              <p className="text-xl font-bold text-gray-800 dark:text-white">
+                {stats.completedVideos}/{stats.totalVideos}
+              </p>
             </div>
           </motion.div>
         </div>
@@ -505,64 +583,24 @@ export default function StudentDashboard() {
           >
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Progression par pilier</h2>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                Progression par pilier
+              </h2>
             </div>
-            <div className="h-52 sm:h-64 md:h-80 w-full relative" style={{ minHeight: '240px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <RadialBarChart
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="30%"
-                  outerRadius="100%"
-                  barSize={20}
-                  data={progressByPillar}
-                  startAngle={90}
-                  endAngle={450}
-                >
-                  <PolarAngleAxis
-                    type="number"
-                    domain={[0, 100]}
-                    angleAxisId={0}
-                    tick={false}
-                  />
-                  <RadialBar
-                    minAngle={15}
-                    background={{ fill: theme === 'dark' ? '#374151' : '#f3f4f6' }}
-                    clockWise
-                    dataKey="value"
-                    cornerRadius={10}
-                    isAnimationActive={true}
-                  >
-                    {progressByPillar.map((entry, index) => (
-                      <Cell key={`cell-${entry.id}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </RadialBar>
-                  <Tooltip
-                    cursor={false}
-                    formatter={(value, name, props) => [`${value}%`, props.payload.name]}
-                    contentStyle={{
-                      backgroundColor: theme === 'dark' ? 'rgba(31,41,55,0.95)' : 'rgba(255,255,255,0.9)',
-                      backdropFilter: 'blur(8px)',
-                      borderRadius: '12px',
-                      border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                      color: theme === 'dark' ? '#f3f4f6' : '#111827'
-                    }}
-                  />
-                  <Legend 
-                    iconSize={10} 
-                    layout="vertical" 
-                    verticalAlign="middle" 
-                    align="right"
-                    wrapperStyle={{ fontSize: '12px', fontWeight: 500, color: theme === 'dark' ? '#d1d5db' : '#1f2937' }}
-                  />
-                </RadialBarChart>
-              </ResponsiveContainer>
+            <div
+              className="h-52 sm:h-64 md:h-80 w-full relative"
+              style={{ minHeight: "240px" }}
+            >
+              <ProgressChart data={progressByPillar} />
               {progressByPillar.length === 1 && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="text-center translate-y-[-10px]">
-                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 animate-pulse">{progressByPillar[0].value}%</p>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">Progression Globale</p>
+                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 animate-pulse">
+                      {progressByPillar[0].value}%
+                    </p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                      Progression Globale
+                    </p>
                   </div>
                 </div>
               )}
@@ -583,7 +621,7 @@ export default function StudentDashboard() {
               Reprendre l'apprentissage
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recommendations.map(rec => (
+              {recommendations.map((rec) => (
                 <motion.div
                   key={rec.videoId}
                   whileHover={{ scale: 1.02 }}
@@ -594,8 +632,12 @@ export default function StudentDashboard() {
                     <PlayCircle className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 dark:text-white truncate">{escapeText(untrusted(rec.title))}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{rec.pillarName} • {formatDuration(rec.duration)}</p>
+                    <p className="font-semibold text-gray-800 dark:text-white truncate">
+                      {escapeText(untrusted(rec.title))}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {rec.pillarName} • {formatDuration(rec.duration)}
+                    </p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                 </motion.div>
@@ -619,7 +661,7 @@ export default function StudentDashboard() {
                 Vidéos récentes
               </h3>
               <button
-                onClick={() => navigate('/student/learning')}
+                onClick={() => navigate("/student/learning")}
                 className="text-sm text-primary-600 dark:text-primary-400 font-semibold hover:underline"
               >
                 Voir tout
@@ -629,11 +671,13 @@ export default function StudentDashboard() {
             {recentVideos.length === 0 ? (
               <div className="text-center py-8">
                 <Video className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 italic">Aucune vidéo visionnée récemment.</p>
+                <p className="text-gray-400 dark:text-gray-500 italic">
+                  Aucune vidéo visionnée récemment.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {recentVideos.map(video => (
+                {recentVideos.map((video) => (
                   <motion.div
                     key={video.id}
                     whileHover={{ x: 5 }}
@@ -642,14 +686,23 @@ export default function StudentDashboard() {
                   >
                     <div className="w-20 h-14 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
                       {video.thumbnail_url ? (
-                        <img src={video.thumbnail_url} alt={video.title} className="w-full h-full object-cover" />
+                        <img
+                          src={video.thumbnail_url}
+                          alt={video.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
                       ) : (
                         <PlayCircle className="w-6 h-6 text-primary-400 dark:text-primary-400" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-800 dark:text-white truncate">{escapeText(untrusted(video.title))}</h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{video.pillar?.name} • {formatDuration(video.duration)}</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white truncate">
+                        {escapeText(untrusted(video.title))}
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {video.pillar?.name} • {formatDuration(video.duration)}
+                      </p>
                     </div>
                     <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </motion.div>
@@ -673,11 +726,13 @@ export default function StudentDashboard() {
             {upcomingQuizzes.length === 0 ? (
               <div className="text-center py-8">
                 <Award className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 italic">Super ! Vous êtes à jour dans vos quiz.</p>
+                <p className="text-gray-400 dark:text-gray-500 italic">
+                  Super ! Vous êtes à jour dans vos quiz.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {upcomingQuizzes.map(quiz => (
+                {upcomingQuizzes.map((quiz) => (
                   <motion.div
                     key={quiz.id}
                     whileHover={{ scale: 1.02 }}
@@ -688,8 +743,12 @@ export default function StudentDashboard() {
                       <Award className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800 dark:text-white">{escapeText(untrusted(quiz.video?.title || 'Quiz'))}</h4>
-                      <p className="text-xs text-green-600 dark:text-green-400">Prêt à être passé</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">
+                        {escapeText(untrusted(quiz.video?.title || "Quiz"))}
+                      </h4>
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        Prêt à être passé
+                      </p>
                     </div>
                     <button className="px-4 py-2 bg-green-600 dark:bg-green-600 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-green-700 dark:hover:bg-green-700 transition-colors">
                       Commencer

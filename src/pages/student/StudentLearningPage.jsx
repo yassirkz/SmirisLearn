@@ -128,7 +128,8 @@ export default function StudentLearningPage() {
           Retour au tableau de bord
         </motion.button>
         {/* En-tête avec badge */}
-        <div className="relative">          <motion.div
+        <div className="relative">
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             className="absolute -top-4 -right-4 hidden sm:block"

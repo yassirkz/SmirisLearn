@@ -19,45 +19,29 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    // Vérification de l'utilisateur connecté
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing Authorization header');
-    }
+    if (!authHeader) throw new Error('Unauthorized');
+
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !user) {
-      console.error('Auth User Error:', userError);
-      throw new Error('Invalid user');
-    }
+    if (userError || !user) throw new Error('Invalid user');
 
-    // Récupérer l'organisation de l'utilisateur
+    // --- OPTIMISATION 1 : Jointure DB en une seule passe ---
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('organization_id')
+      .select('organization_id, organizations(stripe_customer_id, plan_type)')
       .eq('id', user.id)
       .single();
-    if (profileError || !profile?.organization_id) {
-      throw new Error('Organization not found');
-    }
 
-    const { data: org, error: orgError } = await supabase
-      .from('organizations')
-      .select('stripe_customer_id, plan_type')
-      .eq('id', profile.organization_id)
-      .single();
-    if (orgError) throw orgError;
+    if (profileError || !profile?.organization_id) throw new Error('Organization not found');
+    const org = profile.organizations;
 
-    // Lire le priceId envoyé par le frontend
-    const { priceId } = await req.json();
-    if (!priceId) {
-      throw new Error('Missing priceId');
-    }
+    // Lire le plan demandé
+    const { priceId, planType } = await req.json();
+    if (!priceId) throw new Error('Missing priceId');
 
     let customerId = org.stripe_customer_id;
     if (!customerId) {
@@ -72,7 +56,7 @@ serve(async (req) => {
         .eq('id', profile.organization_id);
     }
 
-    // Créer la session de checkout
+    // --- OPTIMISATION 2 : Metadata de plan explicite ---
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
@@ -81,9 +65,14 @@ serve(async (req) => {
       cancel_url: `${Deno.env.get('FRONTEND_URL')}/admin/settings`,
       subscription_data: {
         trial_period_days: org.plan_type === 'free' ? 14 : undefined,
+        metadata: { 
+            organization_id: profile.organization_id,
+            plan_type: planType || 'starter' 
+        }
       },
       metadata: {
         organization_id: profile.organization_id,
+        plan_type: planType || 'starter' // Utilisé par le webhook checkout.session.completed
       },
     });
 
@@ -92,7 +81,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    console.error('Error creating checkout session:', err);
+    console.error('Checkout error:', err.message);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

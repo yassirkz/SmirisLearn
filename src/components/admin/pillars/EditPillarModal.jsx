@@ -267,4 +267,4 @@ export default function EditPillarModal({ isOpen, onClose, pillar, onSuccess }) 
             )}
         </AnimatePresence>
     );
-}
+}

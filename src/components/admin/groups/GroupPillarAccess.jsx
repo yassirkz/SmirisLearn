@@ -230,4 +230,4 @@ export default function GroupPillarAccess({ isOpen, onClose, group, orgId, onUpd
       )}
     </AnimatePresence>
   );
-}
+}

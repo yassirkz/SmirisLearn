@@ -174,4 +174,4 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
         </motion.div>
     );
-}
+}

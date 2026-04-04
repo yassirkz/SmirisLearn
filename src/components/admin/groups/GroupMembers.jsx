@@ -410,4 +410,4 @@ export default function GroupMembers({ isOpen, onClose, group, orgId, onUpdate }
       </AnimatePresence>
     </AnimatePresence>
   );
-}
+}

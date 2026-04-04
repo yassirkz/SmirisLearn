@@ -182,4 +182,4 @@ export default function GroupForm({ isOpen, onClose, onSuccess, group, orgId: pr
       )}
     </AnimatePresence>
   );
-}
+}

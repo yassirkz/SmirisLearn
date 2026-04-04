@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
-import { untrusted, escapeText } from '../../../utils/security';
+import { useUserRole } from '../../../hooks/useUserRole';
 import PillarCard from './PillarCard';
 import PillarTable from './PillarTable';
 import PillarFilters from './PillarFilters';
@@ -20,6 +20,7 @@ import PillarSkeleton from './PillarSkeleton';
 export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { organizationId, loading: roleLoading } = useUserRole();
     const { success, error: showError } = useToast();
     
     const isMounted = useRef(true);
@@ -46,28 +47,19 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
         localStorage.setItem('pillarViewMode', viewMode);
     }, [viewMode]);
 
-    const getOrgId = useCallback(async () => {
-        if (propOrgId) return propOrgId;
-        if (!user?.id) return null;
-        try {
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('organization_id')
-                .eq('id', user.id)
-                .maybeSingle();
-            if (error) {
-                console.error('Erreur récupération orgId:', error);
-                return null;
-            }
-            return profile?.organization_id;
-        } catch (err) {
-            console.error('Exception récupération orgId:', err);
-            return null;
-        }
-    }, [user?.id, propOrgId]);
+    const targetOrgId = propOrgId || organizationId;
 
     const fetchPillars = useCallback(async (isRefresh = false) => {
         if (fetchingRef.current) return;
+        
+        if (!targetOrgId) {
+            if (!roleLoading) {
+                setLoading(false);
+                setError("ID d'organisation non trouvé");
+            }
+            return;
+        }
+
         if (fetchTimeoutRef.current) {
             clearTimeout(fetchTimeoutRef.current);
             fetchTimeoutRef.current = null;
@@ -82,16 +74,6 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
         setError(null);
 
         try {
-            const orgId = await getOrgId();
-            if (!orgId) {
-                if (isMounted.current) {
-                    setError("ID d'organisation non trouvé");
-                    if (isRefresh) setRefreshing(false); else setLoading(false);
-                }
-                fetchingRef.current = false;
-                return;
-            }
-
             if (!isMounted.current) {
                 fetchingRef.current = false;
                 return;
@@ -104,7 +86,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                     *,
                     videos: videos(count)
                 `)
-                .eq('organization_id', orgId)
+                .eq('organization_id', targetOrgId)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -149,8 +131,8 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
                 ...pillar,
                 videoCount: pillar.videos?.[0]?.count || 0,
                 studentCount: studentCountsByPillar[pillar.id] || 0,
-                safeName: escapeText(untrusted(pillar.name)),
-                safeDescription: escapeText(untrusted(pillar.description || ''))
+                safeName: pillar.name,
+                safeDescription: pillar.description || ''
             })) || [];
 
             setAllPillars(pillarsWithStats);
@@ -167,7 +149,7 @@ export default function PillarsList({ isReadOnly = false, orgId: propOrgId }) {
             }
             fetchingRef.current = false;
         }
-    }, [getOrgId, showError]);
+    }, [targetOrgId, roleLoading, showError]);
 
     // Filtrage et tri local pour une réactivité maximale
     const filteredPillars = useMemo(() => {

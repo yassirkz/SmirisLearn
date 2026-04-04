@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
     Users, Video, Award, TrendingUp, Sparkles, 
@@ -13,7 +13,7 @@ import { useUserRole } from '../../hooks/useUserRole';
 
 export default function AdminDashboard() {
     const { user } = useAuth();
-    const { role } = useUserRole();
+    const { role, organizationId, loading: roleLoading } = useUserRole();
     const [searchParams] = useSearchParams();
     const orgIdFromUrl = searchParams.get('orgId');
     const isReadOnly = role === 'super_admin' && orgIdFromUrl;
@@ -22,99 +22,48 @@ export default function AdminDashboard() {
     const [dashboardData, setDashboardData] = useState(null);
     const [error, setError] = useState(null);
     const [lastUpdate, setLastUpdate] = useState(new Date());
+    const [isTabVisible, setIsTabVisible] = useState(true);
 
+    // Monitoring de la visibilité de l'onglet (Performance)
     useEffect(() => {
-        fetchDashboardData();
-        const interval = setInterval(fetchDashboardData, 30000);
-        return () => clearInterval(interval);
-    }, [user, orgIdFromUrl]);
+        const handleVisibilityChange = () => setIsTabVisible(document.visibilityState === 'visible');
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, []);
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
+        if (!isTabVisible && dashboardData) return; // Économie de ressources si onglet caché
+        
         try {
-            let targetOrgId = orgIdFromUrl;
-            
-            if (!targetOrgId && user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('organization_id')
-                    .eq('id', user.id)
-                    .single();
-                
-                targetOrgId = profile?.organization_id;
-            }
-
+            const targetOrgId = orgIdFromUrl || organizationId;
             if (!targetOrgId) {
-                setLoading(false);
+                if (!roleLoading) setLoading(false);
                 return;
             }
 
+            // Utilise la nouvelle RPC optimisée (V2)
             const { data, error } = await supabase
-                .rpc('get_organization_dashboard', {
+                .rpc('get_organization_dashboard_v2', {
                     p_org_id: targetOrgId
                 });
 
             if (error) throw error;
-            
             setDashboardData(data);
-            
-            const lastMonth = new Date();
-            lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-            const [prevMembers, prevVideos, prevQuizzes] = await Promise.all([
-                supabase.from('profiles')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('organization_id', targetOrgId)
-                    .lt('created_at', lastMonth.toISOString()),
-                supabase.from('pillars')
-                    .select('id')
-                    .eq('organization_id', targetOrgId)
-            ]);
-
-            let prevVideosCount = 0;
-            let prevQuizzesCount = 0;
-
-            if (prevVideos.data?.length > 0) {
-                const pillarIds = prevVideos.data.map(p => p.id);
-                
-                const [vRes, qRes] = await Promise.all([
-                    supabase.from('videos')
-                        .select('*', { count: 'exact', head: true })
-                        .in('pillar_id', pillarIds)
-                        .lt('created_at', lastMonth.toISOString()),
-                    supabase.from('quizzes')
-                        .select('*, videos!inner(pillar_id)', { count: 'exact', head: true })
-                        .in('videos.pillar_id', pillarIds)
-                        .lt('created_at', lastMonth.toISOString())
-                ]);
-                prevVideosCount = vRes.count || 0;
-                prevQuizzesCount = qRes.count || 0;
-            }
-
-            const calculateGrowth = (current, previous) => {
-                if (!previous || previous === 0) return current > 0 ? 100 : 0;
-                return Math.round(((current - previous) / previous) * 100);
-            };
-
-            setDashboardData(prev => ({
-                ...prev,
-                growth: {
-                    members: calculateGrowth(data.stats?.total_members || 0, prevMembers.count || 0),
-                    videos: calculateGrowth(data.stats?.total_videos || 0, prevVideosCount),
-                    quizzes: calculateGrowth(data.stats?.total_quizzes || 0, prevQuizzesCount),
-                    score: 0
-                }
-            }));
-
             setLastUpdate(new Date());
             setError(null);
-
         } catch (err) {
             console.error('Erreur lors du chargement du tableau de bord:', err);
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [orgIdFromUrl, organizationId, isTabVisible, dashboardData, roleLoading]);
+
+    useEffect(() => {
+        fetchDashboardData();
+        const interval = setInterval(fetchDashboardData, 60000); // 1 minute (économie serveur)
+        return () => clearInterval(interval);
+    }, [fetchDashboardData]);
 
     if (loading) {
         return (
@@ -157,7 +106,7 @@ export default function AdminDashboard() {
         { 
             label: 'Membres', 
             value: stats?.total_members || 0,
-            growth: dashboardData?.growth?.members || 0,
+            growth: stats?.growth_members || 0,
             icon: Users, 
             color: 'from-blue-500 to-cyan-400',
             glow: 'shadow-blue-500/30',
@@ -166,7 +115,7 @@ export default function AdminDashboard() {
         { 
             label: 'Vidéos', 
             value: stats?.total_videos || 0,
-            growth: dashboardData?.growth?.videos || 0,
+            growth: stats?.growth_videos || 0,
             icon: Video, 
             color: 'from-purple-500 to-pink-500',
             glow: 'shadow-purple-500/30',
@@ -175,7 +124,7 @@ export default function AdminDashboard() {
         { 
             label: 'Quiz', 
             value: stats?.total_quizzes || 0,
-            growth: dashboardData?.growth?.quizzes || 0,
+            growth: stats?.growth_quizzes || 0,
             icon: Award, 
             color: 'from-orange-500 to-amber-400',
             glow: 'shadow-orange-500/30',
@@ -184,7 +133,7 @@ export default function AdminDashboard() {
         { 
             label: 'Score Moyen', 
             value: `${Math.round(stats?.avg_score || 0)}%`,
-            growth: dashboardData?.growth?.score || 0,
+            growth: 0,
             icon: TrendingUp, 
             color: 'from-emerald-400 to-teal-500',
             glow: 'shadow-emerald-500/30',

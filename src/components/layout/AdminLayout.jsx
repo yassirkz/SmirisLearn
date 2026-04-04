@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Menu, X, LayoutDashboard, BookOpen, Video, 
     Award, Users, Users2, Settings, LogOut, Sparkles,
-    Shield, Zap, Sun, Moon 
+    Shield, Zap, Sun, Moon, Search, Bell, ChevronRight
 } from 'lucide-react';
-import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
+import { NavLink, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme'; 
 import { supabase } from '../../lib/supabase';
@@ -14,13 +14,28 @@ import { useOwnerOrg } from '../../hooks/useOwnerOrg';
 import Header from './Header';
 
 export default function AdminLayout({ children }) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const orgId = searchParams.get('orgId');
+
     const [sidebarOpen, setSidebarOpen] = useState(() => {
         if (typeof window !== 'undefined') {
             return window.innerWidth >= 1024;
         }
         return true;
     });
-    // Fermer automatiquement la sidebar sur mobile en cas de changement de route ou clic
+
+    const [companyInfo, setCompanyInfo] = useState({ name: '', plan: '', status: '', trialDays: 0 });
+    const { user, signOut } = useAuth();
+    const { theme, toggleTheme } = useTheme(); 
+    const { isAdminAccess, loading, role, organizationId } = useUserRole(); 
+    const { isOwnerOrg, loading: orgLoading } = useOwnerOrg(orgId);
+    
+    const isImpersonating = role === 'super_admin' && orgId;
+    const isReadOnly = isImpersonating && !isOwnerOrg;
+
+    // Responsive sidebar
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 1024) setSidebarOpen(true);
@@ -30,98 +45,55 @@ export default function AdminLayout({ children }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const [companyName, setCompanyName] = useState('');
-    const [companyPlan, setCompanyPlan] = useState('');
-    const [subscriptionStatus, setSubscriptionStatus] = useState('');
-    const [trialDays, setTrialDays] = useState(0);
-    const { user, signOut } = useAuth();
-    const { theme, toggleTheme } = useTheme(); 
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const orgId = searchParams.get('orgId');
-    const { isAdminAccess, loading, role } = useUserRole(); 
-    const { isOwnerOrg, loading: orgLoading } = useOwnerOrg(orgId);
-    const isImpersonating = role === 'super_admin' && orgId;
-    const isReadOnly = isImpersonating && !isOwnerOrg;
-
-    // Sécurité : vérification du rôle
+    // Sécurité
     useEffect(() => {
         if (!loading && !isAdminAccess) {
             navigate('/unauthorized');
         }
     }, [isAdminAccess, loading, navigate]);
 
-    // Récupération des infos entreprise
+    // Infos entreprise optimisées
     useEffect(() => {
         const fetchCompanyInfo = async () => {
-            if (!user) return;
+            const resolvedOrgId = isImpersonating ? orgId : organizationId;
+            if (!resolvedOrgId) return;
 
             try {
-                let resolvedOrgId = null;
+                const { data: org, error } = await supabase
+                    .from('organizations')
+                    .select('name, plan_type, subscription_status, trial_ends_at')
+                    .eq('id', resolvedOrgId)
+                    .maybeSingle();
 
-                if (isImpersonating) {
-                    resolvedOrgId = orgId;
-                } else {
-                    const { data: profile, error: profileError } = await supabase
-                        .from('profiles')
-                        .select('organization_id')
-                        .eq('id', user.id)
-                        .maybeSingle();
-
-                    if (profileError) throw profileError;
-                    resolvedOrgId = profile?.organization_id;
+                if (!error && org) {
+                    const days = org.trial_ends_at 
+                        ? Math.max(0, Math.ceil((new Date(org.trial_ends_at) - new Date()) / (1000 * 60 * 60 * 24)))
+                        : 0;
+                    
+                    setCompanyInfo({
+                        name: org.name,
+                        plan: org.plan_type,
+                        status: org.subscription_status,
+                        trialDays: days
+                    });
                 }
-
-                if (resolvedOrgId) {
-                    const { data: org, error: orgError } = await supabase
-                        .from('organizations')
-                        .select('name, plan_type, subscription_status, trial_ends_at')
-                        .eq('id', resolvedOrgId)
-                        .maybeSingle();
-
-                    if (orgError) throw orgError;
-
-                    if (org) {
-                        setCompanyName(org.name);
-                        setCompanyPlan(org.plan_type);
-                        setSubscriptionStatus(org.subscription_status);
-
-                        if (org.trial_ends_at) {
-                            const days = Math.max(0, Math.ceil(
-                                (new Date(org.trial_ends_at) - new Date()) / (1000 * 60 * 60 * 24)
-                            ));
-                            setTrialDays(days);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Erreur chargement infos:', error);
+            } catch (err) {
+                console.error('Error fetching company info:', err);
             }
         };
 
         fetchCompanyInfo();
-    }, [user, isImpersonating, orgId]);
+    }, [isImpersonating, orgId, organizationId]);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center dark:bg-secondary-950">
-                <div className="relative">
-                    <div className="w-16 h-16 border-4 border-primary-100 dark:border-primary-900 rounded-full"></div>
-                    <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            </div>
-        );
-    }
-
-    const menuItems = [
-        { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', badge: null },
-        { path: '/admin/pillars', icon: BookOpen, label: 'Piliers', badge: null },
-        { path: '/admin/videos', icon: Video, label: 'Vidéos', badge: null },
-        { path: '/admin/quizzes', icon: Award, label: 'QCM', badge: null },
-        { path: '/admin/groups', icon: Users2, label: 'Groupes', badge: null },
-        { path: '/admin/members', icon: Users, label: 'Membres', badge: null },
-        { path: '/admin/settings', icon: Settings, label: 'Paramètres', badge: null  },
-    ];
+    const menuItems = useMemo(() => [
+        { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+        { path: '/admin/pillars', icon: BookOpen, label: 'Piliers' },
+        { path: '/admin/videos', icon: Video, label: 'Vidéos' },
+        { path: '/admin/quizzes', icon: Award, label: 'QCM' },
+        { path: '/admin/groups', icon: Users2, label: 'Groupes' },
+        { path: '/admin/members', icon: Users, label: 'Membres' },
+        { path: '/admin/settings', icon: Settings, label: 'Paramètres' },
+    ], []);
 
     const handleSignOut = async () => {
         await signOut();
@@ -180,25 +152,25 @@ export default function AdminLayout({ children }) {
                                         <h2 className="font-bold text-gray-800 dark:text-gray-200 text-lg">Smiris Learn</h2>
                                         <p className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
                                             <Shield className="w-3 h-3" />
-                                            {companyName || 'Admin'} • {companyPlan === 'starter' ? 'Starter' : 'Gratuit'} {subscriptionStatus === 'trial' ? '(Essai)' : ''}
+                                            {companyInfo.name || 'Admin'} • {companyInfo.plan === 'starter' ? 'Starter' : 'Gratuit'} {companyInfo.status === 'trial' ? '(Essai)' : ''}
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Badge période d'essai dynamique */}
-                                {trialDays > 0 && (
+                                {companyInfo.trialDays > 0 && (
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
                                         transition={{ delay: 0.3 }}
                                         className={`mt-4 px-3 py-2 rounded-xl flex items-center gap-2 text-xs font-medium ${
-                                            trialDays <= 3
+                                            companyInfo.trialDays <= 3
                                                 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800'
                                                 : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
                                         }`}
                                     >
                                         <Zap className="w-3 h-3" />
-                                        <span>{trialDays} jour{trialDays > 1 ? 's' : ''} d'essai</span>
+                                        <span>{companyInfo.trialDays} jour{companyInfo.trialDays > 1 ? 's' : ''} d'essai</span>
                                     </motion.div>
                                 )}
                             </div>
