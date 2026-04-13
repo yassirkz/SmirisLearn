@@ -107,7 +107,7 @@ export default function AdminLayout({ children }) {
             {isImpersonating && isReadOnly && (
                 <div className="bg-amber-500 text-white p-2 text-center text-sm font-bold flex items-center justify-center gap-4 sticky top-0 z-[60]">
                     <Shield className="w-4 h-4" />
-                    <span>Mode Lecture Seule - Vous visualisez l'entreprise {companyName}</span>
+                    <span>Mode Lecture Seule - Vous visualisez l'entreprise {companyInfo.name}</span>
                     <button 
                         onClick={() => navigate('/super-admin')}
                         className="bg-white text-amber-600 px-3 py-1 rounded-lg text-xs hover:bg-amber-50 transition-colors"
