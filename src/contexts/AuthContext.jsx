@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useState, useEffect, useCallback, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../lib/supabase";
@@ -23,48 +23,50 @@ const pageVariants = {
   },
 };
 
+// Rate limiting config (outside component — never recreated)
+const RATE_LIMITS = {
+  LOGIN: { limit: 5, window: 60000 },   // 5 tentatives par minute
+  SIGNUP: { limit: 3, window: 3600000 }, // 3 inscriptions par heure
+  RESET: { limit: 3, window: 3600000 },  // 3 reset par heure
+};
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [realUser, setRealUser] = useState(null);
+  const [impersonatedData, setImpersonatedData] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastAttempt, setLastAttempt] = useState({});
 
-  // Rate limiting config
-  const RATE_LIMITS = {
-    LOGIN: { limit: 5, window: 60000 }, // 5 tentatives par minute
-    SIGNUP: { limit: 3, window: 3600000 }, // 3 inscriptions par heure
-    RESET: { limit: 3, window: 3600000 }, // 3 reset par heure
-  };
+  // Use a ref for lastAttempt so reads/writes don't cause re-renders
+  const lastAttemptRef = useRef({});
 
-  // Vérification rate limit
-  const checkActionLimit = useCallback(
-    (action, identifier = "global") => {
-      const key = `${action}_${identifier}`;
-      const now = Date.now();
-      const limit = RATE_LIMITS[action];
+  // Computes the effective user (stays stable when neither changes)
+  const user = React.useMemo(() => {
+    if (impersonatedData) return impersonatedData;
+    return realUser;
+  }, [realUser, impersonatedData]);
 
-      if (!limit) return true;
+  // ========== RATE LIMITING (stable — uses ref, no state) ==========
+  const checkActionLimit = useCallback((action, identifier = "global") => {
+    const key = `${action}_${identifier}`;
+    const now = Date.now();
+    const limit = RATE_LIMITS[action];
 
-      const attempts = lastAttempt[key] || [];
-      const recentAttempts = attempts.filter((t) => t > now - limit.window);
+    if (!limit) return true;
 
-      if (recentAttempts.length >= limit.limit) {
-        setError(
-          `Trop de tentatives. Réessayez dans ${Math.ceil((limit.window - (now - recentAttempts[0])) / 60000)} minutes.`,
-        );
-        return false;
-      }
+    const attempts = lastAttemptRef.current[key] || [];
+    const recentAttempts = attempts.filter((t) => t > now - limit.window);
 
-      setLastAttempt((prev) => ({
-        ...prev,
-        [key]: [...recentAttempts, now],
-      }));
+    if (recentAttempts.length >= limit.limit) {
+      setError(
+        `Trop de tentatives. Réessayez dans ${Math.ceil((limit.window - (now - recentAttempts[0])) / 60000)} minutes.`,
+      );
+      return false;
+    }
 
-      return true;
-    },
-    [lastAttempt],
-  );
+    lastAttemptRef.current[key] = [...recentAttempts, now];
+    return true;
+  }, []); // no deps — ref is always current
 
   useEffect(() => {
     // Récupérer session initiale
@@ -77,7 +79,40 @@ export function AuthProvider({ children }) {
         if (error) throw error;
 
         setSession(session);
-        setUser(session?.user ?? null);
+        const actualUser = session?.user ?? null;
+        setRealUser(actualUser);
+
+        // --- IMPERSONATION LOGIC ---
+        const impId = localStorage.getItem("impersonatedUserId");
+        const role = actualUser?.user_metadata?.role;
+        if (impId && actualUser && ["super_admin", "org_admin"].includes(role)) {
+          try {
+            const { data } = await supabase
+              .from("profiles")
+              .select("id, email, role, full_name, organization_id")
+              .eq("id", impId)
+              .single();
+            if (data) {
+              setImpersonatedData({
+                id: data.id,
+                email: data.email,
+                user_metadata: {
+                  role: data.role,
+                  full_name: data.full_name,
+                  organization_id: data.organization_id,
+                },
+                isImpersonated: true,
+                realUserRole: role,
+                realUserEmail: actualUser.email,
+              });
+            } else {
+              localStorage.removeItem("impersonatedUserId");
+            }
+          } catch (e) {
+            console.error("Erreur chargement impersonation:", e);
+            localStorage.removeItem("impersonatedUserId");
+          }
+        }
       } catch (error) {
         console.error("Erreur session:", error);
         setError("Erreur de connexion au serveur");
@@ -93,68 +128,53 @@ export function AuthProvider({ children }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
-      setUser(session?.user ?? null);
+      setRealUser(session?.user ?? null);
       setError(null);
+      // Mode impersonation se perd après reconnexion ou déconnexion forte
+      if (!session) {
+        setImpersonatedData(null);
+        localStorage.removeItem("impersonatedUserId");
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // ========== FONCTIONS AUTH SÉCURISÉES ==========
+  // ========== FONCTIONS AUTH SÉCURISÉES (toutes mémoïsées) ==========
 
-  const signUp = async (email, password, metadata = {}) => {
+  const signUp = useCallback(async (email, password, metadata = {}) => {
     try {
       setError(null);
 
-      //  Rate limiting
       if (!checkActionLimit("SIGNUP", email)) {
         return { error: { message: "Rate limit exceeded" } };
       }
 
-      //  Validation email simple
       const emailStr = String(email).trim().toLowerCase();
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(emailStr)) {
-        throw new Error("Email invalide");
-      }
+      if (!emailRegex.test(emailStr)) throw new Error("Email invalide");
 
-      //  Validation password (OWASP)
-      if (!password || password.length < 8) {
+      if (!password || password.length < 8)
         throw new Error("Le mot de passe doit contenir au moins 8 caractères");
-      }
-
-      if (!/[A-Z]/.test(password)) {
+      if (!/[A-Z]/.test(password))
         throw new Error("Le mot de passe doit contenir au moins une majuscule");
-      }
-
-      if (!/[0-9]/.test(password)) {
+      if (!/[0-9]/.test(password))
         throw new Error("Le mot de passe doit contenir au moins un chiffre");
-      }
 
       setLoading(true);
 
       const fullName = metadata.data?.full_name || metadata.full_name || "";
 
-      // inscription - LE TRIGGER SQL CREER LE PROFIL AUTOMATIQUEMENT
       const { data, error } = await supabase.auth.signUp({
         email: emailStr,
         password,
         options: {
-          data: {
-            full_name: fullName,
-            role: "student",
-          },
+          data: { full_name: fullName, role: "student" },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (error) {
-        console.error("Erreur signUp auth:", error);
-        throw error;
-      }
-
-      //  PLUS D'INSERTION MANUELLE - Le trigger SQL s'en charge !
-
+      if (error) throw error;
       return { data, error: null };
     } catch (error) {
       console.error("Erreur dans signUp:", error);
@@ -163,36 +183,27 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [checkActionLimit]);
 
-  const signIn = async (email, password) => {
+  const signIn = useCallback(async (email, password) => {
     try {
       setError(null);
 
-      // 1. Rate limiting
       if (!checkActionLimit("LOGIN", email)) {
-        return {
-          error: { message: "Trop de tentatives. Réessayez plus tard." },
-        };
+        return { error: { message: "Trop de tentatives. Réessayez plus tard." } };
       }
 
-      // 2. Validation basique
       const validatedEmail = validateEmail(untrusted(email));
-
-      if (!password) {
-        throw new Error("Mot de passe requis");
-      }
+      if (!password) throw new Error("Mot de passe requis");
 
       setLoading(true);
 
-      // 3. Tentative de connexion
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validatedEmail,
         password,
       });
 
       if (error) throw error;
-
       return { data, error: null };
     } catch (error) {
       setError(error.message);
@@ -200,18 +211,14 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [checkActionLimit]);
 
-  // ✅ Connexion avec Google
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       setError(null);
 
-      // Rate limiting
       if (!checkActionLimit("LOGIN", "google")) {
-        return {
-          error: { message: "Trop de tentatives. Réessayez plus tard." },
-        };
+        return { error: { message: "Trop de tentatives. Réessayez plus tard." } };
       }
 
       setLoading(true);
@@ -220,15 +227,11 @@ export function AuthProvider({ children }) {
         provider: "google",
         options: {
           redirectTo: window.location.origin,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
+          queryParams: { access_type: "offline", prompt: "consent" },
         },
       });
 
       if (error) throw error;
-
       return { data, error: null };
     } catch (error) {
       setError(error.message);
@@ -236,9 +239,9 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [checkActionLimit]);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
@@ -248,10 +251,54 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const clearError = useCallback(() => setError(null), []);
 
+  // Mode Impersonation control
+  const startImpersonation = useCallback(async (targetUserId) => {
+    if (!realUser || !["super_admin", "org_admin"].includes(realUser.user_metadata?.role)) {
+      throw new Error("Droit insuffisant pour impersonifier.");
+    }
+    setLoading(true);
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, email, role, full_name, organization_id")
+        .eq("id", targetUserId)
+        .single();
+      if (data) {
+        localStorage.setItem("impersonatedUserId", targetUserId);
+        setImpersonatedData({
+          id: data.id,
+          email: data.email,
+          user_metadata: {
+            role: data.role,
+            full_name: data.full_name,
+            organization_id: data.organization_id,
+          },
+          isImpersonated: true,
+          realUserRole: realUser.user_metadata?.role,
+          realUserEmail: realUser.email,
+        });
+        window.location.href = data.role === "org_admin" ? "/admin" : "/student";
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de l'impersonation");
+    } finally {
+      setLoading(false);
+    }
+  }, [realUser]);
+
+  const stopImpersonation = useCallback(() => {
+    localStorage.removeItem("impersonatedUserId");
+    setImpersonatedData(null);
+    const role = realUser?.user_metadata?.role;
+    window.location.href = role === "super_admin" ? "/super-admin" : "/admin";
+  }, [realUser]);
+
+  // Context value — stable as long as stable deps don't change
   const value = React.useMemo(() => ({
     user,
     session,
@@ -261,8 +308,10 @@ export function AuthProvider({ children }) {
     signIn,
     signOut,
     signInWithGoogle,
-    clearError
-  }), [user, session, loading, error, signUp, signIn, signOut, signInWithGoogle, clearError]);
+    clearError,
+    startImpersonation,
+    stopImpersonation,
+  }), [user, session, loading, error, signUp, signIn, signOut, signInWithGoogle, clearError, startImpersonation, stopImpersonation]);
 
   if (loading) {
     return (

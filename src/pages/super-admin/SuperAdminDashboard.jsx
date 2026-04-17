@@ -19,7 +19,14 @@ export default function SuperAdminDashboard() {
 
     useEffect(() => {
         fetchDashboardData();
-        const interval = setInterval(fetchDashboardData, 60000);
+        // Auto-refresh toutes les 60s — stoppé si erreur
+        const interval = setInterval(() => {
+            // Ne pas rafraîchir si une erreur persiste
+            setError(prev => {
+                if (!prev) fetchDashboardData();
+                return prev;
+            });
+        }, 60000);
         return () => clearInterval(interval);
     }, []);
 
@@ -29,8 +36,12 @@ export default function SuperAdminDashboard() {
                 .rpc('get_super_admin_dashboard');
 
             if (error) throw error;
+
+            // Supabase RPC returning JSONB can wrap the result in an array
+            const dashData = Array.isArray(data) ? data[0] : data;
+            if (!dashData) throw new Error('Aucune donnée retournée par le serveur');
             
-            setDashboardData(data);
+            setDashboardData(dashData);
 
             const lastMonth = new Date();
             lastMonth.setMonth(lastMonth.getMonth() - 1);

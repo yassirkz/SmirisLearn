@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
@@ -10,6 +11,7 @@ export const UserRoleProvider = ({ children }) => {
     const [organizationId, setOrganizationId] = useState(null);
     const [isAdminAccess, setIsAdminAccess] = useState(false);
     const [loading, setLoading] = useState(true);
+    const lastFetchedUserId = React.useRef(null);
 
     const fetchRoleData = useCallback(async () => {
         if (!user) {
@@ -20,8 +22,13 @@ export const UserRoleProvider = ({ children }) => {
             return;
         }
 
+        const isInitialFetch = lastFetchedUserId.current !== user.id;
+
         try {
-            setLoading(true);
+            if (isInitialFetch) {
+                setLoading(true);
+            }
+            
             const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('role, organization_id')
@@ -36,10 +43,14 @@ export const UserRoleProvider = ({ children }) => {
             setRole(finalRole);
             setOrganizationId(finalOrgId);
             setIsAdminAccess(['super_admin', 'org_admin'].includes(finalRole));
+            
+            lastFetchedUserId.current = user.id;
         } catch (err) {
             console.error('Error fetching role data:', err);
             setRole('student');
         } finally {
+            // Always release the loading state, regardless of whether it's
+            // the first fetch or a subsequent refresh.
             setLoading(false);
         }
     }, [user]);

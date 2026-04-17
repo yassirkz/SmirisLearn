@@ -16,7 +16,8 @@ import {
   Ban,
   RefreshCw,
   Plus,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
@@ -41,7 +42,7 @@ const ROLE_CONFIG = {
 };
 
 export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
-  const { user } = useAuth();
+  const { user, startImpersonation } = useAuth();
   const { success, error: showError } = useToast();
   const { createInvitation, loading: inviting } = useMemberInvitation();
 
@@ -550,6 +551,19 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
                                 <Shield className="w-4 h-4 text-accent-600 dark:text-accent-400" />
                               )}
                             </motion.button>
+
+                            {/* Impersonate */}
+                            {member.id !== user.id && (
+                              <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => startImpersonation(member.id)}
+                                title="Voir comme l'utilisateur"
+                                className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800/50 rounded-xl transition-all shadow-sm"
+                              >
+                                <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                              </motion.button>
+                            )}
  
                             {/* Supprimer (étudiants pour les admins, tout le monde pour super_admin) */}
                             {(member.role === 'student' || user?.role === 'super_admin') && (

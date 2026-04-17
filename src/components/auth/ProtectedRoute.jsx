@@ -18,9 +18,6 @@ export default function ProtectedRoute({
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
 
-  // DEBUG: Afficher les infos
-  console.log("🔐 ProtectedRoute DEBUG:");
-  
   // Afficher un loader pendant la vérification
   if (authLoading || roleLoading) {
     return (

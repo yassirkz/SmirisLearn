@@ -17,7 +17,7 @@ import UserActionModal from '../../components/super-admin/UserActionModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 export default function SuperAdminUsers() {
-    const { user } = useAuth();
+    const { user, startImpersonation } = useAuth();
     const { success, error: showError } = useToast();
     const { createInvitation, loading: inviting } = useMemberInvitation();
 
@@ -681,6 +681,13 @@ export default function SuperAdminUsers() {
                                                                         >
                                                                             <Edit className="w-4 h-4" />
                                                                             Modifier le rôle
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => startImpersonation(user.id)}
+                                                                            className="w-full px-4 py-2 text-left text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 flex items-center gap-2 transition-colors"
+                                                                        >
+                                                                            <Eye className="w-4 h-4" />
+                                                                            Voir comme l'utilisateur
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleUserAction(user, 'suspend')}

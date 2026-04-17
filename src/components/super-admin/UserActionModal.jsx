@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Shield, Trash2, AlertCircle, Save, Eye, Mail, Building2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function UserActionModal({ isOpen, onClose, user, action, onSuccess }) {
+    const { startImpersonation } = useAuth();
     const [formData, setFormData] = useState({
         full_name: '',
         email: '',
@@ -253,6 +255,19 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
                                             >
                                                 {isView ? 'Fermer' : 'Annuler'}
                                             </button>
+                                            {isView && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        onClose();
+                                                        startImpersonation(user.id);
+                                                    }}
+                                                    className="flex-1 py-4 bg-blue-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm"
+                                                >
+                                                    <Eye className="w-5 h-5" />
+                                                    <span>Voir comme l'utilisateur</span>
+                                                </button>
+                                            )}
                                             {!isView && (
                                                 <button
                                                     type="submit"

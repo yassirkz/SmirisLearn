@@ -7,6 +7,7 @@ import LoadingSpinner from "./components/ui/LoadingSpinner";
 
 // Non-lazy (needed before routing)
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ImpersonationBanner from "./components/layout/ImpersonationBanner";
 
 // ============================================
 // LAZY-LOADED PAGES (code-split)
@@ -64,6 +65,7 @@ function App() {
         <LoadingSpinner size="lg" color="primary" />
       </div>
     }>
+    <ImpersonationBanner />
     <Routes>
       {/* ============================================
           ROUTES PUBLIQUES
