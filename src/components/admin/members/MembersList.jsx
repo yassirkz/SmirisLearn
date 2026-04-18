@@ -38,6 +38,11 @@ const ROLE_CONFIG = {
     label: "Étudiant",
     icon: GraduationCap,
     color: 'bg-primary-100 text-primary-700 border-primary-200 dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-800'
+  },
+  super_admin: {
+    label: "Super Admin",
+    icon: Shield,
+    color: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
   }
 };
 
@@ -120,7 +125,7 @@ export default function MembersList({ isReadOnly = false, orgId: propOrgId }) {
           created_at
         `)
         .eq('organization_id', organizationId)
-        .in('role', ['student', 'org_admin']);
+        .in('role', ['student', 'org_admin', 'super_admin']);
 
       if (debouncedSearch) {
         query = query.or(

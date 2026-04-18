@@ -59,7 +59,7 @@ serve(async (req) => {
       .insert({
         name: companyName,
         slug: slug,
-        plan_type: plan === "starter" ? "trial" : plan,
+        plan_type: plan,
         subscription_status: plan === "free" ? "active" : "trial",
         trial_ends_at: plan === "starter"
           ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()

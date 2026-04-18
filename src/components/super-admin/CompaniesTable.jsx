@@ -282,7 +282,7 @@ export default function CompaniesTable() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
-                                            <div className="flex items-center justify-end gap-3 translate-x-4 opacity-0 group-hover/row:opacity-100 group-hover/row:translate-x-0 transition-all duration-300">
+                                            <div className="flex items-center justify-end gap-3">
                                                 <motion.button
                                                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(var(--color-primary-50), 0.5)' }}
                                                     whileTap={{ scale: 0.9 }}
@@ -296,7 +296,7 @@ export default function CompaniesTable() {
                                                     whileHover={{ scale: 1.1 }}
                                                     whileTap={{ scale: 0.9 }}
                                                     onClick={() => navigate(`/admin?orgId=${company.id}`)}
-                                                    className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400 opacity-0 group-hover:opacity-100"
+                                                    className="p-2 hover:bg-accent-100 dark:hover:bg-accent-900/50 rounded-lg transition-colors text-accent-600 dark:text-accent-400"
                                                     title="Voir Dashboard Admin"
                                                 >
                                                     <LayoutDashboard size={18} />
@@ -309,8 +309,9 @@ export default function CompaniesTable() {
                                                             .from('profiles')
                                                             .select('email')
                                                             .eq('organization_id', company.id)
-                                                            .eq('role', 'org_admin')
-                                                            .single();
+                                                            .in('role', ['org_admin', 'super_admin'])
+                                                            .limit(1)
+                                                            .maybeSingle();
                                                         
                                                         if (profiles?.email) {
                                                             window.location.href = `mailto:${profiles.email}?subject=Question concernant ${company.name}`;
@@ -318,7 +319,7 @@ export default function CompaniesTable() {
                                                             alert("Aucun email d'administrateur trouvé.");
                                                         }
                                                     }}
-                                                    className="p-2 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-lg transition-colors text-green-600 dark:text-green-400 opacity-0 group-hover:opacity-100"
+                                                    className="p-2 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-lg transition-colors text-green-600 dark:text-green-400"
                                                     title="Envoyer un email"
                                                 >
                                                     <Mail size={18} />

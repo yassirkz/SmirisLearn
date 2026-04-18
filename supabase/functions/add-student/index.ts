@@ -1,4 +1,3 @@
-// supabase/functions/add-student/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { verifyApiKey, logApiCall, corsHeaders } from "../_shared/verify-api-key.ts";
 
@@ -16,16 +15,16 @@ serve(async (req) => {
 
     const url = new URL(req.url);
     const pathParts = url.pathname.split("/");
-    // URL: /organizations/:orgId/students
+    // URL attendue : /add-student/organizations/{orgId}/students
     const orgId = pathParts[pathParts.length - 2];
 
     if (!orgId) {
       throw new Error("Missing organization ID in path");
     }
 
-    const { email, fullName, password } = await req.json();
+    const { email, fullName, password, groupIds } = await req.json();
 
-    // Validation
+    // Validation des entrées
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
       throw new Error("Invalid email");
@@ -39,8 +38,8 @@ serve(async (req) => {
       .rpc("check_organization_limits_full", { p_org_id: orgId });
 
     if (limitsError) throw limitsError;
-    if (!limits.can_add_member) {
-      throw new Error("Organization member limit reached");
+    if (!limits.can_add_users) {
+      throw new Error(`Organization member limit reached (current: ${limits.current_usage?.users}, max: ${limits.limits?.users})`);
     }
 
     // Vérifier si l'utilisateur existe déjà
@@ -79,6 +78,32 @@ serve(async (req) => {
         .from("profiles")
         .update({ organization_id: orgId })
         .eq("id", studentId);
+    }
+
+    // Assignation aux groupes
+    if (groupIds && Array.isArray(groupIds) && groupIds.length > 0) {
+      // Vérifier que les groupes appartiennent bien à l'organisation
+      const { data: validGroups, error: groupsError } = await supabase
+        .from("groups")
+        .select("id")
+        .in("id", groupIds)
+        .eq("organization_id", orgId);
+
+      if (groupsError) throw groupsError;
+      
+      if (validGroups && validGroups.length === groupIds.length) {
+        const inserts = groupIds.map((groupId: string) => ({
+          user_id: studentId,
+          group_id: groupId,
+        }));
+        const { error: insertError } = await supabase
+          .from("group_members")
+          .upsert(inserts, { onConflict: "user_id, group_id", ignoreDuplicates: true });
+        
+        if (insertError) throw insertError;
+      } else {
+        console.warn("Some group IDs are invalid or do not belong to the organization");
+      }
     }
 
     responseBody = {

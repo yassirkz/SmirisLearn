@@ -37,7 +37,28 @@ serve(async (req) => {
 
     const orgId = profile.organization_id;
 
-    // 2. Supprimer l'organisation (cascade grâce aux FK)
+    // 1.5 Récupérer tous les profils de l'organisation pour pouvoir les supprimer du système auth
+    const { data: orgMembers } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("organization_id", orgId);
+
+    // On exclut les super_admin par sécurité au cas où l'un d'eux se serait attaché à l'entreprise
+    const userIdsToDelete = (orgMembers || [])
+      .filter((m: any) => m.role !== "super_admin")
+      .map((m: any) => m.id);
+
+    // 2. Détacher tous les profils (pour éviter l'erreur de clé étrangère sur profiles_organization_id_fkey)
+    const { error: updateProfilesError } = await supabase
+      .from("profiles")
+      .update({ organization_id: null })
+      .eq("organization_id", orgId);
+
+    if (updateProfilesError) {
+      console.warn("Could not detach profiles:", updateProfilesError);
+    }
+
+    // 3. Supprimer l'organisation
     const { error: deleteOrgError } = await supabase
       .from("organizations")
       .delete()
@@ -45,11 +66,11 @@ serve(async (req) => {
 
     if (deleteOrgError) throw deleteOrgError;
 
-    // 3. Supprimer l'utilisateur de auth.users (le compte admin)
-    const { error: deleteUserError } = await supabase.auth.admin.deleteUser(userId);
-    if (deleteUserError) {
-      console.warn("Could not delete auth user:", deleteUserError.message);
-      // On continue, l'organisation est déjà supprimée
+    // 4. Supprimer tous les utilisateurs rattachés (de auth.users)
+    if (userIdsToDelete.length > 0) {
+      await Promise.allSettled(
+        userIdsToDelete.map((uid: string) => supabase.auth.admin.deleteUser(uid))
+      );
     }
 
     responseBody = {

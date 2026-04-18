@@ -296,7 +296,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                       {new Date(group.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover/row:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-2">
                         {!isReadOnly && (
                           <>
                             <motion.button
