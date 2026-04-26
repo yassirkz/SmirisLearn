@@ -76,7 +76,7 @@ export default React.memo(function LoadingSpinner({
             className={`${sizeClass} ${variantClass} bg-gradient-to-r ${colorClass} p-0.5`}
           >
             <div
-              className={`w-full h-full ${variantClass} bg-white dark:bg-gray-900 flex items-center justify-center`}
+              className={`w-full h-full ${variantClass} bg-white/60 dark:bg-slate-900/60 backdrop-blur-md flex items-center justify-center`}
             >
               {showIcon && (
                 <motion.div
@@ -167,7 +167,7 @@ export function FullPageSpinner({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-white/40 dark:bg-slate-900/60 backdrop-blur-2xl"
     >
       <LoadingSpinner size="2xl" color={color} message={message} />
     </motion.div>

@@ -366,11 +366,26 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-primary-50 dark:from-secondary-950 dark:to-secondary-900 flex items-center justify-center">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-primary-100 dark:border-primary-900 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+      <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center">
+        <motion.div
+           animate={{ scale: [1, 1.1, 1], rotate: [0, 180, 360] }}
+           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+           className="relative"
+        >
+          <div className="w-20 h-20 border-4 border-primary-100/50 dark:border-gray-700 rounded-full shadow-2xl"></div>
+          <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full"></div>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+             <Sparkles className="w-6 h-6 text-primary-500 animate-pulse delay-700" />
+          </div>
+        </motion.div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 text-primary-900 dark:text-primary-300 font-medium tracking-wide animate-pulse"
+        >
+          Chargement de votre espace...
+        </motion.p>
       </div>
     );
   }
@@ -449,44 +464,51 @@ export default function StudentDashboard() {
             </div>
 
             {/* Progression globale avec cercle */}
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-primary-100 dark:border-gray-700 flex items-center gap-4">
+            <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl px-6 py-4 rounded-3xl shadow-xl border border-white/50 dark:border-gray-700/50 flex items-center gap-5 hover:bg-white/60 dark:hover:bg-gray-800/60 transition-colors">
               <div className="text-right">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-black mb-0.5">
                   Progression Globale
                 </p>
-                <div className="flex items-center justify-end gap-1">
-                  <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                <div className="flex items-center justify-end gap-1.5">
+                  <p className="text-3xl font-black bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent drop-shadow-sm">
                     {stats.overallProgress}%
                   </p>
                   {stats.overallProgress > 0 && (
-                    <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400 animate-pulse" />
+                    <Sparkles className="w-5 h-5 text-amber-400 dark:text-amber-300 animate-[pulse_2s_ease-in-out_infinite]" />
                   )}
                 </div>
               </div>
-              <div className="relative w-14 h-14">
-                <svg className="w-14 h-14 transform -rotate-90">
+              <div className="relative w-16 h-16 drop-shadow-md">
+                <svg className="w-16 h-16 transform -rotate-90">
                   <circle
-                    cx="28"
-                    cy="28"
-                    r="24"
+                    cx="32"
+                    cy="32"
+                    r="28"
                     stroke="currentColor"
-                    strokeWidth="4"
+                    strokeWidth="6"
                     fill="transparent"
-                    className="text-gray-200 dark:text-gray-700"
+                    className="text-gray-100 dark:text-gray-800"
                   />
                   <circle
-                    cx="28"
-                    cy="28"
-                    r="24"
-                    stroke="currentColor"
-                    strokeWidth="4"
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="url(#progressGradient)"
+                    strokeWidth="6"
+                    strokeLinecap="round"
                     fill="transparent"
-                    strokeDasharray={2 * Math.PI * 24}
+                    strokeDasharray={2 * Math.PI * 28}
                     strokeDashoffset={
-                      2 * Math.PI * 24 * (1 - stats.overallProgress / 100)
+                      2 * Math.PI * 28 * (1 - stats.overallProgress / 100)
                     }
-                    className="text-primary-600 dark:text-primary-400 transition-all duration-500"
+                    className="transition-all duration-1000 ease-out"
                   />
+                  <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#4f46e5" />
+                      <stop offset="100%" stopColor="#8b5cf6" />
+                    </linearGradient>
+                  </defs>
                 </svg>
               </div>
             </div>
@@ -494,21 +516,23 @@ export default function StudentDashboard() {
         </div>
 
         {/* Cartes de statistiques supplémentaires */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 dark:border-gray-700/50 flex items-center gap-4 relative overflow-hidden group"
           >
-            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-              <BookOpen className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary-100/50 dark:bg-primary-900/20 rounded-full blur-2xl group-hover:bg-primary-200/50 transition-colors"></div>
+            <div className="p-3 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/40 dark:to-primary-800/40 rounded-2xl shadow-inner relative z-10">
+              <BookOpen className="w-6 h-6 text-primary-600 dark:text-primary-400" />
             </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="relative z-10">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">
                 Piliers accessibles
               </p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">
+              <p className="text-2xl font-black text-gray-800 dark:text-white mt-0.5">
                 {stats.pillarsCount}
               </p>
             </div>
@@ -518,16 +542,18 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 dark:border-gray-700/50 flex items-center gap-4 relative overflow-hidden group"
           >
-            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-              <Hourglass className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-2xl group-hover:bg-blue-200/50 transition-colors"></div>
+            <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 rounded-2xl shadow-inner relative z-10">
+              <Hourglass className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Temps de formation
+            <div className="relative z-10">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">
+                Temps d'étude
               </p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">
+              <p className="text-2xl font-black text-gray-800 dark:text-white mt-0.5">
                 {formatTimeSpent(totalTimeSpent)}
               </p>
             </div>
@@ -537,17 +563,19 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 dark:border-gray-700/50 flex items-center gap-4 relative overflow-hidden group"
           >
-            <div className="p-2 bg-accent-100 dark:bg-accent-900/30 rounded-lg">
-              <Zap className="w-5 h-5 text-accent-600 dark:text-accent-400" />
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-accent-100/50 dark:bg-accent-900/20 rounded-full blur-2xl group-hover:bg-accent-200/50 transition-colors"></div>
+            <div className="p-3 bg-gradient-to-br from-accent-50 to-accent-100 dark:from-accent-900/40 dark:to-accent-800/40 rounded-2xl shadow-inner relative z-10">
+              <Zap className="w-6 h-6 text-accent-600 dark:text-accent-400" />
             </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="relative z-10">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">
                 Quiz réussis
               </p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">
-                {stats.passedQuizzes}/{stats.totalQuizzes}
+              <p className="text-2xl font-black text-gray-800 dark:text-white mt-0.5">
+                {stats.passedQuizzes} <span className="text-gray-400 text-lg">/ {stats.totalQuizzes}</span>
               </p>
             </div>
           </motion.div>
@@ -556,17 +584,19 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-primary-100 dark:border-gray-700 flex items-center gap-3"
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 dark:border-gray-700/50 flex items-center gap-4 relative overflow-hidden group"
           >
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <PlayCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-full blur-2xl group-hover:bg-emerald-200/50 transition-colors"></div>
+            <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 rounded-2xl shadow-inner relative z-10">
+              <PlayCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="relative z-10">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">
                 Vidéos terminées
               </p>
-              <p className="text-xl font-bold text-gray-800 dark:text-white">
-                {stats.completedVideos}/{stats.totalVideos}
+              <p className="text-2xl font-black text-gray-800 dark:text-white mt-0.5">
+                {stats.completedVideos} <span className="text-gray-400 text-lg">/ {stats.totalVideos}</span>
               </p>
             </div>
           </motion.div>
@@ -579,27 +609,32 @@ export default function StudentDashboard() {
             animate={{ opacity: 1, rotateX: 0, scale: 1 }}
             transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
             whileHover={{ rotateX: 2, rotateY: -2 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-primary-100 dark:border-gray-700 transition-shadow hover:shadow-primary-200/50 dark:hover:shadow-primary-900/30"
+            className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[2rem] p-8 sm:p-10 shadow-2xl border border-white/60 dark:border-gray-700/50 hover:shadow-primary-500/10 transition-shadow relative overflow-hidden"
           >
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Progression par pilier
+            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                <TrendingUp className="w-64 h-64 text-primary-500" />
+            </div>
+            <div className="flex items-center gap-3 mb-8 relative z-10">
+              <div className="p-3 bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-xl shadow-lg">
+                  <TrendingUp className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-black text-gray-800 dark:text-white tracking-tight">
+                Progression par module
               </h2>
             </div>
             <div
-              className="h-52 sm:h-64 md:h-80 w-full relative"
+              className="h-52 sm:h-64 md:h-80 w-full relative z-10"
               style={{ minHeight: "240px" }}
             >
               <ProgressChart data={progressByPillar} />
               {progressByPillar.length === 1 && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="text-center translate-y-[-10px]">
-                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 animate-pulse">
+                  <div className="text-center translate-y-[-10px] bg-white/80 dark:bg-gray-900/80 px-6 py-4 rounded-3xl backdrop-blur-md shadow-lg border border-white/50 dark:border-gray-700">
+                    <p className="text-4xl font-black bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
                       {progressByPillar[0].value}%
                     </p>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                      Progression Globale
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-widest mt-1">
+                      Avancement
                     </p>
                   </div>
                 </div>
@@ -614,32 +649,36 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+            className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[2rem] p-8 shadow-xl border border-white/60 dark:border-gray-700/50 cursor-default"
           >
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
-              <PlayCircle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <h3 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-3 mb-6 tracking-tight">
+              <div className="p-2.5 bg-gradient-to-br from-accent-500 to-amber-500 text-white rounded-xl shadow-md">
+                 <PlayCircle className="w-5 h-5" />
+              </div>
               Reprendre l'apprentissage
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {recommendations.map((rec) => (
                 <motion.div
                   key={rec.videoId}
-                  whileHover={{ scale: 1.02 }}
-                  className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-xl border border-primary-100 dark:border-primary-800 cursor-pointer hover:shadow-md transition-shadow"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  className="flex items-center gap-4 p-5 bg-gradient-to-br from-white to-primary-50/50 dark:from-gray-800 dark:to-primary-900/20 rounded-2xl border border-white dark:border-gray-700 cursor-pointer shadow-[0_4px_15px_rgb(0,0,0,0.05)] hover:shadow-[0_10px_25px_rgb(99,102,241,0.15)] transition-all group"
                   onClick={() => navigate(`/student/video/${rec.videoId}`)}
                 >
-                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-800/50 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
-                    <PlayCircle className="w-6 h-6" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/60 dark:to-primary-800/60 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-300 shadow-inner group-hover:rotate-12 transition-transform">
+                    <PlayCircle className="w-7 h-7" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 dark:text-white truncate">
+                    <p className="font-bold text-gray-800 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                       {escapeText(untrusted(rec.title))}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium uppercase mt-0.5 tracking-wider">
                       {rec.pillarName} • {formatDuration(rec.duration)}
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                  <div className="w-8 h-8 rounded-full bg-primary-50 dark:bg-gray-700 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                      <ChevronRight className="w-4 h-4 text-primary-400 group-hover:text-white" />
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -653,58 +692,59 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+            className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[2rem] p-7 shadow-xl border border-white/60 dark:border-gray-700/50"
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-                <PlayCircle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-3 tracking-tight">
+                <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <Video className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                </div>
                 Vidéos récentes
               </h3>
               <button
                 onClick={() => navigate("/student/learning")}
-                className="text-sm text-primary-600 dark:text-primary-400 font-semibold hover:underline"
+                className="text-sm text-primary-600 dark:text-primary-400 font-bold hover:text-primary-800 dark:hover:text-primary-300 flex items-center gap-1 group"
               >
-                Voir tout
+                Tout voir <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
 
             {recentVideos.length === 0 ? (
-              <div className="text-center py-8">
-                <Video className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 italic">
+              <div className="text-center py-12 bg-white/50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
+                <Video className="w-14 h-14 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium tracking-wide">
                   Aucune vidéo visionnée récemment.
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {recentVideos.map((video) => (
                   <motion.div
                     key={video.id}
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer border border-transparent hover:border-primary-200 dark:hover:border-primary-800"
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-gray-800/60 hover:bg-white/90 dark:hover:bg-gray-700/80 transition-all cursor-pointer border border-white/50 dark:border-gray-700 shadow-sm hover:shadow-md group"
                     onClick={() => navigate(`/student/video/${video.id}`)}
                   >
-                    <div className="w-20 h-14 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <div className="w-24 h-16 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/50 dark:to-primary-800/50 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center border border-primary-100/50 dark:border-primary-800/50">
                       {video.thumbnail_url ? (
                         <img
                           src={video.thumbnail_url}
                           alt={video.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           loading="lazy"
                         />
                       ) : (
-                        <PlayCircle className="w-6 h-6 text-primary-400 dark:text-primary-400" />
+                        <PlayCircle className="w-8 h-8 text-primary-400 dark:text-primary-500 group-hover:scale-110 transition-transform" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-800 dark:text-white truncate">
+                      <h4 className="font-bold text-gray-800 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {escapeText(untrusted(video.title))}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {video.pillar?.name} • {formatDuration(video.duration)}
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mt-1 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span> {video.pillar?.name} • {formatDuration(video.duration)}
                       </p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </motion.div>
                 ))}
               </div>
@@ -716,42 +756,46 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary-100 dark:border-gray-700"
+            className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[2rem] p-7 shadow-xl border border-white/60 dark:border-gray-700/50"
           >
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
-              <Award className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <h3 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-3 mb-6 tracking-tight">
+              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg">
+                  <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
               Quiz en attente
             </h3>
 
             {upcomingQuizzes.length === 0 ? (
-              <div className="text-center py-8">
-                <Award className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 dark:text-gray-500 italic">
-                  Super ! Vous êtes à jour dans vos quiz.
+              <div className="text-center py-12 bg-white/50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
+                <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Award className="w-10 h-10 text-emerald-300 dark:text-emerald-600" />
+                </div>
+                <p className="text-emerald-600 dark:text-emerald-400 font-bold tracking-wide">
+                  Super ! Vous êtes à jour.
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {upcomingQuizzes.map((quiz) => (
                   <motion.div
                     key={quiz.id}
                     whileHover={{ scale: 1.02 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-800 hover:shadow-md transition-shadow cursor-pointer"
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/20 border border-emerald-100 dark:border-emerald-800/50 hover:shadow-lg transition-all cursor-pointer group"
                     onClick={() => navigate(`/student/quiz/${quiz.id}`)}
                   >
-                    <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400 shadow-sm">
-                      <Award className="w-5 h-5" />
+                    <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-50 dark:border-gray-700 group-hover:rotate-12 transition-transform">
+                      <Award className="w-7 h-7" />
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800 dark:text-white">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 dark:text-white truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                         {escapeText(untrusted(quiz.video?.title || "Quiz"))}
                       </h4>
-                      <p className="text-xs text-green-600 dark:text-green-400">
-                        Prêt à être passé
+                      <p className="text-[11px] text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-bold mt-1 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> Prêt à être passé
                       </p>
                     </div>
-                    <button className="px-4 py-2 bg-green-600 dark:bg-green-600 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-green-700 dark:hover:bg-green-700 transition-colors">
-                      Commencer
+                    <button className="hidden sm:flex items-center justify-center px-5 py-2.5 bg-emerald-600 dark:bg-emerald-600 text-white rounded-xl text-sm font-black shadow-md hover:bg-emerald-700 dark:hover:bg-emerald-500 transition-colors shrink-0 hover:scale-105 active:scale-95">
+                      Go !
                     </button>
                   </motion.div>
                 ))}

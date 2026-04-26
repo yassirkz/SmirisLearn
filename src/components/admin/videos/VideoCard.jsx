@@ -104,7 +104,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                     </div>
                 </td>
                 <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-slate-800/50 w-fit px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700/50">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white/50 dark:bg-white/5 w-fit px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700/50">
                         <Clock className="w-4 h-4 text-gray-400" />
                         <span>{formatDuration(video.duration)}</span>
                     </div>
@@ -118,7 +118,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleView}
-                            className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
+                            className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
                             title="Voir les détails"
                         >
                             <Eye className="w-4 h-4" />
@@ -130,7 +130,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleEdit}
-                                    className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
+                                    className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
                                     title="Modifier"
                                 >
                                     <Edit className="w-4 h-4" />
@@ -140,7 +140,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleDelete}
-                                    className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
+                                    className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
                                     title="Supprimer"
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -161,7 +161,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
             transition={{ delay: index * 0.1 }}
             whileHover={{ y: -5, scale: 1.01 }}
             onClick={handleCardClick}
-            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group cursor-pointer transition-all duration-300"
+            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg hover:shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden group cursor-pointer transition-all duration-300"
         >
             {/* Effet de shine */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -211,7 +211,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
 
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-2">
-                    <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-slate-800/50 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700/50">
+                    <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-white/50 dark:bg-white/5 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700/50 shadow-sm">
                         {formatDate(video.created_at)}
                     </span>
                     
@@ -220,7 +220,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={handleView}
-                            className="p-2.5 bg-gray-50 dark:bg-slate-800/50 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 shadow-sm"
+                            className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 shadow-sm"
                             title="Voir les détails"
                         >
                             <Eye className="w-4 h-4" />
@@ -232,7 +232,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleEdit}
-                                    className="p-2.5 bg-gray-50 dark:bg-slate-800/50 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 shadow-sm"
+                                    className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 shadow-sm"
                                     title="Modifier"
                                 >
                                     <Edit className="w-4 h-4" />
@@ -242,7 +242,7 @@ export default function VideoCard({ video, index, onEdit, onDelete, isReadOnly, 
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleDelete}
-                                    className="p-2.5 bg-gray-50 dark:bg-slate-800/50 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 shadow-sm"
+                                    className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700/50 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 shadow-sm"
                                     title="Supprimer"
                                 >
                                     <Trash2 className="w-4 h-4" />

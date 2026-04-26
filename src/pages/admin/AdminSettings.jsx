@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Settings, Save, RefreshCw, Mail, 
     Bell, Lock, Globe, Moon, Sun, Eye, EyeOff,
     CheckCircle, AlertCircle, X, Building,
     User, Key, CreditCard, ArrowRight, History, Sparkles,
-    Building2
+    Building2, ChevronDown
 } from 'lucide-react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import { supabase } from '../../lib/supabase';
@@ -53,6 +53,8 @@ export default function AdminSettings() {
         quizCompleted: true,
         sessionTimeout: '30'
     });
+    const [isSessionTimeoutOpen, setIsSessionTimeoutOpen] = useState(false);
+    const sessionTimeoutRef = useRef(null);
 
     const [originalSettings, setOriginalSettings] = useState({});
     const [showPassword, setShowPassword] = useState(false);
@@ -78,6 +80,17 @@ export default function AdminSettings() {
             window.history.replaceState({}, '', newUrl);
         }
     }, [user, role, isReadOnly]);
+
+    // Fermer le dropdown si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (sessionTimeoutRef.current && !sessionTimeoutRef.current.contains(event.target)) {
+                setIsSessionTimeoutOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [sessionTimeoutRef]);
 
     const fetchSettings = async () => {
         try {
@@ -282,7 +295,7 @@ export default function AdminSettings() {
                 className="space-y-8"
             >
                 {/* En-tête avec Glassmorphism */}
-                <div className="relative bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white/50 dark:border-white/5 overflow-hidden">
+                <div className="relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 shadow-lg border border-white/50 dark:border-white/5 overflow-hidden">
                     {/* Background Glows */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-title-500/10 dark:bg-title-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
@@ -302,7 +315,7 @@ export default function AdminSettings() {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="px-4 py-1.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800/50 rounded-full text-sm font-bold text-primary-700 dark:text-primary-300 shadow-sm flex items-center gap-2 w-fit"
+                                    className="px-4 py-1.5 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 rounded-full text-sm font-bold text-primary-700 dark:text-primary-300 shadow-sm flex items-center gap-2 w-fit"
                                 >
                                     <Sparkles className="w-4 h-4" />
                                     Paramètres
@@ -361,7 +374,7 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             {/* Glow Effect */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
@@ -416,7 +429,7 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             {/* Glow Effect */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
@@ -480,7 +493,7 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             {/* Glow Effect */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
@@ -529,7 +542,7 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.35 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             {/* Glow Effect */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
@@ -616,7 +629,7 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             {/* Glow Effect */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />
@@ -631,18 +644,58 @@ export default function AdminSettings() {
 
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Délai d'expiration de session</p>
-                                <select
-                                    value={settings.sessionTimeout}
-                                    onChange={(e) => setSettings({...settings, sessionTimeout: e.target.value})}
-                                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white"
-                                    disabled={isReadOnly}
-                                >
-                                    <option value="15">15 minutes</option>
-                                    <option value="30">30 minutes</option>
-                                    <option value="60">1 heure</option>
-                                    <option value="120">2 heures</option>
-                                    <option value="240">4 heures</option>
-                                </select>
+                                <div className="relative" ref={sessionTimeoutRef}>
+                                    <button
+                                        onClick={() => setIsSessionTimeoutOpen(!isSessionTimeoutOpen)}
+                                        disabled={isReadOnly}
+                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-700 dark:text-white flex items-center justify-between gap-2 shadow-sm disabled:opacity-50"
+                                    >
+                                        <span>
+                                            {[
+                                                { value: '15', label: '15 minutes' },
+                                                { value: '30', label: '30 minutes' },
+                                                { value: '60', label: '1 heure' },
+                                                { value: '120', label: '2 heures' },
+                                                { value: '240', label: '4 heures' }
+                                            ].find(o => o.value === settings.sessionTimeout)?.label || 'Sélectionner'}
+                                        </span>
+                                        <ChevronDown size={14} className={`transition-transform duration-200 ${isSessionTimeoutOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+
+                                    <AnimatePresence>
+                                        {isSessionTimeoutOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                className="absolute left-0 mt-2 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50 overflow-hidden"
+                                            >
+                                                {[
+                                                    { value: '15', label: '15 minutes' },
+                                                    { value: '30', label: '30 minutes' },
+                                                    { value: '60', label: '1 heure' },
+                                                    { value: '120', label: '2 heures' },
+                                                    { value: '240', label: '4 heures' }
+                                                ].map((opt) => (
+                                                    <button
+                                                        key={opt.value}
+                                                        onClick={() => {
+                                                            setSettings({...settings, sessionTimeout: opt.value});
+                                                            setIsSessionTimeoutOpen(false);
+                                                        }}
+                                                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                            ${settings.sessionTimeout === opt.value 
+                                                                ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                                : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                            }`}
+                                                    >
+                                                        {opt.label}
+                                                    </button>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
                             </div>
                         </motion.div>
@@ -651,7 +704,7 @@ export default function AdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             {/* Glow Effect */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-500/10 dark:group-hover:bg-primary-500/20 transition-colors duration-500" />

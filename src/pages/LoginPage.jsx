@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   return (
     <div className="dark">
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
+      <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50/50 via-white to-accent-50/30 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
       {/* Particules animées */}
       <div className="absolute inset-0 overflow-hidden">
         {particles.map((particle) => (

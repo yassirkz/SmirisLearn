@@ -59,11 +59,11 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/50 dark:border-white/5 overflow-hidden"
+            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden"
         >
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px]">
-                    <thead className="bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-gray-700/50 backdrop-blur-sm">
+                    <thead className="bg-white/40 dark:bg-slate-800/40 border-b border-white/50 dark:border-white/5 backdrop-blur-md">
                         <tr>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest min-w-[200px]">
                                 Pilier
@@ -82,7 +82,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100/80 dark:divide-gray-800/80">
+                    <tbody className="divide-y divide-white/50 dark:divide-white/5">
                         {currentPillars.map((pillar, index) => {
                             const colorStyle = getColorStyle(pillar.color);
                             
@@ -178,7 +178,7 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
             </div>
 
             {totalPages > 1 && (
-                <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div className="px-6 py-4 border-t border-white/50 dark:border-white/5 flex items-center justify-between bg-white/20 dark:bg-transparent">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                         Page {page} sur {totalPages}
                     </p>
@@ -186,14 +186,14 @@ export default function PillarTable({ pillars, onEdit, onDelete, isReadOnly }) {
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                            className="p-2 border border-white/50 dark:border-white/5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 disabled:opacity-50 transition-colors shadow-sm bg-white/20 dark:bg-transparent"
                         >
                             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
                         <button
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
-                            className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                            className="p-2 border border-white/50 dark:border-white/5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 disabled:opacity-50 transition-colors shadow-sm bg-white/20 dark:bg-transparent"
                         >
                             <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>

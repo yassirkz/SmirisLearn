@@ -23,7 +23,6 @@ export function useInvitation() {
 
             // Validation email
             const validatedEmail = validateEmail(untrusted(email));
-            console.log('📨 Email validé :', validatedEmail);
 
             // Vérification doublons
             const { data: existingInvite, error: checkError } = await supabase
@@ -78,11 +77,10 @@ export function useInvitation() {
                 token: data.token
             };
 
-            console.log('📦 Données préparées pour l\'email :', emailData);
 
-            // Récupérer l'utilisateur connecté (super admin)
+
             const { data: { user: superAdmin } } = await supabase.auth.getUser();
-            const fromEmail = superAdmin?.email || "kezziyassir005@gmail.com";
+            const fromEmail = superAdmin?.email;
 
             // Envoyer l'email
             const emailResult = await sendInvitationEmail({

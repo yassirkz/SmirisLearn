@@ -1,6 +1,6 @@
 // supabase/functions/list-students/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyApiKey, logApiCall, corsHeaders } from "../_shared/verify-api-key.ts";
+import { verifyApiKey, logApiCall, corsHeaders, checkOrgAccess } from "../_shared/verify-api-key.ts";
 
 serve(async (req) => {
   const startTime = performance.now();
@@ -22,6 +22,9 @@ serve(async (req) => {
       throw new Error("Missing organization ID in path");
     }
 
+    // VÉRIFICATION DE SÉCURITÉ (IDOR)
+    checkOrgAccess(keyData, orgId);
+
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");
     const search = url.searchParams.get("search") || "";
@@ -35,7 +38,8 @@ serve(async (req) => {
       .range((page - 1) * limit, page * limit - 1);
 
     if (search) {
-      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
+      const sanitized = search.replace(/[%_\\]/g, '\\$&');
+      query = query.or(`full_name.ilike.%${sanitized}%,email.ilike.%${sanitized}%`);
     }
 
     const { data, error, count } = await query;

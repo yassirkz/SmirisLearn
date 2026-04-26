@@ -280,7 +280,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-primary-200 dark:hover:border-primary-900/50 transition-colors"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-primary-200 dark:hover:border-primary-900/50 transition-colors cursor-pointer group"
                 >
                     <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <div className="p-1.5 bg-primary-100 dark:bg-primary-900/50 rounded-lg">
@@ -291,19 +291,19 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Durée totale</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {formatDuration(stats.videos.totalDuration)}
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Durée moyenne</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {formatDuration(stats.videos.averageDuration)}
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Avec quiz</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {stats.quizzes.total} / {stats.videos.total}
                             </span>
                         </div>
@@ -315,7 +315,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-accent-200 dark:hover:border-accent-900/50 transition-colors"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-accent-200 dark:hover:border-accent-900/50 transition-colors cursor-pointer group"
                 >
                     <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <div className="p-1.5 bg-accent-100 dark:bg-accent-900/50 rounded-lg">
@@ -326,7 +326,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Total</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {stats.students.total}
                             </span>
                         </div>
@@ -350,7 +350,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-green-200 dark:hover:border-green-900/50 transition-colors"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 hover:border-green-200 dark:hover:border-green-900/50 transition-colors cursor-pointer group"
                 >
                     <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <div className="p-1.5 bg-green-100 dark:bg-green-900/50 rounded-lg">
@@ -361,7 +361,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm border-b border-gray-100 dark:border-gray-800 pb-2">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Score moyen</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {stats.quizzes.averageScore}%
                             </span>
                         </div>
@@ -373,7 +373,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Tentatives</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {stats.quizzes.totalAttempts}
                             </span>
                         </div>
@@ -385,7 +385,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 border-b-4 border-b-primary-500"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-5 shadow-lg border border-white/50 dark:border-white/5 border-b-4 border-b-primary-500 cursor-pointer group"
                 >
                     <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <div className="p-1.5 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
@@ -402,7 +402,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-gray-500 dark:text-gray-400 font-medium">Vidéos Vues</span>
-                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            <span className="font-bold text-gray-800 dark:text-gray-200 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 px-2 py-0.5 rounded text-xs shadow-sm">
                                 {stats.progress.totalWatched}
                             </span>
                         </div>
@@ -411,7 +411,7 @@ export default function PillarStats({ pillarId, pillarName, videos: pillarVideos
                                 <span className="font-medium text-gray-500">Avancement</span>
                                 <span className="font-bold text-primary-600 dark:text-primary-400">{stats.progress.averageCompletion}%</span>
                             </div>
-                            <div className="h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-200/50 dark:border-gray-700/50">
+                            <div className="h-2.5 bg-white/40 dark:bg-white/5 rounded-full overflow-hidden shadow-inner border border-white/50 dark:border-white/5">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${stats.progress.averageCompletion}%` }}

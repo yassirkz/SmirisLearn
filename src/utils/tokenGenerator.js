@@ -1,22 +1,25 @@
+/**
+ * Génère un token d'invitation cryptographiquement sécurisé
+ * @returns {string}
+ */
 export function generateInvitationToken() {
-    // Timestamp en base36 (plus court)
-    const timestamp = Date.now().toString(36).toUpperCase();
-    
-    // Random sur 8 caractères
-    const random = Math.random().toString(36).substring(2, 10).toUpperCase();
-        
-    // Format: INV_timestamp_random
-    return `INV_${timestamp}_${random}`;
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    const hex = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+    return `INV_${hex}`;
 }
+
 /**
  * Valide le format du token
  * @param {string} token - Token à valider
  * @returns {boolean}
  */
 export function isValidToken(token) {
-    const pattern = /^INV_[A-Z0-9]+_[A-Z0-9]+$/;
-    return pattern.test(token);
+    // Support ancien format (base36) et nouveau format (hex 64 chars)
+    const pattern = /^INV_[A-Za-z0-9]+$/;
+    return pattern.test(token) && token.length >= 20;
 }
+
 /**
  * Calcule la date d'expiration (24h)
  * @returns {string} Date ISO
@@ -26,6 +29,7 @@ export function getExpirationDate() {
     date.setHours(date.getHours() + 24);
     return date.toISOString();
 }
+
 /**
  * Vérifie si un token est expiré
  * @param {string} expiresAt - Date d'expiration ISO

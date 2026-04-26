@@ -51,17 +51,21 @@ export default function Sidebar({ onClose }) {
 
     return (
         <motion.aside 
-            className="h-full w-64 bg-white/80 dark:bg-secondary-950/80 backdrop-blur-xl border-r border-primary-100 dark:border-gray-800 shadow-xl flex flex-col"
+            className="h-full w-64 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-white/50 dark:border-white/5 shadow-[0_0_60px_-15px_rgba(139,92,246,0.15)] dark:shadow-[0_0_60px_-15px_rgba(139,92,246,0.1)] flex flex-col relative overflow-hidden"
             initial={{ x: -20 }}
             animate={{ x: 0 }}
         >
+            {/* Decorative gradient orbs */}
+            <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary-400/20 dark:bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-accent-400/15 dark:bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
+
             {/* Logo */}
-            <div className="p-6 border-b border-primary-100 dark:border-gray-800">
+            <div className="p-6 border-b border-white/30 dark:border-white/5 relative z-10">
                 <div className="flex items-center gap-3">
                     <Logo size="md" withText={false} />
                     <div>
-                        <h2 className="font-bold text-gray-800 dark:text-gray-200">Smiris Learn</h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <h2 className="font-bold text-gray-800 dark:text-gray-100 tracking-tight">Smiris Learn</h2>
+                        <p className="text-[11px] text-primary-600 dark:text-primary-400 font-medium tracking-wide uppercase">
                             {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Administration' : 'Espace Étudiant'}
                         </p>
                     </div>
@@ -69,54 +73,67 @@ export default function Sidebar({ onClose }) {
             </div>
 
             {/* Menu */}
-            <nav className="flex-1 p-4 space-y-1">
+            <nav className="flex-1 p-3 space-y-1 relative z-10 overflow-y-auto">
                 {menuItems.map((item, index) => (
                     <motion.div
                         key={item.path}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
+                        transition={{ delay: index * 0.08, type: "spring", stiffness: 200, damping: 20 }}
                     >
                         <NavLink
                             to={item.path}
                             end={item.path === '/super-admin' || item.path === '/admin' || item.path === '/student'}
                             onClick={() => window.innerWidth < 1024 && onClose()}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                                `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden
                                 ${isActive 
-                                    ? 'bg-gradient-to-r from-primary-600 to-primary-800 text-white shadow-lg shadow-primary-200 dark:shadow-primary-900/30' 
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
+                                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/30 dark:shadow-primary-900/40' 
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-300'
                                 }`
                             }
                         >
-                            <item.icon size={20} />
-                            <span className="font-medium">{item.label}</span>
-                            {item.label === 'Tableau de bord' && (
-                                <Sparkles className="w-4 h-4 ml-auto opacity-50" />
+                            {({ isActive }) => (
+                                <>
+                                    {isActive && (
+                                        <div className="absolute inset-0 bg-white/10 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                                    )}
+                                    <div className={`p-1.5 rounded-xl ${isActive ? 'bg-white/20' : 'bg-transparent group-hover:bg-primary-100/50 dark:group-hover:bg-primary-900/30'} transition-colors`}>
+                                        <item.icon size={18} />
+                                    </div>
+                                    <span className="font-medium text-[14px]">{item.label}</span>
+                                    {item.label === 'Tableau de bord' && (
+                                        <Sparkles className="w-3.5 h-3.5 ml-auto opacity-40" />
+                                    )}
+                                </>
                             )}
                         </NavLink>
                     </motion.div>
                 ))}
             </nav>
 
-            {/* Bas de la sidebar : bouton Dark Mode et Déconnexion */}
-            <div className="p-4 border-t border-primary-100 dark:border-gray-800 space-y-2">
+            {/* Bottom actions */}
+            <div className="p-3 border-t border-white/30 dark:border-white/5 space-y-1 relative z-10">
                 <button
                     onClick={toggleTheme}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all group"
                 >
-                    {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                    <span className="font-medium">{theme === 'light' ? 'Mode Sombre' : 'Mode Clair'}</span>
+                    <div className="p-1.5 rounded-xl bg-transparent group-hover:bg-amber-100/50 dark:group-hover:bg-amber-900/30 transition-colors">
+                        {theme === 'light' ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
+                    </div>
+                    <span className="font-medium text-[14px]">{theme === 'light' ? 'Mode Sombre' : 'Mode Clair'}</span>
                 </button>
 
                 <motion.button
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={signOut}
-                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-300"
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-2xl text-red-500 dark:text-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/20 transition-all duration-300 group"
                 >
-                    <LogOut size={20} />
-                    <span className="font-medium">Déconnexion</span>
+                    <div className="p-1.5 rounded-xl bg-transparent group-hover:bg-red-100/50 dark:group-hover:bg-red-900/30 transition-colors">
+                        <LogOut size={18} />
+                    </div>
+                    <span className="font-medium text-[14px]">Déconnexion</span>
                 </motion.button>
             </div>
         </motion.aside>

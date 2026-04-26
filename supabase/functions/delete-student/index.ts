@@ -1,6 +1,6 @@
 // supabase/functions/delete-student/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyApiKey, logApiCall, corsHeaders } from "../_shared/verify-api-key.ts";
+import { verifyApiKey, logApiCall, corsHeaders, checkOrgAccess } from "../_shared/verify-api-key.ts";
 
 serve(async (req) => {
   const startTime = performance.now();
@@ -25,12 +25,15 @@ serve(async (req) => {
     // Vérifier que c'est bien un étudiant
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, role")
+      .select("id, role, organization_id")
       .eq("id", studentId)
       .eq("role", "student")
       .single();
 
     if (profileError) throw new Error("Student not found");
+
+    // VÉRIFICATION DE SÉCURITÉ (IDOR)
+    checkOrgAccess(keyData, profile.organization_id);
 
     // Supprimer les progrès
     await supabase.from("user_progress").delete().eq("user_id", studentId);

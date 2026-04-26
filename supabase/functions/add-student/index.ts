@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyApiKey, logApiCall, corsHeaders } from "../_shared/verify-api-key.ts";
+import { verifyApiKey, logApiCall, corsHeaders, checkOrgAccess } from "../_shared/verify-api-key.ts";
 
 serve(async (req) => {
   const startTime = performance.now();
@@ -21,6 +21,9 @@ serve(async (req) => {
     if (!orgId) {
       throw new Error("Missing organization ID in path");
     }
+
+    // VÉRIFICATION DE SÉCURITÉ (IDOR)
+    checkOrgAccess(keyData, orgId);
 
     const { email, fullName, password, groupIds } = await req.json();
 

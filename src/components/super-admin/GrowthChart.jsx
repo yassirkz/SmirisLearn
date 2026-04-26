@@ -178,7 +178,7 @@ export default function GrowthChart() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden"
+            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden"
         >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
@@ -186,7 +186,7 @@ export default function GrowthChart() {
                     <p className="text-sm text-gray-500 dark:text-gray-400">Évolution des entreprises et utilisateurs</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <div className="flex bg-white/40 dark:bg-white/5 rounded-xl p-1 border border-white/50 dark:border-white/5">
                         {[
                             { value: '1m', label: '1M' },
                             { value: '3m', label: '3M' },
@@ -196,10 +196,10 @@ export default function GrowthChart() {
                             <button
                                 key={p.value}
                                 onClick={() => setPeriod(p.value)}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                className={`px-3 py-1.5 text-sm font-semibold rounded-xl transition-all ${
                                     period === p.value
-                                        ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                        ? 'bg-white/80 dark:bg-white/10 text-primary-600 dark:text-primary-400 shadow-sm border border-white/50 dark:border-white/10'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                 }`}
                             >
                                 {p.label}
@@ -212,8 +212,8 @@ export default function GrowthChart() {
             {loading ? (
                 <div className="h-80 flex items-center justify-center">
                     <div className="relative">
-                        <div className="w-16 h-16 border-4 border-blue-200 dark:border-blue-800 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-16 h-16 border-4 border-primary-200/50 dark:border-primary-800/30 rounded-full"></div>
+                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 </div>
             ) : (
@@ -227,19 +227,19 @@ export default function GrowthChart() {
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl p-3">
+                        <div className="bg-primary-50/80 dark:bg-primary-900/20 rounded-2xl p-3.5 border border-primary-200/30 dark:border-primary-800/20">
                             <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total Entreprises</p>
                             <p className="text-2xl font-bold text-blue-800 dark:text-blue-300">
                                 {data.reduce((acc, item) => acc + item.entreprises, 0)}
                             </p>
                         </div>
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl p-3">
-                            <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">Total Utilisateurs</p>
-                            <p className="text-2xl font-bold text-purple-800 dark:text-purple-300">
+                        <div className="bg-accent-50/80 dark:bg-accent-900/20 rounded-2xl p-3.5 border border-accent-200/30 dark:border-accent-800/20">
+                            <p className="text-xs text-accent-600 dark:text-accent-400 font-medium">Total Utilisateurs</p>
+                            <p className="text-2xl font-bold text-accent-800 dark:text-accent-300">
                                 {data.reduce((acc, item) => acc + item.utilisateurs, 0)}
                             </p>
                         </div>
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl p-3">
+                        <div className="bg-emerald-50/80 dark:bg-emerald-900/20 rounded-2xl p-3.5 border border-emerald-200/30 dark:border-emerald-800/20">
                             <p className="text-xs text-green-600 dark:text-green-400 font-medium">Taux de croissance</p>
                             <p className="text-2xl font-bold text-green-800 dark:text-green-300">
                                 {data.length > 1 
@@ -247,7 +247,7 @@ export default function GrowthChart() {
                                     : '0%'}
                             </p>
                         </div>
-                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl p-3">
+                        <div className="bg-amber-50/80 dark:bg-amber-900/20 rounded-2xl p-3.5 border border-amber-200/30 dark:border-amber-800/20">
                             <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Période</p>
                             <p className="text-2xl font-bold text-orange-800 dark:text-orange-300">
                                 {period}

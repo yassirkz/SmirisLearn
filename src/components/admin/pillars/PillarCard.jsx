@@ -26,14 +26,14 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
 
     const getBgLight = (color) => {
         const bgs = {
-            blue: 'bg-blue-50 dark:bg-blue-900/30',
-            purple: 'bg-purple-50 dark:bg-purple-900/30',
-            green: 'bg-green-50 dark:bg-green-900/30',
-            red: 'bg-red-50 dark:bg-red-900/30',
-            yellow: 'bg-yellow-50 dark:bg-yellow-900/30',
-            indigo: 'bg-indigo-50 dark:bg-indigo-900/30',
-            pink: 'bg-pink-50 dark:bg-pink-900/30',
-            orange: 'bg-orange-50 dark:bg-orange-900/30'
+            blue: 'bg-blue-50/60 dark:bg-blue-900/40 backdrop-blur-2xl',
+            purple: 'bg-purple-50/60 dark:bg-purple-900/40 backdrop-blur-2xl',
+            green: 'bg-green-50/60 dark:bg-green-900/40 backdrop-blur-2xl',
+            red: 'bg-red-50/60 dark:bg-red-900/40 backdrop-blur-2xl',
+            yellow: 'bg-yellow-50/60 dark:bg-yellow-900/40 backdrop-blur-2xl',
+            indigo: 'bg-indigo-50/60 dark:bg-indigo-900/40 backdrop-blur-2xl',
+            pink: 'bg-pink-50/60 dark:bg-pink-900/40 backdrop-blur-2xl',
+            orange: 'bg-orange-50/60 dark:bg-orange-900/40 backdrop-blur-2xl'
         };
         return bgs[color] || bgs.blue;
     };
@@ -75,7 +75,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             }}
             style={{ transformStyle: "preserve-3d" }}
             onClick={handleCardClick}
-            className={`${getBgLight(pillar.color)} rounded-3xl p-4 sm:p-6 shadow-xl border border-white/50 dark:border-white/5 backdrop-blur-xl relative overflow-hidden group cursor-pointer`}
+            className={`${getBgLight(pillar.color)} rounded-3xl p-4 sm:p-6 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group cursor-pointer`}
         >
             {/* Effet de shine et de fond premium */}
             <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${getColorGradient(pillar.color)} rounded-full opacity-0 dark:opacity-20 blur-3xl group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity duration-700 pointer-events-none`} />
@@ -108,21 +108,21 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
 
             {/* Statistiques */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" style={{ transform: "translateZ(20px)" }}>
-                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-slate-800">
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-white/5 shadow-sm transition-colors group-hover:bg-white/80 dark:group-hover:bg-slate-800/80">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
                         <Video className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1.5 text-primary-500 sm:group-hover:scale-110 transition-transform" />
                         <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Vidéos</p>
                     </div>
                     <p className="text-sm sm:text-xl font-black text-gray-800 dark:text-white">{pillar.videoCount}</p>
                 </div>
-                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-slate-800">
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-white/5 shadow-sm transition-colors group-hover:bg-white/80 dark:group-hover:bg-slate-800/80">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
                         <Users className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1.5 text-accent-500 sm:group-hover:scale-110 transition-transform" />
                         <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Apprenants</p>
                     </div>
                     <p className="text-sm sm:text-xl font-black text-gray-800 dark:text-white">{pillar.studentCount}</p>
                 </div>
-                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm transition-colors group-hover:bg-white dark:group-hover:bg-slate-800">
+                <div className="flex sm:flex-col items-center justify-between sm:justify-center p-3 sm:py-4 bg-white/60 dark:bg-slate-800/60 rounded-xl border border-white/50 dark:border-white/5 shadow-sm transition-colors group-hover:bg-white/80 dark:group-hover:bg-slate-800/80">
                     <div className="flex items-center gap-2 sm:block sm:text-center">
                         <Calendar className="w-4 h-4 sm:mx-auto mb-0 sm:mb-1.5 text-emerald-500 sm:group-hover:scale-110 transition-transform" />
                         <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Création</p>
@@ -134,7 +134,7 @@ export default function PillarCard({ pillar, index, onEdit, onDelete, isReadOnly
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/50 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/50 dark:border-white/5">
                 {/* Bouton Voir détails */}
                 <motion.button
                     whileHover={{ scale: 1.1 }}

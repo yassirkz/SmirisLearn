@@ -208,14 +208,14 @@ export default function VideoDetailPage() {
                     whileHover={{ scale: 1.05, x: -5 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate('/admin/videos')}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-slate-800/80 shadow-sm backdrop-blur-md rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium text-sm"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 shadow-lg backdrop-blur-xl rounded-xl hover:bg-white/80 dark:hover:bg-slate-700/80 transition-all border border-white/50 dark:border-white/5 text-gray-700 dark:text-gray-300 font-medium text-sm"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Retour aux vidéos
                 </motion.button>
 
                 {/* En-tête */}
-                <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden">
+                <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                     
                     <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start gap-6">
@@ -253,11 +253,11 @@ export default function VideoDetailPage() {
 
                     {/* Métadonnées */}
                     <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-6 text-xs sm:text-sm font-semibold relative z-10">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/50 dark:bg-white/5 text-gray-600 dark:text-gray-300 shadow-sm border border-white/50 dark:border-white/5">
                             <Clock className="w-4 h-4 text-gray-500" />
                             <span>{formatDuration(video.duration)}</span>
                         </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/50 dark:bg-white/5 text-gray-600 dark:text-gray-300 shadow-sm border border-white/50 dark:border-white/5">
                             <Calendar className="w-4 h-4 text-gray-500" />
                             <span>Ajouté le {formatDate(video.created_at)}</span>
                         </div>
@@ -288,7 +288,7 @@ export default function VideoDetailPage() {
                 </div>
 
                 {/* Section Quiz associé */}
-                <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden">
+                <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-40 h-40 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -306,7 +306,7 @@ export default function VideoDetailPage() {
                                     fetchAvailableQuizzes();
                                     setShowLinkModal(true);
                                 }}
-                                className="px-6 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-bold rounded-2xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none"
+                                className="px-6 py-3 bg-white/80 dark:bg-slate-800/80 text-gray-700 dark:text-gray-200 font-bold rounded-2xl border border-white/50 dark:border-white/5 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none"
                             >
                                 <Plus className="w-4 h-4" />
                                 {quizzes.length > 0 ? "Associer un autre" : "Associer existant"}
@@ -328,7 +328,7 @@ export default function VideoDetailPage() {
                     {quizzes.length > 0 ? (
                         <div className="space-y-4 relative z-10">
                             {quizzes.map((quiz, idx) => (
-                                <div key={quiz.id} className="p-6 bg-gray-50/50 dark:bg-slate-800/40 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-inner group">
+                                <div key={quiz.id} className="p-6 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm group">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 mb-1">
@@ -339,15 +339,15 @@ export default function VideoDetailPage() {
                                                 <div className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/50 rounded-xl font-bold shadow-sm">
                                                     {quiz.questions?.length || 0} questions
                                                 </div>
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-white/5 rounded-xl font-medium shadow-sm">
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 border border-white/50 dark:border-white/5 rounded-xl font-medium shadow-sm">
                                                     Score minimum : <strong className="text-gray-900 dark:text-white ml-1">{quiz.passing_score}%</strong>
                                                 </div>
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-white/5 rounded-xl font-medium shadow-sm">
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 border border-white/50 dark:border-white/5 rounded-xl font-medium shadow-sm">
                                                     <RefreshCw className="w-4 h-4 text-gray-400" />
                                                     Tentatives : <strong className="text-gray-900 dark:text-white ml-1">{quiz.max_attempts === -1 ? '∞' : quiz.max_attempts}</strong>
                                                 </div>
                                                 {quiz.timer_minutes && (
-                                                    <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-white/5 rounded-xl font-medium shadow-sm">
+                                                    <div className="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-800/60 border border-white/50 dark:border-white/5 rounded-xl font-medium shadow-sm">
                                                         <Clock className="w-4 h-4 text-gray-400" />
                                                         <strong className="text-gray-900 dark:text-white">{quiz.timer_minutes} min</strong>
                                                     </div>
@@ -385,7 +385,7 @@ export default function VideoDetailPage() {
                             ))}
                         </div>
                     ) : (
-                        <div className="relative z-10 text-center py-12 px-4 bg-gray-50/50 dark:bg-slate-800/20 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700/50">
+                        <div className="relative z-10 text-center py-12 px-4 bg-white/40 dark:bg-slate-800/20 rounded-2xl border-2 border-dashed border-white/50 dark:border-white/5">
                             <Award className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3 opacity-50" />
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Aucun quiz n'est encore associé à cette vidéo.</p>
                         </div>

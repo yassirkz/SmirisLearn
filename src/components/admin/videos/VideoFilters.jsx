@@ -1,19 +1,24 @@
 // src/components/admin/videos/VideoFilters.jsx
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, X, Filter, ArrowUpDown, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { untrusted, escapeText } from '../../../utils/security';
 
 export default function VideoFilters({ filters, onChange, pillars }) {
     const [showFilters, setShowFilters] = useState(false);
+    const [isPillarOpen, setIsPillarOpen] = useState(false);
     const filterRef = useRef(null);
+    const pillarRef = useRef(null);
     const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (filterRef.current && !filterRef.current.contains(event.target) && !event.target.closest('.video-filter-portal')) {
                 setShowFilters(false);
+            }
+            if (pillarRef.current && !pillarRef.current.contains(event.target)) {
+                setIsPillarOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -83,18 +88,60 @@ export default function VideoFilters({ filters, onChange, pillars }) {
                 </div>
 
                 {/* Filtre pilier */}
-                <select
-                    value={filters.pillar_id}
-                    onChange={handlePillarChange}
-                    className="flex-1 sm:flex-none px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 bg-white dark:bg-gray-800 dark:text-white"
-                >
-                    <option value="all">Tous les piliers</option>
-                    {pillars.map(pillar => (
-                        <option key={pillar.id} value={pillar.id}>
-                            {escapeText(untrusted(pillar.name))}
-                        </option>
-                    ))}
-                </select>
+                <div className="relative flex-1 sm:flex-none" ref={pillarRef}>
+                    <button
+                        onClick={() => setIsPillarOpen(!isPillarOpen)}
+                        className="w-full sm:w-auto px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 bg-white dark:bg-gray-800 dark:text-white flex items-center justify-between gap-2 shadow-sm min-w-[150px]"
+                    >
+                        <span className="truncate">
+                            {filters.pillar_id === 'all' 
+                                ? 'Tous les piliers' 
+                                : escapeText(untrusted(pillars.find(p => p.id === filters.pillar_id)?.name || 'Pilier'))}
+                        </span>
+                        <ChevronDown size={14} className={`transition-transform duration-200 ${isPillarOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                        {isPillarOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                className="absolute left-0 mt-2 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50 overflow-hidden"
+                            >
+                                <button
+                                    onClick={() => {
+                                        onChange({ ...filters, pillar_id: 'all' });
+                                        setIsPillarOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                        ${filters.pillar_id === 'all' 
+                                            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                        }`}
+                                >
+                                    Tous les piliers
+                                </button>
+                                {pillars.map((pillar) => (
+                                    <button
+                                        key={pillar.id}
+                                        onClick={() => {
+                                            onChange({ ...filters, pillar_id: pillar.id });
+                                            setIsPillarOpen(false);
+                                        }}
+                                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                            ${filters.pillar_id === pillar.id 
+                                                ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                            }`}
+                                    >
+                                        {escapeText(untrusted(pillar.name))}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
                 {/* Bouton filtres */}
                 <motion.button

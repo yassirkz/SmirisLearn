@@ -201,8 +201,23 @@ export default function QuizView() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-                <Loader className="w-12 h-12 animate-spin text-primary-600 dark:text-primary-400" />
+            <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center">
+                <motion.div
+                   animate={{ scale: [1, 1.1, 1], rotate: [0, 180, 360] }}
+                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                   className="relative"
+                >
+                  <div className="w-20 h-20 border-4 border-primary-100/50 dark:border-gray-700 rounded-full shadow-2xl"></div>
+                  <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full"></div>
+                </motion.div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-6 text-primary-900 dark:text-primary-300 font-medium tracking-wide animate-pulse"
+                >
+                  Préparation du quiz...
+                </motion.p>
             </div>
         );
     }
@@ -243,41 +258,57 @@ export default function QuizView() {
 
     if (submitted && result) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-900 dark:to-gray-800 p-6 flex flex-col items-center">
+            <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6 flex flex-col items-center pt-12 md:pt-24">
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-2xl overflow-hidden relative mb-12"
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                    className="max-w-4xl w-full bg-white/60 dark:bg-gray-800/60 backdrop-blur-3xl rounded-[3rem] p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 dark:border-gray-700/50 overflow-hidden relative mb-12 z-10"
                 >
-                    <div className={`absolute top-0 left-0 w-full h-2 ${result.passed ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <div className={`absolute top-0 left-0 w-full h-3 ${result.passed ? 'bg-gradient-to-r from-emerald-400 to-green-500' : 'bg-gradient-to-r from-rose-400 to-red-500'}`} />
+                    <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 ${result.passed ? 'bg-green-400/20' : 'bg-red-400/20'} rounded-full blur-3xl -z-10`} />
                     
-                    <div className="text-center mb-10">
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ${result.passed ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
-                            {result.passed ? <CheckCircle className="w-12 h-12" /> : <XCircle className="w-12 h-12" />}
-                        </div>
-                        <h2 className="text-4xl font-black mb-2 tracking-tight text-gray-900 dark:text-white">
+                    <div className="text-center mb-10 mt-6 relative z-10">
+                        <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1, rotate: result.passed ? 360 : 0 }}
+                            transition={{ type: "spring", bounce: 0.5, duration: 1, delay: 0.2 }}
+                            className={`w-32 h-32 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl ${result.passed ? 'bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-emerald-500/40' : 'bg-gradient-to-br from-rose-400 to-red-500 text-white shadow-red-500/40'} rotate-12`}
+                        >
+                            <div className="-rotate-12">
+                                {result.passed ? <CheckCircle className="w-16 h-16" /> : <XCircle className="w-16 h-16" />}
+                            </div>
+                        </motion.div>
+                        <h2 className="text-5xl font-black mb-4 tracking-tight text-gray-900 dark:text-white">
                             {result.passed ? 'Félicitations !' : 'Dommage !'}
                         </h2>
-                        <p className="text-xl text-gray-600 dark:text-gray-300">
+                        <p className="text-xl font-medium text-gray-500 dark:text-gray-400">
                             {result.passed ? 'Quiz validé avec succès' : `Score minimum requis : ${quiz.passing_score}%`}
                         </p>
                         
-                        <div className="mt-8 flex justify-center items-end gap-2">
-                            <span className={`text-6xl font-black ${result.passed ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                {result.score}%
-                            </span>
-                            <span className="text-gray-400 dark:text-gray-500 font-bold mb-2">/ 100%</span>
+                        <div className="mt-10 mb-4 inline-flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm px-10 py-6 rounded-3xl border border-white/60 dark:border-gray-700/50 shadow-inner">
+                            <div className="flex items-baseline gap-2">
+                                <span className={`text-7xl font-black bg-clip-text text-transparent ${result.passed ? 'bg-gradient-to-tr from-emerald-500 to-green-400' : 'bg-gradient-to-tr from-rose-500 to-red-400'}`}>
+                                    {result.score}
+                                </span>
+                                <span className="text-3xl text-gray-300 dark:text-gray-600 font-black">%</span>
+                            </div>
                         </div>
+
                         {maxAttempts !== -1 && (
-                            <p className="text-sm text-gray-400 dark:text-gray-500 mt-4 font-medium uppercase tracking-widest">
-                                Tentative {attempts}/{maxAttempts}
-                            </p>
+                            <div className="mt-4 inline-block px-4 py-2 bg-gray-100/80 dark:bg-gray-900/80 rounded-full">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest">
+                                    Tentative {attempts}/{maxAttempts}
+                                </p>
+                            </div>
                         )}
                     </div>
 
-                    <div className="space-y-6 mt-12 bg-gray-50/50 dark:bg-gray-900/30 p-8 rounded-3xl border border-gray-100 dark:border-gray-700">
-                        <h3 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-2 mb-6">
-                            <HelpCircle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                    <div className="space-y-6 mt-16 bg-white/40 dark:bg-gray-900/40 p-8 sm:p-10 rounded-[2.5rem] border border-white/60 dark:border-gray-700/50 shadow-sm relative z-10">
+                        <h3 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 mb-8 tracking-tight">
+                            <div className="p-2.5 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800 rounded-xl shadow-inner text-primary-600 dark:text-primary-300">
+                                <HelpCircle className="w-6 h-6" />
+                            </div>
                             Correction détaillée
                         </h3>
                         {quiz.questions.map((q, idx) => {
@@ -349,22 +380,22 @@ export default function QuizView() {
     const currentAnswer = answers[currentQuestionIndex];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6 flex flex-col items-center justify-center font-sans">
-            <div className="max-w-4xl w-full">
-                {/* Header Profile/Timeline */}
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-primary-100 dark:border-gray-700 flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-xl">
-                            {currentQuestionIndex + 1}
+        <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6 flex flex-col items-center justify-center font-sans">
+            <div className="max-w-4xl w-full mt-4 md:mt-0">
+                {/* Header Timeline/Timer */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+                    <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-[1.5rem] shadow-xl shadow-primary-500/30 flex items-center justify-center text-white font-black text-2xl rotate-3">
+                            <div className="-rotate-3">{currentQuestionIndex + 1}</div>
                         </div>
                         <div>
-                            <h3 className="font-black text-gray-900 dark:text-white leading-none">Question {currentQuestionIndex + 1}/{quiz.questions.length}</h3>
-                            <div className="flex gap-1.5 mt-2">
+                            <h3 className="font-black text-2xl text-gray-900 dark:text-white tracking-tight mb-2">Question {currentQuestionIndex + 1} <span className="text-gray-400 text-lg">/ {quiz.questions.length}</span></h3>
+                            <div className="flex gap-1.5 items-center">
                                 {quiz.questions.map((_, i) => (
                                     <div 
                                         key={i} 
                                         className={`h-2 rounded-full transition-all duration-500 ${
-                                            i === currentQuestionIndex ? 'w-10 bg-primary-600 dark:bg-primary-400' : i < currentQuestionIndex ? 'w-5 bg-green-400 dark:bg-green-600' : 'w-5 bg-gray-200 dark:bg-gray-700'
+                                            i === currentQuestionIndex ? 'w-10 bg-primary-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : i < currentQuestionIndex ? 'w-4 bg-emerald-400' : 'w-4 bg-gray-200 dark:bg-gray-700/50'
                                         }`} 
                                     />
                                 ))}
@@ -372,8 +403,8 @@ export default function QuizView() {
                         </div>
                     </div>
                     {timeLeft !== null && (
-                        <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-mono text-xl font-black shadow-2xl border-2 transition-colors ${timeLeft < 30 ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 animate-pulse' : 'bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 border-primary-50 dark:border-gray-700'}`}>
-                            <Clock className="w-6 h-6" />
+                        <div className={`flex items-center justify-center gap-3 px-6 py-4 rounded-[1.5rem] font-mono text-2xl font-black shadow-lg border backdrop-blur-md transition-all ${timeLeft <= 30 ? 'bg-red-50/80 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 animate-pulse' : 'bg-white/60 dark:bg-gray-800/60 text-gray-800 dark:text-white border-white/60 dark:border-gray-700/50'}`}>
+                            <Clock className={`w-6 h-6 ${timeLeft <= 30 ? 'text-red-500' : 'text-primary-500'}`} />
                             {formatTime(timeLeft)}
                         </div>
                     )}
@@ -385,18 +416,19 @@ export default function QuizView() {
                         initial={{ x: 20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -20, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 md:p-14 shadow-2xl border border-primary-100/50 dark:border-gray-700 relative overflow-hidden"
+                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                        className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-2xl rounded-[3rem] p-8 md:p-14 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 dark:border-gray-700/50 relative overflow-hidden z-10"
                     >
-                        <div className="absolute top-0 right-0 p-8 opacity-5">
-                            <HelpCircle className="w-48 h-48 text-primary-600 dark:text-primary-400" />
+                        <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary-200/40 dark:bg-primary-900/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+                        <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                            <HelpCircle className="w-64 h-64 text-primary-600 dark:text-primary-400" />
                         </div>
 
-                        <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-12 leading-tight relative">
+                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-12 leading-tight relative z-10 tracking-tight">
                             {escapeText(untrusted(question.text))}
                         </h2>
 
-                        <div className="space-y-4 relative">
+                        <div className="space-y-5 relative z-10">
                             {question.type === 'single' && question.options.map((opt, idx) => (
                                 <button
                                     key={idx}
@@ -462,11 +494,11 @@ export default function QuizView() {
                             )}
                         </div>
 
-                        <div className="mt-20 flex items-center justify-between gap-6">
+                        <div className="mt-20 flex flex-col-reverse sm:flex-row items-center justify-between gap-6">
                             <button
                                 onClick={goToPrev}
                                 disabled={currentQuestionIndex === 0}
-                                className="flex items-center gap-3 py-5 px-10 rounded-2xl font-black text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 dark:disabled:hover:text-gray-500 transition-all active:scale-95"
+                                className="w-full sm:w-auto flex items-center justify-center gap-3 py-4 sm:py-5 px-8 sm:px-10 rounded-[1.5rem] font-black text-gray-500 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-500 transition-all active:scale-95 border border-transparent shadow-sm hover:shadow-md hover:border-white/50 dark:hover:border-gray-600/50"
                             >
                                 <ArrowLeft className="w-6 h-6" />
                                 Précédent
@@ -475,18 +507,18 @@ export default function QuizView() {
                             {currentQuestionIndex === quiz.questions.length - 1 ? (
                                 <button
                                     onClick={() => handleSubmit()}
-                                    className="flex items-center gap-3 py-5 px-14 bg-primary-600 dark:bg-primary-600 text-white rounded-2xl font-black hover:bg-primary-700 dark:hover:bg-primary-700 shadow-2xl shadow-primary-100 dark:shadow-primary-900/30 transition-all hover:scale-105 active:scale-95"
+                                    className="w-full sm:w-auto flex items-center justify-center gap-3 py-4 sm:py-5 px-10 sm:px-14 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-[1.5rem] font-black shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)] hover:shadow-[0_20px_35px_-5px_rgba(79,70,229,0.5)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0 group border border-primary-500/50"
                                 >
-                                    Terminer
-                                    <ArrowRight className="w-6 h-6" />
+                                    Terminer le quiz
+                                    <CheckCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 </button>
                             ) : (
                                 <button
                                     onClick={goToNext}
-                                    className="flex items-center gap-3 py-5 px-14 bg-gray-900 dark:bg-gray-700 text-white rounded-2xl font-black hover:bg-black dark:hover:bg-gray-600 transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-200 dark:shadow-gray-900/30"
+                                    className="w-full sm:w-auto flex items-center justify-center gap-3 py-4 sm:py-5 px-10 sm:px-14 bg-gray-900 dark:bg-gray-700 text-white rounded-[1.5rem] font-black shadow-[0_10px_25px_-5px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_35px_-5px_rgba(0,0,0,0.4)] transition-all hover:-translate-y-1 active:scale-95 active:translate-y-0 group border border-gray-700 dark:border-gray-600"
                                 >
                                     Suivant
-                                    <ArrowRight className="w-6 h-6" />
+                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" />
                                 </button>
                             )}
                         </div>

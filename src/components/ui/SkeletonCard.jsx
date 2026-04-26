@@ -51,7 +51,7 @@ export default function SkeletonCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className={`bg-white dark:bg-gray-800 ${variantClass} p-6 shadow-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group`}
+      className={`bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl ${variantClass} p-6 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group`}
     >
       {/* Animation de fond */}
       <motion.div
@@ -170,9 +170,9 @@ export default function SkeletonCard({
 // Variante pour tableau
 export function TableSkeleton({ rows = 5, columns = 4 }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-50 dark:bg-gray-900 p-4 border-b border-gray-100 dark:border-gray-700">
+      <div className="bg-white/40 dark:bg-slate-800/40 p-4 border-b border-white/50 dark:border-white/5">
         <div className="flex gap-4">
           {Array.from({ length: columns }).map((_, i) => (
             <motion.div
@@ -193,7 +193,7 @@ export function TableSkeleton({ rows = 5, columns = 4 }) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: rowIndex * 0.05 }}
-          className="p-4 border-b border-gray-100 dark:border-gray-700 last:border-0"
+          className="p-4 border-b border-white/50 dark:border-white/5 last:border-0"
         >
           <div className="flex gap-4">
             {Array.from({ length: columns }).map((_, colIndex) => (
@@ -222,7 +222,7 @@ export function TableSkeleton({ rows = 5, columns = 4 }) {
 // Variante pour graphique
 export function ChartSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-6 shadow-lg border border-white/50 dark:border-white/5">
       <div className="flex justify-between mb-6">
         <div className="space-y-2">
           <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />

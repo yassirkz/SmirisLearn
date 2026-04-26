@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [
     react(),
-    visualizer({ open: true }),
+    visualizer({ open: false, filename: 'stats.html' }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {

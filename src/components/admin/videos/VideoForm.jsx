@@ -1,9 +1,8 @@
-// src/components/admin/videos/VideoForm.jsx
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Save, X, Sparkles, AlertCircle,
-    CheckCircle, Clock, Film, RefreshCw
+    CheckCircle, Clock, Film, RefreshCw, ChevronDown
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
@@ -38,6 +37,11 @@ export default function VideoForm({
     const [loadingQuizzes, setLoadingQuizzes] = useState(false);
     const [touched, setTouched] = useState({});
     const [errors, setErrors] = useState({});
+    
+    const [isPillarOpen, setIsPillarOpen] = useState(false);
+    const [isQuizOpen, setIsQuizOpen] = useState(false);
+    const pillarRef = useRef(null);
+    const quizRef = useRef(null);
 
     useEffect(() => {
         const fetchPillars = async () => {
@@ -100,6 +104,20 @@ export default function VideoForm({
             setFormData(prev => ({ ...prev, duration: uploadedVideo.duration }));
         }
     }, [uploadedVideo]);
+
+    // Fermer les dropdowns si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (pillarRef.current && !pillarRef.current.contains(event.target)) {
+                setIsPillarOpen(false);
+            }
+            if (quizRef.current && !quizRef.current.contains(event.target)) {
+                setIsQuizOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const validateForm = () => {
         const newErrors = {};
@@ -312,23 +330,53 @@ export default function VideoForm({
                     Pilier associé
                     <span className="text-red-500 ml-1">*</span>
                 </label>
-                <select
-                    value={formData.pillar_id}
-                    onChange={(e) => handleChange('pillar_id', e.target.value)}
-                    onBlur={() => setTouched({ ...touched, pillar_id: true })}
-                    className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-xl focus:outline-none focus:ring-4 transition-all dark:text-white ${
-                        errors.pillar_id && touched.pillar_id
-                            ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-100 dark:focus:ring-red-900/30'
-                            : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
-                    }`}
-                >
-                    <option value="">Sélectionner un pilier</option>
-                    {pillars.map(pillar => (
-                        <option key={pillar.id} value={pillar.id}>
-                            {escapeText(untrusted(pillar.name))}
-                        </option>
-                    ))}
-                </select>
+                 <div className="relative" ref={pillarRef}>
+                    <button
+                        type="button"
+                        onClick={() => setIsPillarOpen(!isPillarOpen)}
+                        className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-xl focus:outline-none focus:ring-4 transition-all dark:text-white flex items-center justify-between gap-2 shadow-sm ${
+                            errors.pillar_id && touched.pillar_id
+                                ? 'border-red-300 dark:border-red-600 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-100 dark:focus:ring-red-900/30'
+                                : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
+                        }`}
+                    >
+                        <span>
+                            {formData.pillar_id 
+                                ? escapeText(untrusted(pillars.find(p => p.id === formData.pillar_id)?.name || 'Pilier')) 
+                                : 'Sélectionner un pilier'}
+                        </span>
+                        <ChevronDown size={14} className={`transition-transform duration-200 ${isPillarOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                        {isPillarOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                className="absolute left-0 mt-2 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50 overflow-hidden"
+                            >
+                                {pillars.map(pillar => (
+                                    <button
+                                        key={pillar.id}
+                                        type="button"
+                                        onClick={() => {
+                                            handleChange('pillar_id', pillar.id);
+                                            setIsPillarOpen(false);
+                                        }}
+                                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                            ${formData.pillar_id === pillar.id 
+                                                ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                            }`}
+                                    >
+                                        {escapeText(untrusted(pillar.name))}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
                 {errors.pillar_id && touched.pillar_id && (
                     <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                         <AlertCircle className="w-4 h-4" />
@@ -362,19 +410,64 @@ export default function VideoForm({
                     Quiz associé
                     <span className="text-gray-400 dark:text-gray-500 text-xs ml-2">(optionnel)</span>
                 </label>
-                <select
-                    value={associatedQuizId}
-                    onChange={(e) => setAssociatedQuizId(e.target.value)}
-                    disabled={loadingQuizzes}
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white"
-                >
-                    <option value="">Aucun quiz</option>
-                    {availableQuizzes.map(q => (
-                        <option key={q.id} value={q.id}>
-                            Quiz de : {q.video?.title || 'Inconnue'} {q.id === associatedQuizId ? '(Actuel)' : ''}
-                        </option>
-                    ))}
-                </select>
+                <div className="relative" ref={quizRef}>
+                    <button
+                        type="button"
+                        onClick={() => setIsQuizOpen(!isQuizOpen)}
+                        disabled={loadingQuizzes}
+                        className="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white flex items-center justify-between gap-2 shadow-sm disabled:opacity-50"
+                    >
+                        <span>
+                            {associatedQuizId 
+                                ? `Quiz de : ${escapeText(untrusted(availableQuizzes.find(q => q.id === associatedQuizId)?.video?.title || 'Inconnue'))}` 
+                                : 'Aucun quiz'}
+                        </span>
+                        <ChevronDown size={14} className={`transition-transform duration-200 ${isQuizOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                        {isQuizOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                className="absolute left-0 mt-2 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50 overflow-hidden"
+                            >
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setAssociatedQuizId('');
+                                        setIsQuizOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                        ${associatedQuizId === '' 
+                                            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                        }`}
+                                >
+                                    Aucun quiz
+                                </button>
+                                {availableQuizzes.map(q => (
+                                    <button
+                                        key={q.id}
+                                        type="button"
+                                        onClick={() => {
+                                            setAssociatedQuizId(q.id);
+                                            setIsQuizOpen(false);
+                                        }}
+                                        className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                            ${associatedQuizId === q.id 
+                                                ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                            }`}
+                                    >
+                                        Quiz de : {escapeText(untrusted(q.video?.title || 'Inconnue'))}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                     {loadingQuizzes ? 'Chargement des quiz...' : 'Vous pouvez lier un quiz existant à cette vidéo.'}
                 </p>

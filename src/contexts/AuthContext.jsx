@@ -82,9 +82,18 @@ export function AuthProvider({ children }) {
         const actualUser = session?.user ?? null;
         setRealUser(actualUser);
 
-        // --- IMPERSONATION LOGIC ---
+        // --- LOGIQUE D'IMPERSONNALISATION SÉCURISÉE ---
         const impId = localStorage.getItem("impersonatedUserId");
-        const role = actualUser?.user_metadata?.role;
+        
+        // On récupère le VRAI rôle depuis la table profiles pour éviter toute falsification
+        const { data: realProfile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", actualUser.id)
+          .single();
+        
+        const role = realProfile?.role || "student";
+
         if (impId && actualUser && ["super_admin", "org_admin"].includes(role)) {
           try {
             const { data } = await supabase
@@ -257,11 +266,18 @@ export function AuthProvider({ children }) {
 
   // Mode Impersonation control
   const startImpersonation = useCallback(async (targetUserId) => {
-    if (!realUser || !["super_admin", "org_admin"].includes(realUser.user_metadata?.role)) {
-      throw new Error("Droit insuffisant pour impersonifier.");
-    }
-    setLoading(true);
     try {
+      // Vérification du rôle dans la DB (pas le JWT)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", realUser.id)
+        .single();
+
+      if (!profile || !["super_admin", "org_admin"].includes(profile.role)) {
+        throw new Error("Droit insuffisant pour impersonifier.");
+      }
+
       const { data } = await supabase
         .from("profiles")
         .select("id, email, role, full_name, organization_id")
@@ -278,7 +294,7 @@ export function AuthProvider({ children }) {
             organization_id: data.organization_id,
           },
           isImpersonated: true,
-          realUserRole: realUser.user_metadata?.role,
+          realUserRole: profile.role,
           realUserEmail: realUser.email,
         });
         window.location.href = data.role === "org_admin" ? "/admin" : "/student";

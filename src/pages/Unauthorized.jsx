@@ -255,7 +255,7 @@ export default function Unauthorized() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50/50 via-white to-accent-50/30 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
       {/* Particules animées dynamiques */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(errorType === 'maintenance_mode' ? 30 : 20)].map((_, i) => (
@@ -295,7 +295,7 @@ export default function Unauthorized() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl dark:shadow-gray-900/50 max-w-md w-full border border-primary-100 dark:border-gray-700 transition-colors duration-300"
+        className="relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-2xl max-w-md w-full border border-white/50 dark:border-white/5 transition-colors duration-300"
       >
         {/* Badge dynamique */}
         <motion.div
@@ -376,7 +376,7 @@ export default function Unauthorized() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-700/30 rounded-xl p-4 mb-6 border border-gray-200 dark:border-gray-600"
+            className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-xl p-4 mb-6 border border-white/50 dark:border-white/5 shadow-inner"
           >
             <div className="flex items-center gap-3 mb-3">
               <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -470,7 +470,7 @@ export default function Unauthorized() {
                 whileHover={{ scale: 1.02, x: 5 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={action.action}
-                className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-700/30 rounded-xl hover:shadow-md dark:hover:shadow-gray-900/30 transition-all group"
+                className="w-full flex items-center justify-between p-3 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-xl hover:shadow-md dark:hover:shadow-gray-900/30 border border-white/50 dark:border-white/5 transition-all group"
               >
                 <div className="flex items-center gap-2">
                   <action.icon className={`w-4 h-4 text-${action.color}-500`} />
@@ -540,7 +540,7 @@ export default function Unauthorized() {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:border-primary-300 dark:hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group text-sm"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-white/50 dark:border-white/5 text-gray-700 dark:text-gray-300 rounded-xl hover:border-primary-300 dark:hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group text-sm shadow-sm"
             >
               <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
               Retour
@@ -581,7 +581,7 @@ export default function Unauthorized() {
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl space-y-3">
+                <div className="mt-4 p-4 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm border border-white/50 dark:border-white/5 rounded-xl space-y-3 shadow-inner">
                   <button
                     onClick={() => window.location.href = 'mailto:support@smiris-learn.com'}
                     className="w-full flex items-center gap-3 p-2 hover:bg-white dark:hover:bg-gray-600 rounded-lg transition-colors text-left"

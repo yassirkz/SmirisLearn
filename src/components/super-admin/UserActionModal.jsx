@@ -36,12 +36,17 @@ export default function UserActionModal({ isOpen, onClose, user, action, onSucce
 
         try {
             if (action === 'edit') {
-                const { error: updateError } = await supabase
-                    .from('profiles')
-                    .update({ role: formData.role })
-                    .eq('id', user.id);
+                // APPEL SÉCURISÉ À L'EDGE FUNCTION (Verrouille l'élévation de privilèges)
+                const { data, error: functionError } = await supabase.functions.invoke('manage-user-role', {
+                    body: { 
+                        targetUserId: user.id, 
+                        newRole: formData.role 
+                    }
+                });
 
-                if (updateError) throw updateError;
+                if (functionError || data?.error) {
+                    throw new Error(data?.error || functionError?.message || 'Erreur lors du changement de rôle');
+                }
             } else if (action === 'delete') {
                 // Nettoyage des données dépendantes pour éviter les erreurs de clés étrangères
                 // 1. Supprimer les progrès

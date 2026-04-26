@@ -168,7 +168,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
   return (
     <div className="space-y-6">
       {/* Barre d'outils */}
-      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
+      <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="flex items-center gap-3 px-2 h-11">
             <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
@@ -185,7 +185,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Rechercher..."
-                className="w-full pl-11 pr-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400"
+                className="w-full pl-11 pr-4 h-11 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium placeholder:text-gray-400 shadow-sm backdrop-blur-md"
               />
             </div>
 
@@ -193,7 +193,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
               whileHover={{ rotate: 180 }}
               transition={{ duration: 0.3 }}
               onClick={handleRefresh}
-              className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500 rounded-xl shadow-sm transition-all shrink-0"
+              className="w-11 h-11 flex items-center justify-center bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-primary-300 dark:hover:border-primary-500 rounded-xl shadow-sm transition-all shrink-0"
               title="Actualiser"
               disabled={loading}
             >
@@ -218,10 +218,10 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
       </div>
 
       {/* Table */}
-      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 dark:border-white/5 overflow-hidden transition-all duration-300 relative">
+      <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden transition-all duration-300 relative">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[800px]">
-            <thead className="bg-gray-50/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-700/50">
+            <thead className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-b border-white/50 dark:border-white/5">
               <tr>
                 <th className="px-6 py-5 text-left text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap">Nom / Description</th>
                 <th className="px-6 py-5 text-center text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap w-32">Membres</th>
@@ -230,7 +230,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 <th className="px-6 py-5 text-right text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest whitespace-nowrap w-48">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100/50 dark:divide-gray-800/50">
+            <tbody className="divide-y divide-white/50 dark:divide-white/5">
               {loading ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-12">
@@ -244,7 +244,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                   <td colSpan="5" className="px-6 py-16 text-center relative">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
                     <div className="relative z-10 flex flex-col items-center">
-                      <div className="w-20 h-20 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 shadow-inner border border-gray-100 dark:border-gray-700">
+                      <div className="w-20 h-20 bg-white/50 dark:bg-white/5 rounded-full flex items-center justify-center mb-4 shadow-inner border border-white/50 dark:border-white/5">
                         <Users className="w-10 h-10 text-gray-300 dark:text-gray-600" />
                       </div>
                       <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">
@@ -263,7 +263,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="hover:bg-white/60 dark:hover:bg-slate-700/40 transition-all duration-300 group/row cursor-default"
+                    className="hover:bg-white/40 dark:hover:bg-white/5 transition-all duration-300 group/row cursor-default border-b border-transparent hover:border-white/50 dark:hover:border-white/10"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
@@ -303,7 +303,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => setShowMembers(group)}
-                              className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 shadow-sm"
+                              className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-primary-100 dark:hover:bg-primary-900/50 border border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800/50 rounded-xl transition-all text-primary-600 dark:text-primary-400 shadow-sm"
                               title="Gérer les membres"
                             >
                               <UserPlus className="w-4 h-4" />
@@ -312,7 +312,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => setShowPillarAccess(group)}
-                              className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 shadow-sm"
+                              className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-accent-100 dark:hover:bg-accent-900/50 border border-gray-200 dark:border-gray-700 hover:border-accent-200 dark:hover:border-accent-800/50 rounded-xl transition-all text-accent-600 dark:text-accent-400 shadow-sm"
                               title="Gérer l'accès aux piliers"
                             >
                               <Shield className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => handleEdit(group)}
-                              className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-gray-200 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-xl transition-all text-emerald-600 dark:text-emerald-400 shadow-sm"
+                              className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-gray-200 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-xl transition-all text-emerald-600 dark:text-emerald-400 shadow-sm"
                               title="Modifier le groupe"
                             >
                               <Edit className="w-4 h-4" />
@@ -330,7 +330,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => setShowDeleteConfirm(group)}
-                              className="p-2.5 bg-gray-50 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 shadow-sm"
+                              className="p-2.5 bg-white/50 dark:bg-white/5 hover:bg-red-100 dark:hover:bg-red-900/50 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800/50 rounded-xl transition-all text-red-600 dark:text-red-400 shadow-sm"
                               title="Supprimer le groupe"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -348,7 +348,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-gray-50/50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
+          <div className="px-6 py-4 bg-white/40 dark:bg-white/5 border-t border-white/50 dark:border-white/5 flex items-center justify-between">
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               {Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, totalCount)} -{' '}
               {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} sur {totalCount}
@@ -359,7 +359,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:hover:bg-white dark:disabled:hover:bg-slate-800 shadow-sm transition-all font-medium text-gray-700 dark:text-gray-300 text-sm"
+                className="px-4 py-2 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 rounded-xl hover:bg-white/80 dark:hover:bg-white/10 disabled:opacity-50 disabled:hover:bg-white/50 dark:disabled:hover:bg-white/5 shadow-sm transition-all font-medium text-gray-700 dark:text-gray-300 text-sm"
               >
                 Précédent
               </motion.button>
@@ -368,7 +368,7 @@ export default function GroupsList({ isReadOnly = false, orgId: propOrgId }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:hover:bg-white dark:disabled:hover:bg-slate-800 shadow-sm transition-all font-medium text-gray-700 dark:text-gray-300 text-sm"
+                className="px-4 py-2 bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 rounded-xl hover:bg-white/80 dark:hover:bg-white/10 disabled:opacity-50 disabled:hover:bg-white/50 dark:disabled:hover:bg-white/5 shadow-sm transition-all font-medium text-gray-700 dark:text-gray-300 text-sm"
               >
                 Suivant
               </motion.button>

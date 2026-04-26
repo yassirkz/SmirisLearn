@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -8,7 +8,7 @@ import {
     Download, Filter, Search, X, Sparkles,
     PieChart, BarChart3, Activity, UserPlus,
     Eye, Trash2, Zap, LayoutDashboard,
-    Gauge, AlertTriangle, HardDrive
+    Gauge, AlertTriangle, HardDrive, ChevronDown
 } from 'lucide-react';
 import { 
     AreaChart, Area, XAxis, YAxis, CartesianGrid, 
@@ -43,6 +43,8 @@ export default function SuperAdminCompanyDetail() {
     const [recentVideos, setRecentVideos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('all');
+    const [isRoleFilterOpen, setIsRoleFilterOpen] = useState(false);
+    const roleFilterRef = useRef(null);
     const [showActions, setShowActions] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [limits, setLimits] = useState(null);
@@ -60,6 +62,17 @@ export default function SuperAdminCompanyDetail() {
             fetchOrganizationLimits();
         }
     }, [id]);
+
+    // Fermer le dropdown si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (roleFilterRef.current && !roleFilterRef.current.contains(event.target)) {
+                setIsRoleFilterOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [roleFilterRef]);
 
     const fetchOrganizationLimits = async () => {
         try {
@@ -483,7 +496,7 @@ export default function SuperAdminCompanyDetail() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-primary-100 dark:border-gray-700 relative overflow-hidden"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden"
                 >
                     {/* Éléments décoratifs */}
                     <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-primary-400 to-accent-400 rounded-full opacity-20 blur-3xl pointer-events-none" />
@@ -630,14 +643,14 @@ export default function SuperAdminCompanyDetail() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-primary-100 dark:border-gray-700"
+                        className="lg:col-span-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5"
                     >
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
                                 <BarChart3 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                                 Évolution des membres
                             </h2>
-                            <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
+                            <span className="text-xs text-gray-400 dark:text-gray-500 bg-white/40 dark:bg-white/5 px-2 py-1 rounded-full border border-white/50 dark:border-white/5 shadow-sm">
                                 30 derniers jours
                             </span>
                         </div>
@@ -691,7 +704,7 @@ export default function SuperAdminCompanyDetail() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-primary-100 dark:border-gray-700"
+                        className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5"
                     >
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                             <Video className="w-5 h-5 text-accent-600 dark:text-accent-400" />
@@ -705,7 +718,7 @@ export default function SuperAdminCompanyDetail() {
                         ) : (
                             <div className="space-y-3">
                                 {recentVideos.map((video, index) => (
-                                    <div key={index} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                    <div key={index} className="flex items-center gap-3 p-2 bg-white/40 dark:bg-white/5 rounded-xl hover:bg-white/60 dark:hover:bg-white/10 transition-colors border border-white/50 dark:border-white/5 shadow-sm">
                                         <div className="w-8 h-8 bg-gradient-to-br from-accent-500 to-primary-600 rounded-lg flex items-center justify-center">
                                             <Video className="w-4 h-4 text-white" />
                                         </div>
@@ -725,7 +738,7 @@ export default function SuperAdminCompanyDetail() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.25 }}
-                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-primary-100 dark:border-gray-700"
+                        className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5"
                     >
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                             <Gauge className="w-5 h-5 text-accent-600 dark:text-accent-400" />
@@ -833,7 +846,7 @@ export default function SuperAdminCompanyDetail() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-primary-100 dark:border-gray-700"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5 relative z-30"
                 >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
@@ -850,7 +863,7 @@ export default function SuperAdminCompanyDetail() {
                                     placeholder="Rechercher..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all w-full sm:w-64 dark:bg-gray-700 dark:text-white"
+                                    className="pl-9 pr-4 py-2 border border-white/50 dark:border-white/5 rounded-2xl focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100/50 dark:focus:ring-blue-900/30 transition-all w-full sm:w-64 bg-white/40 dark:bg-white/5 dark:text-white shadow-sm"
                                 />
                                 {searchTerm && (
                                     <button
@@ -863,22 +876,56 @@ export default function SuperAdminCompanyDetail() {
                             </div>
 
                             {/* Filtre par rôle */}
-                            <select
-                                value={filterRole}
-                                onChange={(e) => setFilterRole(e.target.value)}
-                                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 bg-white dark:bg-gray-700 dark:text-white"
-                            >
-                                <option value="all">Tous les rôles</option>
-                                <option value="org_admin">Admins</option>
-                                <option value="student">Étudiants</option>
-                            </select>
+                            <div className="relative" ref={roleFilterRef}>
+                                <button
+                                    onClick={() => setIsRoleFilterOpen(!isRoleFilterOpen)}
+                                    className="px-4 py-2 border border-white/50 dark:border-white/5 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100/50 dark:focus:ring-blue-900/30 bg-white/40 dark:bg-white/5 dark:text-white shadow-sm flex items-center justify-between gap-2 min-w-[140px] transition-all font-medium text-sm"
+                                >
+                                    <span>
+                                        {filterRole === 'all' ? 'Tous les rôles' : filterRole === 'org_admin' ? 'Admins' : 'Étudiants'}
+                                    </span>
+                                    <ChevronDown size={14} className={`transition-transform duration-200 ${isRoleFilterOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isRoleFilterOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            className="absolute right-0 mt-2 w-48 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50"
+                                        >
+                                            {[
+                                                { value: 'all', label: 'Tous les rôles' },
+                                                { value: 'org_admin', label: 'Admins' },
+                                                { value: 'student', label: 'Étudiants' }
+                                            ].map((role) => (
+                                                <button
+                                                    key={role.value}
+                                                    onClick={() => {
+                                                        setFilterRole(role.value);
+                                                        setIsRoleFilterOpen(false);
+                                                    }}
+                                                    className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                        ${filterRole === role.value 
+                                                            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {role.label}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
                             {/* Bouton inviter */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowInviteModal(true)}
-                                className="px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+                                className="px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-2xl shadow-lg hover:shadow-xl shadow-primary-500/25 transition-all flex items-center gap-2 font-bold text-sm"
                             >
                                 <UserPlus className="w-4 h-4" />
                                 <span>Inviter</span>
@@ -907,7 +954,7 @@ export default function SuperAdminCompanyDetail() {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: index * 0.05 }}
-                                            className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
+                                            className="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group"
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
@@ -997,7 +1044,7 @@ export default function SuperAdminCompanyDetail() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full"
+                            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50 dark:border-white/10"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Inviter un membre</h3>
@@ -1009,7 +1056,7 @@ export default function SuperAdminCompanyDetail() {
                                         required
                                         value={inviteEmail}
                                         onChange={(e) => setInviteEmail(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2 border border-white/50 dark:border-white/10 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100/50 dark:focus:ring-primary-900/30 outline-none bg-white/50 dark:bg-slate-800/50 dark:text-white shadow-sm"
                                         placeholder="email@exemple.com"
                                     />
                                 </div>
@@ -1018,7 +1065,7 @@ export default function SuperAdminCompanyDetail() {
                                     <select
                                         value={inviteRole}
                                         onChange={(e) => setInviteRole(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2 border border-white/50 dark:border-white/10 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100/50 dark:focus:ring-primary-900/30 outline-none bg-white/50 dark:bg-slate-800/50 dark:text-white shadow-sm"
                                     >
                                         <option value="student">Étudiant</option>
                                         <option value="org_admin">Admin</option>
@@ -1060,7 +1107,7 @@ export default function SuperAdminCompanyDetail() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full"
+                            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50 dark:border-white/10"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Changer le rôle</h3>
@@ -1114,7 +1161,7 @@ export default function SuperAdminCompanyDetail() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full"
+                            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50 dark:border-white/10"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Détails de l'utilisateur</h3>

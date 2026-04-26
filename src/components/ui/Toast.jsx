@@ -121,8 +121,8 @@ function Toast({
       layout
       className={`
         relative flex items-start gap-3 p-4 rounded-2xl
-        ${config.bg} ${config.border} shadow-xl backdrop-blur-sm
-        border border-white/20 min-w-[280px] sm:min-w-[320px] max-w-md
+        ${config.bg} ${config.border} shadow-xl backdrop-blur-2xl
+        border border-white/30 min-w-[280px] sm:min-w-[320px] max-w-md
         group cursor-pointer hover:shadow-2xl transition-all
         ${config.glow}
       `}

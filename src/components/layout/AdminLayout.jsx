@@ -46,14 +46,14 @@ export default function AdminLayout({ children }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Sécurité
+    // Security
     useEffect(() => {
         if (!loading && !isAdminAccess) {
             navigate('/unauthorized');
         }
     }, [isAdminAccess, loading, navigate]);
 
-    // Infos entreprise optimisées
+    // Company info
     useEffect(() => {
         const fetchCompanyInfo = async () => {
             const resolvedOrgId = isImpersonating ? orgId : organizationId;
@@ -102,22 +102,22 @@ export default function AdminLayout({ children }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950">
-            {/* Banner Impersonation */}
+        <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50/50 via-white to-accent-50/30 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950">
+            {/* Impersonation Banner */}
             {isImpersonating && isReadOnly && (
-                <div className="bg-amber-500 text-white p-2 text-center text-sm font-bold flex items-center justify-center gap-4 sticky top-0 z-[60]">
+                <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-2.5 text-center text-sm font-bold flex items-center justify-center gap-4 sticky top-0 z-[60] shadow-lg shadow-amber-500/20">
                     <Shield className="w-4 h-4" />
-                    <span>Mode Lecture Seule - Vous visualisez l'entreprise {companyInfo.name}</span>
+                    <span>Mode Lecture Seule — Vous visualisez l'entreprise {companyInfo.name}</span>
                     <button 
                         onClick={() => navigate('/super-admin')}
-                        className="bg-white text-amber-600 px-3 py-1 rounded-lg text-xs hover:bg-amber-50 transition-colors"
+                        className="bg-white/20 backdrop-blur-sm text-white px-4 py-1 rounded-xl text-xs hover:bg-white/30 transition-colors border border-white/20"
                     >
                         Quitter
                     </button>
                 </div>
             )}
 
-            {/* Overlay mobile */}
+            {/* Mobile overlay */}
             <AnimatePresence mode="wait">
                 {sidebarOpen && (
                     <motion.div
@@ -125,7 +125,7 @@ export default function AdminLayout({ children }) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden fixed inset-0 bg-secondary-950/50 backdrop-blur-sm z-30"
+                        className="lg:hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-30"
                     />
                 )}
             </AnimatePresence>
@@ -140,32 +140,34 @@ export default function AdminLayout({ children }) {
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         className="fixed top-0 left-0 h-full z-40"
                     >
-                        <aside className="h-full w-72 bg-white/80 dark:bg-secondary-950/80 backdrop-blur-xl border-r border-primary-100 dark:border-gray-800 shadow-2xl flex flex-col">
-                            {/* Logo avec badge dynamique */}
-                            <div className="p-6 border-b border-primary-100 dark:border-gray-800 relative overflow-hidden">
-                                <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full opacity-20 blur-2xl" />
-                                
+                        <aside className="h-full w-72 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border-r border-white/50 dark:border-white/5 shadow-[0_0_60px_-15px_rgba(139,92,246,0.15)] dark:shadow-[0_0_60px_-15px_rgba(139,92,246,0.1)] flex flex-col relative overflow-hidden">
+                            {/* Decorative orbs */}
+                            <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary-400/20 dark:bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-accent-400/15 dark:bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                            {/* Logo with dynamic badge */}
+                            <div className="p-6 border-b border-white/30 dark:border-white/5 relative z-10">
                                 <div className="relative flex items-center gap-4">
                                     <Logo size="lg" withText={false} />
                                     <div className="flex-1">
-                                        <h2 className="font-bold text-gray-800 dark:text-gray-200 text-lg">Smiris Learn</h2>
-                                        <p className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                                        <h2 className="font-bold text-gray-800 dark:text-gray-100 text-lg tracking-tight">Smiris Learn</h2>
+                                        <p className="text-[11px] text-primary-600 dark:text-primary-400 flex items-center gap-1 font-medium">
                                             <Shield className="w-3 h-3" />
                                             {companyInfo.name || 'Admin'} • {companyInfo.plan === 'starter' ? 'Starter' : 'Gratuit'} {companyInfo.status === 'trial' ? '(Essai)' : ''}
                                         </p>
                                     </div>
                                 </div>
 
-                                {/* Badge période d'essai dynamique */}
+                                {/* Dynamic trial badge */}
                                 {companyInfo.trialDays > 0 && (
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        transition={{ delay: 0.3 }}
-                                        className={`mt-4 px-3 py-2 rounded-xl flex items-center gap-2 text-xs font-medium ${
+                                        transition={{ delay: 0.3, type: "spring" }}
+                                        className={`mt-4 px-3 py-2 rounded-xl flex items-center gap-2 text-xs font-semibold ${
                                             companyInfo.trialDays <= 3
-                                                ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800'
-                                                : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
+                                                ? 'bg-orange-100/80 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border border-orange-200/50 dark:border-orange-800/30'
+                                                : 'bg-emerald-100/80 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/30'
                                         }`}
                                     >
                                         <Zap className="w-3 h-3" />
@@ -175,61 +177,69 @@ export default function AdminLayout({ children }) {
                             </div>
 
                             {/* Menu */}
-                            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                            <nav className="flex-1 p-3 space-y-1 overflow-y-auto relative z-10">
                                 {menuItems.map((item, index) => (
                                     <motion.div
                                         key={item.path}
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.1 }}
+                                        transition={{ delay: index * 0.06, type: "spring", stiffness: 200, damping: 20 }}
                                     >
                                         <NavLink
                                             to={isImpersonating ? `${item.path}?orgId=${orgId}` : item.path}
                                             end={item.path === '/admin'}
                                             onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
                                             className={({ isActive }) =>
-                                                `relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group overflow-hidden
+                                                `relative flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 group overflow-hidden
                                                 ${isActive 
-                                                    ? 'bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 text-white shadow-lg shadow-primary-200 dark:shadow-primary-900/30' 
-                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
+                                                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/30 dark:shadow-primary-900/40' 
+                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-300'
                                                 }`
                                             }
                                         >
-                                            <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                                            
-                                            <item.icon size={20} />
-                                            <span className="font-medium flex-1">{item.label}</span>
-                                            {item.badge && (
-                                                <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                                                    {item.badge}
-                                                </span>
+                                            {({ isActive }) => (
+                                                <>
+                                                    {isActive && (
+                                                        <div className="absolute inset-0 bg-white/10 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                                                    )}
+                                                    <div className={`p-1.5 rounded-xl ${isActive ? 'bg-white/20' : 'bg-transparent group-hover:bg-primary-100/50 dark:group-hover:bg-primary-900/30'} transition-colors`}>
+                                                        <item.icon size={18} />
+                                                    </div>
+                                                    <span className="font-medium text-[14px] flex-1">{item.label}</span>
+                                                    {item.badge && (
+                                                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                                                            {item.badge}
+                                                        </span>
+                                                    )}
+                                                </>
                                             )}
                                         </NavLink>
                                     </motion.div>
                                 ))}
                             </nav>
 
-                            {/* Bas de la sidebar : bouton Dark Mode et Déconnexion */}
-                            <div className="p-4 border-t border-primary-100 dark:border-gray-800 space-y-2">
-                                {/* Bouton Dark Mode */}
+                            {/* Bottom actions */}
+                            <div className="p-3 border-t border-white/30 dark:border-white/5 space-y-1 relative z-10">
                                 <button
                                     onClick={toggleTheme}
-                                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-gray-800 transition-colors"
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/5 transition-all group"
                                 >
-                                    {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                                    <span className="font-medium">Mode {theme === 'light' ? 'sombre' : 'clair'}</span>
+                                    <div className="p-1.5 rounded-xl bg-transparent group-hover:bg-amber-100/50 dark:group-hover:bg-amber-900/30 transition-colors">
+                                        {theme === 'light' ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
+                                    </div>
+                                    <span className="font-medium text-[14px]">Mode {theme === 'light' ? 'sombre' : 'clair'}</span>
                                 </button>
 
-                                {/* Déconnexion */}
                                 <motion.button
-                                    whileHover={{ scale: 1.02 }}
+                                    whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleSignOut}
-                                    className="relative flex items-center gap-3 px-4 py-3.5 w-full rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-300 group overflow-hidden"
+                                    className="relative flex items-center gap-3 px-4 py-3 w-full rounded-2xl text-red-500 dark:text-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/20 transition-all duration-300 group"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-100/50 dark:via-red-900/30 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                                    <LogOut size={20} />
-                                    <span className="font-medium">Déconnexion</span>
+                                    <div className="p-1.5 rounded-xl bg-transparent group-hover:bg-red-100/50 dark:group-hover:bg-red-900/30 transition-colors">
+                                        <LogOut size={18} />
+                                    </div>
+                                    <span className="font-medium text-[14px]">Déconnexion</span>
                                 </motion.button>
                             </div>
                         </aside>
@@ -237,7 +247,7 @@ export default function AdminLayout({ children }) {
                 )}
             </AnimatePresence>
 
-            {/* Contenu principal */}
+            {/* Main content */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

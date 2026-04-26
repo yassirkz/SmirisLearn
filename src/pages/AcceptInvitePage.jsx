@@ -142,8 +142,7 @@ export default function AcceptInvitePage() {
                     password: formData.password,
                     options: {
                         data: {
-                            full_name: invitation.admin_name,
-                            role: 'org_admin'
+                            full_name: invitation.admin_name
                         }
                     }
                 });
@@ -191,7 +190,7 @@ export default function AcceptInvitePage() {
                         email: invitation.email,
                         password: formData.password,
                         options: {
-                            data: { role: invitation.role }
+                            data: { full_name: invitation.full_name || '' }
                         }
                     });
                     if (signUpError) throw signUpError;
@@ -213,7 +212,7 @@ export default function AcceptInvitePage() {
     // ============================================
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 transition-colors duration-300">
+            <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50/50 via-white to-accent-50/30 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -236,11 +235,11 @@ export default function AcceptInvitePage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 transition-colors duration-300">
+            <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50/50 via-white to-accent-50/30 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl dark:shadow-gray-900/50 max-w-md w-full text-center transition-colors duration-300"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-8 shadow-2xl border border-white/50 dark:border-white/5 max-w-md w-full text-center transition-colors duration-300"
                 >
                     <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-6 flex items-center justify-center">
                         <AlertCircle className="w-10 h-10 text-red-500" />
@@ -259,11 +258,11 @@ export default function AcceptInvitePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 transition-colors duration-300">
+        <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50/50 via-white to-accent-50/30 dark:from-slate-950 dark:via-gray-900 dark:to-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl dark:shadow-gray-900/50 border border-blue-100 dark:border-gray-700 max-w-md w-full relative overflow-hidden transition-colors duration-300"
+                className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 max-w-md w-full relative overflow-hidden transition-colors duration-300"
             >
                 {/* Badge */}
                 <div className="absolute -top-1 -right-1">
@@ -291,7 +290,7 @@ export default function AcceptInvitePage() {
                 </div>
 
                 {/* Informations de l'invitation */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 mb-6 border border-blue-100 dark:border-gray-600">
+                <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-xl p-4 mb-6 border border-white/50 dark:border-white/5 shadow-inner">
                     {invitationType === 'company' ? (
                         <>
                             <div className="flex items-center gap-3 mb-3">
@@ -352,7 +351,7 @@ export default function AcceptInvitePage() {
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                         onBlur={() => setTouched({ ...touched, password: true })}
                                         className={`
-                                            w-full pl-10 pr-12 py-3 border-2 rounded-xl outline-none transition-all bg-white dark:bg-gray-700 dark:text-white
+                                            w-full pl-10 pr-12 py-3 border-2 rounded-xl outline-none transition-all bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm dark:text-white
                                             ${passwordError && touched.password
                                                 ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                 : formData.password && !passwordError
@@ -398,7 +397,7 @@ export default function AcceptInvitePage() {
                                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                                         onBlur={() => setTouched({ ...touched, confirmPassword: true })}
                                         className={`
-                                            w-full pl-10 pr-12 py-3 border-2 rounded-xl outline-none transition-all bg-white dark:bg-gray-700 dark:text-white
+                                            w-full pl-10 pr-12 py-3 border-2 rounded-xl outline-none transition-all bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm dark:text-white
                                             ${confirmError && touched.confirmPassword
                                                 ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30'
                                                 : formData.confirmPassword && !confirmError

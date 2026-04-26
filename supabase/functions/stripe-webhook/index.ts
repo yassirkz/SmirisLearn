@@ -5,13 +5,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!);
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  Deno.env.get('SERVICE_ROLE_KEY')!,
   { auth: { persistSession: false } }
 );
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Origin': Deno.env.get('FRONTEND_URL') || 'https://smiris-learn.vercel.app',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
@@ -83,7 +83,7 @@ serve(async (req) => {
             subscription_status: status,
             stripe_subscription_id: subscription.status === 'canceled' ? null : subscription.id,
             // Mise à jour optionnelle du plan si présent dans metadata
-            plan_type: subscription.metadata?.plan_type || undefined 
+            ...(subscription.metadata?.plan_type ? { plan_type: subscription.metadata.plan_type } : {})
           })
           .eq('stripe_customer_id', customerId);
 

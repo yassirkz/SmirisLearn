@@ -14,6 +14,11 @@ serve(async (req) => {
   try {
     const { keyData, supabase } = await verifyApiKey(req);
 
+    // Seules les clés super_admin peuvent lister toutes les organisations
+    if (!keyData.is_super_admin) {
+      throw new Error("Unauthorized: Only super admin API keys can list all accounts");
+    }
+
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");

@@ -1,6 +1,6 @@
 // supabase/functions/delete-account/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyApiKey, logApiCall, corsHeaders } from "../_shared/verify-api-key.ts";
+import { verifyApiKey, logApiCall, corsHeaders, checkOrgAccess } from "../_shared/verify-api-key.ts";
 
 serve(async (req) => {
   const startTime = performance.now();
@@ -36,6 +36,9 @@ serve(async (req) => {
     }
 
     const orgId = profile.organization_id;
+
+    // VÉRIFICATION DE SÉCURITÉ (IDOR)
+    checkOrgAccess(keyData, orgId);
 
     // 1.5 Récupérer tous les profils de l'organisation pour pouvoir les supprimer du système auth
     const { data: orgMembers } = await supabase

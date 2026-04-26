@@ -97,10 +97,19 @@ export default function NotificationDropdown({ isOpen, onClose }) {
 
     const getTypeIcon = (type) => {
         switch (type) {
-            case 'success': return <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />;
-            case 'warning': return <AlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400" />;
-            case 'error': return <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />;
-            default: return <Info className="w-5 h-5 text-primary-500 dark:text-primary-400" />;
+            case 'success': return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+            case 'warning': return <AlertTriangle className="w-5 h-5 text-amber-500" />;
+            case 'error': return <AlertCircle className="w-5 h-5 text-red-500" />;
+            default: return <Info className="w-5 h-5 text-primary-500" />;
+        }
+    };
+
+    const getTypeBg = (type) => {
+        switch (type) {
+            case 'success': return 'bg-emerald-100 dark:bg-emerald-900/30';
+            case 'warning': return 'bg-amber-100 dark:bg-amber-900/30';
+            case 'error': return 'bg-red-100 dark:bg-red-900/30';
+            default: return 'bg-primary-100 dark:bg-primary-900/30';
         }
     };
 
@@ -120,27 +129,30 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                 <>
                     <div className="fixed inset-0 z-40" onClick={onClose} />
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 md:w-96 max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-blue-100 dark:border-gray-700 z-50 overflow-hidden"
+                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 md:w-96 max-w-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] border border-white/50 dark:border-white/5 z-50 overflow-hidden"
                     >
                         {/* Header */}
-                        <div className="p-4 border-b border-primary-50 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-white dark:from-gray-800 dark:to-gray-800 flex items-center justify-between">
-                            <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                <Bell className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                        <div className="p-4 border-b border-white/30 dark:border-white/5 flex items-center justify-between">
+                            <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2 tracking-tight">
+                                <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                                    <Bell className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                                </div>
                                 Notifications
                             </h3>
                             <div className="flex items-center gap-2">
                                 {notifications.some(n => !n.read) && (
                                     <button 
                                         onClick={markAllAsRead}
-                                        className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                                        className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold px-2 py-1 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
                                     >
-                                        Tout marquer comme lu
+                                        Tout marquer lu
                                     </button>
                                 )}
-                                <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+                                <button onClick={onClose} className="p-1.5 hover:bg-white/50 dark:hover:bg-white/5 rounded-lg transition-colors">
                                     <X className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                 </button>
                             </div>
@@ -150,49 +162,52 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                         <div className="max-h-[400px] overflow-y-auto">
                             {loading ? (
                                 <div className="p-8 text-center">
-                                    <div className="w-8 h-8 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Chargement...</p>
+                                    <div className="w-8 h-8 border-2 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                    <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Chargement...</p>
                                 </div>
                             ) : notifications.length === 0 ? (
                                 <div className="p-12 text-center">
-                                    <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Bell className="w-8 h-8 text-blue-200 dark:text-blue-600" />
+                                    <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                        <Bell className="w-8 h-8 text-primary-200 dark:text-primary-700" />
                                     </div>
-                                    <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune notification</p>
+                                    <p className="text-gray-500 dark:text-gray-400 font-semibold">Aucune notification</p>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Vous êtes à jour</p>
                                 </div>
                             ) : (
-                                <div className="divide-y divide-gray-50 dark:divide-gray-700">
-                                    {notifications.map((notification) => (
-                                        <div 
+                                <div className="p-1.5">
+                                    {notifications.map((notification, index) => (
+                                        <motion.div 
                                             key={notification.id}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.03 }}
                                             onClick={() => handleNotificationClick(notification)}
                                             role="button"
                                             tabIndex={0}
-                                            className={`p-4 hover:bg-blue-50/30 dark:hover:bg-gray-700/50 transition-colors flex gap-3 relative group cursor-pointer ${!notification.read ? 'bg-blue-50/10 dark:bg-blue-900/20' : ''}`}
+                                            className={`p-3.5 hover:bg-white/50 dark:hover:bg-white/5 transition-all rounded-xl flex gap-3 relative group cursor-pointer mb-1 ${!notification.read ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''}`}
                                         >
                                             {!notification.read && (
-                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-400"></div>
+                                                <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary-600 dark:bg-primary-400 rounded-full"></div>
                                             )}
-                                            <div className="mt-0.5">
+                                            <div className={`p-2 ${getTypeBg(notification.type)} rounded-xl mt-0.5 shrink-0`}>
                                                 {getTypeIcon(notification.type)}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className={`text-sm font-bold text-gray-800 dark:text-white ${!notification.read ? '' : 'font-semibold'}`}>
+                                                <p className={`text-sm text-gray-800 dark:text-white ${!notification.read ? 'font-bold' : 'font-medium'}`}>
                                                     {notification.title}
                                                 </p>
-                                                <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5 line-clamp-2">
+                                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
                                                     {notification.message}
                                                 </p>
-                                                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                                                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 font-medium">
                                                     {new Date(notification.created_at).toLocaleString()}
                                                 </p>
                                             </div>
-                                            <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                                 {!notification.read && (
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
-                                                        className="p-1.5 bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-600"
+                                                        className="p-1.5 bg-white/60 dark:bg-white/5 shadow-sm border border-white/50 dark:border-white/5 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
                                                         title="Marquer comme lu"
                                                     >
                                                         <Check className="w-3.5 h-3.5" />
@@ -200,13 +215,13 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                                                 )}
                                                 <button 
                                                     onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}
-                                                    className="p-1.5 bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600 rounded-lg text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                                    className="p-1.5 bg-white/60 dark:bg-white/5 shadow-sm border border-white/50 dark:border-white/5 rounded-lg text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                                     title="Supprimer"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     ))}
                                 </div>
                             )}

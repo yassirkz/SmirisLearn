@@ -31,6 +31,10 @@ serve(async (req) => {
       throw new Error("Password must be at least 8 characters");
     }
 
+    // Validation du plan (whitelist)
+    const validPlans = ["free", "starter"];
+    const safePlan = validPlans.includes(plan) ? plan : "free";
+
     // 4. Créer l'utilisateur dans Auth
     const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
       email: adminEmail,
@@ -59,9 +63,9 @@ serve(async (req) => {
       .insert({
         name: companyName,
         slug: slug,
-        plan_type: plan,
-        subscription_status: plan === "free" ? "active" : "trial",
-        trial_ends_at: plan === "starter"
+        plan_type: safePlan,
+        subscription_status: safePlan === "free" ? "active" : "trial",
+        trial_ends_at: safePlan === "starter"
           ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
           : null,
       })

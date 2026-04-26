@@ -97,16 +97,9 @@ export default function SearchComponent({
         switch(type) {
             case 'organization': return 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/30';
             case 'user': return 'text-accent-600 bg-accent-100 dark:text-accent-400 dark:bg-accent-900/30';
-            case 'video': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
+            case 'video': return 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30';
             default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800';
         }
-    };
-
-    const getBadge = (result) => {
-        if (result.type === 'organization') return result.plan;
-        if (result.type === 'user') return result.role;
-        if (result.type === 'video') return result.pillar;
-        return '';
     };
 
     return (
@@ -126,10 +119,10 @@ export default function SearchComponent({
                     }}
                     placeholder={displayPlaceholder}
                     autoFocus={autoFocus}
-                    className="w-full pl-10 pr-20 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all text-sm dark:text-white dark:placeholder-gray-400"
+                    className="w-full pl-11 pr-24 py-3 bg-white/50 dark:bg-white/5 backdrop-blur-md border border-white/50 dark:border-white/5 rounded-2xl focus:border-primary-400/50 dark:focus:border-primary-500/30 focus:ring-4 focus:ring-primary-100/50 dark:focus:ring-primary-900/20 outline-none transition-all text-sm dark:text-white dark:placeholder-gray-500 shadow-sm focus:shadow-md"
                 />
                 
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4.5 h-4.5" />
                 
                 {query && (
                     <button
@@ -139,7 +132,7 @@ export default function SearchComponent({
                             setResults(null);
                             setShowResults(false);
                         }}
-                        className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                        className="absolute right-[4.5rem] top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-lg hover:bg-white/50 dark:hover:bg-white/5 transition-colors"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -148,7 +141,7 @@ export default function SearchComponent({
                 <button
                     type="submit"
                     disabled={loading || !query.trim()}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg text-xs font-medium disabled:opacity-50 hover:shadow-md transition-all"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3.5 py-1.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:shadow-md hover:shadow-primary-500/25 transition-all"
                 >
                     {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Rechercher'}
                 </button>
@@ -157,17 +150,20 @@ export default function SearchComponent({
             <AnimatePresence>
                 {showResults && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50"
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className="absolute top-full left-0 right-0 mt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] border border-white/50 dark:border-white/5 max-h-96 overflow-y-auto z-50"
                     >
-                        {/* Résultats */}
+                        {/* Results */}
                         {results ? (
                             results.total_results === 0 ? (
                                 <div className="p-6 text-center">
-                                    <Search className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                        <Search className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+                                    </div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                                         Aucun résultat pour "{results.query}"
                                     </p>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
@@ -177,13 +173,13 @@ export default function SearchComponent({
                             ) : (
                                 <div className="p-2">
                                     <div className="flex items-center justify-between px-3 py-2">
-                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            {results.total_results} résultats trouvés
+                                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            {results.total_results} résultats
                                         </p>
                                         <Sparkles className="w-3 h-3 text-primary-500 dark:text-primary-400" />
                                     </div>
                                     
-                                    {/* Organisations */}
+                                    {/* Organizations */}
                                     {results.organizations?.map((org) => (
                                         <ResultItem
                                             key={`org-${org.id}`}
@@ -195,7 +191,7 @@ export default function SearchComponent({
                                         />
                                     ))}
 
-                                    {/* Utilisateurs */}
+                                    {/* Users */}
                                     {results.users?.map((user) => (
                                         <ResultItem
                                             key={`user-${user.id}`}
@@ -207,7 +203,7 @@ export default function SearchComponent({
                                         />
                                     ))}
 
-                                    {/* Vidéos */}
+                                    {/* Videos */}
                                     {results.videos?.map((video) => (
                                         <ResultItem
                                             key={`video-${video.id}`}
@@ -221,10 +217,10 @@ export default function SearchComponent({
                                 </div>
                             )
                         ) : (
-                            /* Recherches récentes */
+                            /* Recent searches */
                             recentSearches.length > 0 && (
                                 <div className="p-2">
-                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-3 py-2">
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-3 py-2 uppercase tracking-wider">
                                         Recherches récentes
                                     </p>
                                     {recentSearches.map((search, index) => (
@@ -234,9 +230,9 @@ export default function SearchComponent({
                                                 setQuery(search.query);
                                                 handleSearch();
                                             }}
-                                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-left"
+                                            className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/50 dark:hover:bg-white/5 rounded-xl text-left transition-colors"
                                         >
-                                            <Search className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+                                            <Search className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                                             <span className="text-sm text-gray-600 dark:text-gray-300">{search.query}</span>
                                         </button>
                                     ))}
@@ -251,29 +247,27 @@ export default function SearchComponent({
 }
 
 function ResultItem({ result, onClick, icon: Icon, color, badge }) {
-    // color est une chaîne comme "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30"
-    // On extrait les classes pour le conteneur et l'icône
+    // color is a string like "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30"
     const [textColor, bgColor] = color.split(' ');
-    // Pour l'icône, on utilise seulement la classe de texte
     const iconColor = textColor;
     
     return (
         <motion.button
-            whileHover={{ x: 5 }}
+            whileHover={{ x: 3 }}
             onClick={() => onClick(result)}
-            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all text-left group"
+            className="w-full flex items-center gap-3 p-3 hover:bg-white/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group"
         >
-            <div className={`p-2 ${bgColor} rounded-lg`}>
+            <div className={`p-2 ${bgColor} rounded-xl`}>
                 <Icon className={`w-4 h-4 ${iconColor}`} />
             </div>
             
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">
                         {result.name || result.title}
                     </p>
                     {badge && (
-                        <span className="text-xs px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
+                        <span className="text-[10px] px-2 py-0.5 bg-white/60 dark:bg-white/5 text-gray-600 dark:text-gray-300 rounded-full font-medium border border-white/50 dark:border-white/5">
                             {badge}
                         </span>
                     )}

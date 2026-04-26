@@ -18,14 +18,14 @@ import DOMPurify from 'dompurify';
  */
 export function untrusted(value) {
     return value;
-    }
+}
 
-    /**
-     * Échappe du texte pour affichage sécurisé (prévention XSS)
-     * @param {UntrustedString} content - Contenu non fiable
-     * @returns {TrustedText}
-     */
-    export function escapeText(content) {
+/**
+ * Échappe du texte pour affichage sécurisé (prévention XSS)
+ * @param {UntrustedString} content - Contenu non fiable
+ * @returns {TrustedText}
+ */
+export function escapeText(content) {
     if (!content) return '';
     
     const escaped = String(content)
@@ -37,14 +37,14 @@ export function untrusted(value) {
         .replace(/\//g, '&#x2F;');
         
     return escaped;
-    }
+}
 
-    /**
-     * Sanitize du HTML (pour contenu riche - utilisation prudente)
-     * @param {UntrustedString} content - Contenu HTML non fiable
-     * @returns {TrustedHtml}
-     */
-    export function sanitizeHtml(content) {
+/**
+ * Sanitize du HTML (pour contenu riche - utilisation prudente)
+ * @param {UntrustedString} content - Contenu HTML non fiable
+ * @returns {TrustedHtml}
+ */
+export function sanitizeHtml(content) {
     if (!content) return '';
     
     const clean = DOMPurify.sanitize(content, {
@@ -55,15 +55,15 @@ export function untrusted(value) {
     });
     
     return clean;
-    }
+}
 
-    /**
-     * Valide et nettoie un email
-     * @param {UntrustedString} email - Email non fiable
-     * @returns {Email}
-     * @throws {Error} Si email invalide
-     */
-    export function validateEmail(email) {
+/**
+ * Valide et nettoie un email
+ * @param {UntrustedString} email - Email non fiable
+ * @returns {Email}
+ * @throws {Error} Si email invalide
+ */
+export function validateEmail(email) {
     const emailStr = String(email).trim().toLowerCase();
     
     // Regex OWASP recommandée pour emails
@@ -73,16 +73,16 @@ export function untrusted(value) {
         throw new Error('Format d\'email invalide');
     }
     
-    // Échapper pour prévention XSS
-    return escapeText(untrusted(emailStr));
-    }
+    // Retourner l'email nettoyé (pas d'échappement HTML pour stocker en DB)
+    return emailStr;
+}
 
-    /**
-     * Nettoie une chaîne pour usage dans URLs (prévention path traversal)
-     * @param {UntrustedString} input - Entrée utilisateur
-     * @returns {string}
-     */
-    export function sanitizeUrlInput(input) {
+/**
+ * Nettoie une chaîne pour usage dans URLs (prévention path traversal)
+ * @param {UntrustedString} input - Entrée utilisateur
+ * @returns {string}
+ */
+export function sanitizeUrlInput(input) {
     if (!input) return '';
     
     // Supprime les caractères dangereux pour les chemins
@@ -90,82 +90,84 @@ export function untrusted(value) {
         .replace(/\.\./g, '')
         .replace(/[\\/]/g, '')
         .replace(/[^a-zA-Z0-9-_]/g, '');
-    }
+}
 
-    /**
-     * Rate limiting client-side (complémentaire au serveur)
-     * @param {string} action - Type d'action
-     * @param {number} limit - Limite
-     * @param {number} windowMs - Fenêtre en ms
-     * @returns {boolean}
-     */
-    const rateLimitStore = new Map();
+/**
+ * Rate limiting client-side (complémentaire au serveur)
+ * NOTE: Ce rate limiting est réinitialisé au rechargement de page.
+ * Le vrai rate limiting doit être fait côté serveur.
+ * @param {string} action - Type d'action (ex: 'login', 'signup')
+ * @param {string} identifier - Identifiant unique (ex: email)
+ * @param {number} limit - Nombre max de tentatives
+ * @param {number} windowMs - Fenêtre en ms
+ * @returns {boolean}
+ */
+const rateLimitStore = new Map();
 
-    export function checkRateLimit(action, limit = 5, windowMs = 60000) {
-    const key = `${action}_${Date.now()}`;
+export function checkRateLimit(action, identifier = 'global', limit = 5, windowMs = 60000) {
+    const key = `${action}:${identifier}`;
     const now = Date.now();
     
-    // Nettoie les entrées expirées
-    for (const [k, timestamp] of rateLimitStore.entries()) {
-        if (now - timestamp > windowMs) {
-        rateLimitStore.delete(k);
-        }
+    const entry = rateLimitStore.get(key);
+    
+    if (!entry || now - entry.windowStart >= windowMs) {
+        // Nouvelle fenêtre
+        rateLimitStore.set(key, { count: 1, windowStart: now });
+        return true;
     }
     
-    // Compte les tentatives récentes
-    const attempts = Array.from(rateLimitStore.values())
-        .filter(ts => ts > now - windowMs)
-        .length;
-    
-    if (attempts >= limit) {
+    if (entry.count >= limit) {
         return false;
     }
     
-    rateLimitStore.set(key, now);
+    entry.count += 1;
     return true;
-    }
+}
 
-    /**
-     * Middleware de validation pour les formulaires
-     * @param {Object} schema - Schéma de validation
-     * @param {Object} data - Données à valider
-     * @returns {Object} Résultat validation
-     */
-    export function validateInput(schema, data) {
+/**
+ * Middleware de validation pour les formulaires
+ * @param {Object} schema - Schéma de validation
+ * @param {Object} data - Données à valider
+ * @returns {Object} Résultat validation
+ */
+export function validateInput(schema, data) {
     const errors = {};
     const sanitized = {};
     
     for (const [field, rules] of Object.entries(schema)) {
         const value = data[field];
-        const untrustedValue = untrusted(value || '');
         
         // Validation requise
         if (rules.required && !value) {
-        errors[field] = `${field} est requis`;
-        continue;
+            errors[field] = `${field} est requis`;
+            continue;
         }
+        
+        if (!value) continue;
+        
+        const untrustedValue = untrusted(value);
         
         // Validation type
         if (rules.type === 'email') {
-        try {
-            sanitized[field] = validateEmail(untrustedValue);
-        } catch (e) {
-            errors[field] = e.message;
-        }
+            try {
+                sanitized[field] = validateEmail(untrustedValue);
+            } catch (e) {
+                errors[field] = e.message;
+            }
         } else if (rules.type === 'text') {
-        sanitized[field] = escapeText(untrustedValue);
+            sanitized[field] = escapeText(untrustedValue);
         } else if (rules.type === 'html') {
-        sanitized[field] = sanitizeHtml(untrustedValue);
+            sanitized[field] = sanitizeHtml(untrustedValue);
         }
         
         // Validation longueur min
         if (rules.minLength && value.length < rules.minLength) {
-        errors[field] = `Minimum ${rules.minLength} caractères`;
+            errors[field] = `Minimum ${rules.minLength} caractères`;
         }
         
         // Validation longueur max
         if (rules.maxLength && value.length > rules.maxLength) {
-        errors[field] = `Maximum ${rules.maxLength} caractères`;
+            errors[field] = `Maximum ${rules.maxLength} caractères`;
         }
     }
     

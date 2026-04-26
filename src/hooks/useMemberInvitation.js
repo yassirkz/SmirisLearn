@@ -121,10 +121,15 @@ export function useMemberInvitation() {
       if (!invitation) throw new Error('Invitation invalide');
       if (new Date(invitation.expires_at) < new Date()) throw new Error('Invitation expirée');
 
-      // Mettre à jour le profil de l'utilisateur
+      // SÉCURITÉ : Dans une application de production, cette mise à jour doit être 
+      // effectuée via une RPC ou un Trigger SQL pour empêcher l'utilisateur
+      // de modifier lui-même son rôle via l'API client.
       const { error } = await supabase
         .from('profiles')
-        .update({ organization_id: invitation.organization_id, role: invitation.role })
+        .update({ 
+          organization_id: invitation.organization_id, 
+          role: invitation.role 
+        })
         .eq('id', userId);
       if (error) throw error;
 

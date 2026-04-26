@@ -1,6 +1,6 @@
 // supabase/functions/suspend-account/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { verifyApiKey, logApiCall, corsHeaders } from "../_shared/verify-api-key.ts";
+import { verifyApiKey, logApiCall, corsHeaders, checkOrgAccess } from "../_shared/verify-api-key.ts";
 
 serve(async (req) => {
   const startTime = performance.now();
@@ -35,6 +35,9 @@ serve(async (req) => {
       .single();
 
     if (profileError) throw new Error("User not found");
+
+    // VÉRIFICATION DE SÉCURITÉ (IDOR)
+    checkOrgAccess(keyData, profile.organization_id);
 
     if (profile.role !== "org_admin") {
       throw new Error("User is not an organization admin");

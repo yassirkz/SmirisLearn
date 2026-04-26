@@ -1,7 +1,6 @@
-// src/components/admin/quizzes/QuizCreator.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Save, X, AlertCircle, Loader } from 'lucide-react';
+import { Plus, Save, X, AlertCircle, Loader, ChevronDown } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../ui/Toast';
@@ -24,6 +23,8 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
     const [loadingVideos, setLoadingVideos] = useState(true);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
+    const [isVideoOpen, setIsVideoOpen] = useState(false);
+    const videoRef = useRef(null);
 
     const [form, setForm] = useState({
         video_id: videoId || quiz?.video_id || '',
@@ -61,6 +62,17 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
         };
         fetchVideos();
     }, [user]);
+
+    // Fermer le dropdown si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (videoRef.current && !videoRef.current.contains(event.target)) {
+                setIsVideoOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [videoRef]);
 
     const validate = () => {
         const newErrors = {};
@@ -203,26 +215,54 @@ export default function QuizCreator({ quiz, videoId, onSuccess, onCancel }) {
                     </div>
                 ) : (
                     <div className="relative group">
-                        <select
-                            value={form.video_id}
-                            onChange={(e) => setForm(f => ({ ...f, video_id: e.target.value }))}
-                            className={`w-full px-4 py-3 bg-white dark:bg-slate-900 border rounded-xl focus:ring-4 outline-none transition-all font-medium appearance-none cursor-pointer ${
+                    <div className="relative" ref={videoRef}>
+                        <button
+                            type="button"
+                            onClick={() => setIsVideoOpen(!isVideoOpen)}
+                            className={`w-full px-4 py-3 bg-white dark:bg-slate-900 border rounded-xl focus:ring-4 outline-none transition-all font-medium flex items-center justify-between gap-2 shadow-sm ${
                                 errors.video_id 
                                 ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-900/30' 
                                 : 'border-gray-200 dark:border-gray-700 focus:border-primary-500 focus:ring-primary-100 dark:focus:ring-primary-900/30'
                             }`}
                         >
-                            <option value="">Sélectionner une vidéo</option>
-                            {videos.map(v => (
-                                <option key={v.id} value={v.id}>
-                                    {escapeText(untrusted(v.title))}
-                                    {v.pillar?.name ? ` (${escapeText(untrusted(v.pillar.name))})` : ''}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                            <span className="text-gray-400">▼</span>
-                        </div>
+                            <span className="truncate">
+                                {form.video_id 
+                                    ? escapeText(untrusted(videos.find(v => v.id === form.video_id)?.title || 'Vidéo')) 
+                                    : 'Sélectionner une vidéo'}
+                            </span>
+                            <ChevronDown size={14} className={`transition-transform duration-200 ${isVideoOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        <AnimatePresence>
+                            {isVideoOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    className="absolute left-0 mt-2 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50 overflow-hidden max-h-60 overflow-y-auto"
+                                >
+                                    {videos.map(v => (
+                                        <button
+                                            key={v.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setForm(f => ({ ...f, video_id: v.id }));
+                                                setIsVideoOpen(false);
+                                            }}
+                                            className={`w-full px-4 py-2.5 text-left text-sm transition-colors truncate
+                                                ${form.video_id === v.id 
+                                                    ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                }`}
+                                        >
+                                            {escapeText(untrusted(v.title))}
+                                            {v.pillar?.name ? ` (${escapeText(untrusted(v.pillar.name))})` : ''}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                     </div>
                 )}
                 {errors.video_id && (

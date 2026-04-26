@@ -1,11 +1,10 @@
-// src/components/admin/quizzes/QuizList.jsx
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Filter, X, Edit, Trash2, Copy, Eye,
     RefreshCw, Plus, Sparkles, Award, Clock,
     BarChart3, ChevronLeft, ChevronRight, Target,
-    History as HistoryIcon
+    History as HistoryIcon, ChevronDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
@@ -34,6 +33,8 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
         sortBy: 'created_at',
         sortOrder: 'desc'
     });
+    const [isVideoFilterOpen, setIsVideoFilterOpen] = useState(false);
+    const videoFilterRef = useRef(null);
     const itemsPerPage = 10;
 
     const userId = user?.id;
@@ -149,6 +150,17 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
         loadQuizzes();
     }, [loadQuizzes, refreshTrigger, localRefreshKey]);
 
+    // Fermer le dropdown si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (videoFilterRef.current && !videoFilterRef.current.contains(event.target)) {
+                setIsVideoFilterOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [videoFilterRef]);
+
     // Filtrage et tri local
     const filteredQuizzes = useMemo(() => {
         let result = allQuizzes.filter(q => {
@@ -238,7 +250,7 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
     return (
         <div className="space-y-6">
             {/* Barre de filtres */}
-            <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden">
+            <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/50 dark:border-white/5 relative z-30">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-5">
                     <div className="flex items-center gap-3 px-2 h-11">
                         <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
@@ -262,21 +274,62 @@ export default function QuizList({ isReadOnly = false, orgId: propOrgId, onEdit,
                             />
                         </div>
 
-                        <select
-                            value={filters.video_id}
-                            onChange={(e) => {
-                                setFilters({ ...filters, video_id: e.target.value });
-                                setPage(1);
-                            }}
-                            className="w-full sm:w-auto px-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium min-w-[200px] cursor-pointer"
-                        >
-                            <option value="all">Toutes les vidéos</option>
-                            {videos.map((v, idx) => (
-                                <option key={v.id || `v-opt-${idx}`} value={v.id}>
-                                    {escapeText(untrusted(v.title))}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative" ref={videoFilterRef}>
+                            <button
+                                onClick={() => setIsVideoFilterOpen(!isVideoFilterOpen)}
+                                className="w-full sm:w-auto px-4 h-11 bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 dark:text-white transition-all font-medium min-w-[200px] flex items-center justify-between gap-2"
+                            >
+                                <span className="truncate max-w-[150px]">
+                                    {filters.video_id === 'all' 
+                                        ? 'Toutes les vidéos' 
+                                        : escapeText(untrusted(videos.find(v => v.id === filters.video_id)?.title || 'Vidéo'))}
+                                </span>
+                                <ChevronDown size={14} className={`transition-transform duration-200 ${isVideoFilterOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            <AnimatePresence>
+                                {isVideoFilterOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        className="absolute left-0 mt-2 w-full min-w-[200px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50"
+                                    >
+                                        <button
+                                            onClick={() => {
+                                                setFilters({ ...filters, video_id: 'all' });
+                                                setPage(1);
+                                                setIsVideoFilterOpen(false);
+                                            }}
+                                            className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                ${filters.video_id === 'all' 
+                                                    ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                }`}
+                                        >
+                                            Toutes les vidéos
+                                        </button>
+                                        {videos.map((v) => (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => {
+                                                    setFilters({ ...filters, video_id: v.id });
+                                                    setPage(1);
+                                                    setIsVideoFilterOpen(false);
+                                                }}
+                                                className={`w-full px-4 py-2.5 text-left text-sm transition-colors truncate
+                                                    ${filters.video_id === v.id 
+                                                        ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                        : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                    }`}
+                                            >
+                                                {escapeText(untrusted(v.title))}
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         <div className="flex bg-gray-100/80 dark:bg-slate-800/80 p-1.5 rounded-xl shadow-inner border border-gray-200 dark:border-gray-700 h-11 items-center">
                             <button

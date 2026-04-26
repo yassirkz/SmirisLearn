@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Users, Search, Filter, X, ChevronLeft, ChevronRight,
+    Users, Search, Filter, X, ChevronLeft, ChevronRight, ChevronDown,
     Building2, Mail, Calendar, MoreVertical, Eye,
     Edit, Trash2, Shield, Award, UserPlus, Download,
     RefreshCw, Sparkles, AlertCircle, CheckCircle,
@@ -43,6 +43,10 @@ export default function SuperAdminUsers() {
     const [selectedRole, setSelectedRole] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const [showActions, setShowActions] = useState(null);
+    const [isOrgFilterOpen, setIsOrgFilterOpen] = useState(false);
+    const [isRoleFilterOpen, setIsRoleFilterOpen] = useState(false);
+    const orgFilterRef = useRef(null);
+    const roleFilterRef = useRef(null);
 
     // Modals
     const [showUserModal, setShowUserModal] = useState(false);
@@ -64,6 +68,20 @@ export default function SuperAdminUsers() {
         fetchUsers();
         fetchOrganizations();
     }, [page, searchTerm, selectedOrg, selectedRole]);
+
+    // Fermer les dropdowns si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (orgFilterRef.current && !orgFilterRef.current.contains(event.target)) {
+                setIsOrgFilterOpen(false);
+            }
+            if (roleFilterRef.current && !roleFilterRef.current.contains(event.target)) {
+                setIsRoleFilterOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [orgFilterRef, roleFilterRef]);
 
     // ============================================
     // Récupérer les organisations (pour le filtre et l'invitation)
@@ -339,7 +357,7 @@ export default function SuperAdminUsers() {
                 className="space-y-8"
             >
                 {/* En-tête premium glassmorphism */}
-                <div className="relative bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white/50 dark:border-white/5 overflow-hidden">
+                <div className="relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 shadow-lg border border-white/50 dark:border-white/5 overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/10 dark:bg-accent-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                     
@@ -391,7 +409,7 @@ export default function SuperAdminUsers() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ y: -6, scale: 1.02 }}
-                        className="bg-white/90 dark:bg-slate-900/80 rounded-3xl p-6 shadow-xl border border-white/50 dark:border-white/5 backdrop-blur-xl relative overflow-hidden group"
+                        className="bg-white/60 dark:bg-slate-900/60 rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5 backdrop-blur-2xl relative overflow-hidden group"
                     >
                         <div className={`absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br ${card.color} rounded-full opacity-0 dark:opacity-20 blur-3xl group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity duration-500 pointer-events-none`} />
                         
@@ -418,7 +436,7 @@ export default function SuperAdminUsers() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 dark:border-white/5 relative overflow-hidden"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5 relative z-30"
                 >
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex items-center gap-2">
@@ -447,7 +465,7 @@ export default function SuperAdminUsers() {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
                                     }}
-                                    className="w-full pl-9 pr-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 transition-all"
+                                    className="w-full pl-9 pr-4 py-2 bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 dark:text-white dark:placeholder:text-gray-400 rounded-2xl focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 transition-all font-medium text-sm shadow-sm"
                                 />
                                 {searchTerm && (
                                     <button
@@ -460,43 +478,116 @@ export default function SuperAdminUsers() {
                             </div>
 
                             {/* Filtre par organisation */}
-                            <select
-                                value={selectedOrg}
-                                onChange={(e) => {
-                                    setSelectedOrg(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white w-full sm:w-auto sm:min-w-[200px]"
-                            >
-                                <option value="all">Toutes les entreprises</option>
-                                {organizations.map(org => (
-                                    <option key={org.id} value={org.id}>
-                                        {escapeText(untrusted(org.name))}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="relative" ref={orgFilterRef}>
+                                <button
+                                    onClick={() => setIsOrgFilterOpen(!isOrgFilterOpen)}
+                                    className="px-4 py-2.5 bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 dark:text-white rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary-100/50 w-full sm:w-auto sm:min-w-[200px] font-medium text-sm shadow-sm flex items-center justify-between gap-2 transition-all"
+                                >
+                                    <span className="truncate">
+                                        {selectedOrg === 'all' 
+                                            ? 'Toutes les entreprises' 
+                                            : organizations.find(o => o.id === selectedOrg)?.name || 'Organisation inconnue'}
+                                    </span>
+                                    <ChevronDown size={14} className={`shrink-0 transition-transform duration-200 ${isOrgFilterOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isOrgFilterOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            className="absolute left-0 mt-2 w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50"
+                                        >
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedOrg('all');
+                                                    setPage(1);
+                                                    setIsOrgFilterOpen(false);
+                                                }}
+                                                className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                    ${selectedOrg === 'all' 
+                                                        ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                        : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                    }`}
+                                            >
+                                                Toutes les entreprises
+                                            </button>
+                                            {organizations.map(org => (
+                                                <button
+                                                    key={org.id}
+                                                    onClick={() => {
+                                                        setSelectedOrg(org.id);
+                                                        setPage(1);
+                                                        setIsOrgFilterOpen(false);
+                                                    }}
+                                                    className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                        ${selectedOrg === org.id 
+                                                            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {escapeText(untrusted(org.name))}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
                             {/* Filtre par rôle */}
-                            <select
-                                value={selectedRole}
-                                onChange={(e) => {
-                                    setSelectedRole(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100 bg-white w-full sm:w-auto sm:min-w-[150px]"
-                            >
-                                <option value="all">Tous les rôles</option>
-                                <option value="super_admin">Super Admin</option>
-                                <option value="org_admin">Admin</option>
-                                <option value="student">Étudiant</option>
-                            </select>
+                            <div className="relative" ref={roleFilterRef}>
+                                <button
+                                    onClick={() => setIsRoleFilterOpen(!isRoleFilterOpen)}
+                                    className="px-4 py-2.5 bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 dark:text-white rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary-100/50 w-full sm:w-auto sm:min-w-[150px] font-medium text-sm shadow-sm flex items-center justify-between gap-2 transition-all"
+                                >
+                                    <span>
+                                        {selectedRole === 'all' ? 'Tous les rôles' : getRoleBadge(selectedRole).label}
+                                    </span>
+                                    <ChevronDown size={14} className={`transition-transform duration-200 ${isRoleFilterOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isRoleFilterOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            className="absolute left-0 mt-2 w-48 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50"
+                                        >
+                                            {[
+                                                { value: 'all', label: 'Tous les rôles' },
+                                                { value: 'super_admin', label: 'Super Admin' },
+                                                { value: 'org_admin', label: 'Admin' },
+                                                { value: 'student', label: 'Étudiant' }
+                                            ].map((role) => (
+                                                <button
+                                                    key={role.value}
+                                                    onClick={() => {
+                                                        setSelectedRole(role.value);
+                                                        setPage(1);
+                                                        setIsRoleFilterOpen(false);
+                                                    }}
+                                                    className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                        ${selectedRole === role.value 
+                                                            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {role.label}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
                             {/* Bouton rafraîchir */}
                             <motion.button
                                 whileHover={{ rotate: 180 }}
                                 transition={{ duration: 0.3 }}
                                 onClick={fetchUsers}
-                                className="p-2 border border-gray-200 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="p-2.5 border border-white/50 dark:border-white/5 bg-white/40 dark:bg-white/5 dark:text-white rounded-2xl hover:bg-white/60 dark:hover:bg-white/10 transition-colors shadow-sm"
                                 title="Rafraîchir"
                             >
                                 <RefreshCw className="w-5 h-5 text-gray-600" />
@@ -508,7 +599,7 @@ export default function SuperAdminUsers() {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleExportUsers}
                                 disabled={exporting}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50"
+                                className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50 font-bold text-sm"
                             >
                                 {exporting ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -523,7 +614,7 @@ export default function SuperAdminUsers() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowInviteModal(true)}
-                                className="px-4 py-2 dark:bg-gray-800/90 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                                className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl transition-all flex items-center gap-2 font-bold text-sm"
                             >
                                 <UserPlus className="w-4 h-4" />
                                 <span className="hidden sm:inline">Inviter</span>
@@ -537,11 +628,11 @@ export default function SuperAdminUsers() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 dark:border-white/5 overflow-hidden"
+                    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden"
                 >
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[640px]">
-                            <thead className="bg-gradient-to-r from-primary-50/80 to-accent-50/80 dark:from-slate-800/80 dark:to-slate-800/80 backdrop-blur-sm">
+                            <thead className="bg-transparent border-b border-gray-100 dark:border-gray-700">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Utilisateur</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
@@ -551,22 +642,22 @@ export default function SuperAdminUsers() {
                                     <th className="px-6 py-4 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                        <tbody className="divide-y divide-white/40 dark:divide-white/5">
                                 {loading ? (
                                     // Skeleton loader
                                     [...Array(5)].map((_, i) => (
                                         <tr key={i}>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                                                    <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+                                                    <div className="w-8 h-8 bg-white/50 dark:bg-white/5 rounded-full border border-white/30 dark:border-white/5 animate-pulse"></div>
+                                                    <div className="h-4 bg-white/50 dark:bg-white/5 rounded w-32 border border-white/30 dark:border-white/5 animate-pulse"></div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-40 animate-pulse"></div></td>
-                                            <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div></td>
-                                            <td className="px-6 py-4"><div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div></td>
-                                            <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div></td>
-                                            <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-12 ml-auto animate-pulse"></div></td>
+                                            <td className="px-6 py-4"><div className="h-4 bg-white/50 dark:bg-white/5 rounded w-40 border border-white/30 dark:border-white/5 animate-pulse"></div></td>
+                                            <td className="px-6 py-4"><div className="h-4 bg-white/50 dark:bg-white/5 rounded w-32 border border-white/30 dark:border-white/5 animate-pulse"></div></td>
+                                            <td className="px-6 py-4"><div className="h-6 bg-white/50 dark:bg-white/5 rounded-full w-20 border border-white/30 dark:border-white/5 animate-pulse"></div></td>
+                                            <td className="px-6 py-4"><div className="h-4 bg-white/50 dark:bg-white/5 rounded w-24 border border-white/30 dark:border-white/5 animate-pulse"></div></td>
+                                            <td className="px-6 py-4"><div className="h-4 bg-white/50 dark:bg-white/5 rounded w-12 ml-auto border border-white/30 dark:border-white/5 animate-pulse"></div></td>
                                         </tr>
                                     ))
                                 ) : users.length === 0 ? (
@@ -600,7 +691,7 @@ export default function SuperAdminUsers() {
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: index * 0.05 }}
-                                                className="hover:bg-primary-50/50 dark:hover:bg-gray-700/50 transition-colors group"
+                                                className="hover:bg-white/40 dark:hover:bg-white/5 transition-colors group"
                                             >
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
@@ -644,7 +735,7 @@ export default function SuperAdminUsers() {
                                                             whileHover={{ scale: 1.1 }}
                                                             whileTap={{ scale: 0.9 }}
                                                             onClick={() => handleUserAction(user, 'view')}
-                                                            className="p-2 hover:bg-primary-100 rounded-lg transition-colors text-primary-600 opacity-0 group-hover:opacity-100"
+                                                            className="p-2 hover:bg-white/60 dark:hover:bg-white/5 rounded-xl transition-colors text-primary-600 dark:text-primary-400 opacity-0 group-hover:opacity-100 border border-transparent hover:border-white/50 dark:hover:border-white/5"
                                                             title="Voir détails"
                                                         >
                                                             <Eye className="w-4 h-4" />
@@ -653,7 +744,7 @@ export default function SuperAdminUsers() {
                                                             whileHover={{ scale: 1.1 }}
                                                             whileTap={{ scale: 0.9 }}
                                                             onClick={() => handleUserAction(user, 'edit')}
-                                                            className="p-2 hover:bg-primary-100 rounded-lg transition-colors text-primary-600 opacity-0 group-hover:opacity-100"
+                                                            className="p-2 hover:bg-white/60 dark:hover:bg-white/5 rounded-xl transition-colors text-primary-600 dark:text-primary-400 opacity-0 group-hover:opacity-100 border border-transparent hover:border-white/50 dark:hover:border-white/5"
                                                             title="Modifier"
                                                         >
                                                             <Edit className="w-4 h-4" />
@@ -663,7 +754,7 @@ export default function SuperAdminUsers() {
                                                                 whileHover={{ scale: 1.1 }}
                                                                 whileTap={{ scale: 0.9 }}
                                                                 onClick={() => setShowActions(showActions === user.id ? null : user.id)}
-                                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                                className="p-2 hover:bg-white/60 dark:hover:bg-white/5 rounded-xl transition-colors border border-transparent hover:border-white/50 dark:hover:border-white/5"
                                                             >
                                                                 <MoreVertical className="w-4 h-4 text-gray-500" />
                                                             </motion.button>
@@ -673,32 +764,32 @@ export default function SuperAdminUsers() {
                                                                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                                                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                                        className="absolute right-0 mt-2 w-48 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 dark:border-white/10 py-1.5 z-10"
+                                                                        className="absolute right-0 mt-2 w-48 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-2xl shadow-lg border border-white/50 dark:border-white/5 py-1.5 z-10"
                                                                     >
                                                                         <button
                                                                             onClick={() => handleUserAction(user, 'edit')}
-                                                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-2 transition-colors"
+                                                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10 hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-2 transition-colors"
                                                                         >
                                                                             <Edit className="w-4 h-4" />
                                                                             Modifier le rôle
                                                                         </button>
                                                                         <button
                                                                             onClick={() => startImpersonation(user.id)}
-                                                                            className="w-full px-4 py-2 text-left text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 flex items-center gap-2 transition-colors"
+                                                                            className="w-full px-4 py-2 text-left text-sm text-blue-600 dark:text-blue-400 hover:bg-white/50 dark:hover:bg-white/10 flex items-center gap-2 transition-colors"
                                                                         >
                                                                             <Eye className="w-4 h-4" />
                                                                             Voir comme l'utilisateur
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleUserAction(user, 'suspend')}
-                                                                            className="w-full px-4 py-2 text-left text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 flex items-center gap-2 transition-colors"
+                                                                            className="w-full px-4 py-2 text-left text-sm text-orange-600 dark:text-orange-400 hover:bg-white/50 dark:hover:bg-white/10 flex items-center gap-2 transition-colors"
                                                                         >
                                                                             <UserX className="w-4 h-4" />
                                                                             Suspendre
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleUserAction(user, 'delete')}
-                                                                            className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                                                                            className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-white/50 dark:hover:bg-white/10 flex items-center gap-2 transition-colors"
                                                                         >
                                                                             <Trash2 className="w-4 h-4" />
                                                                             Supprimer
@@ -719,7 +810,7 @@ export default function SuperAdminUsers() {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="px-6 py-4 border-t border-white/40 dark:border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Affichage de {((page - 1) * itemsPerPage) + 1} à {Math.min(page * itemsPerPage, totalCount)} sur {totalCount} utilisateurs
                             </p>
@@ -727,7 +818,7 @@ export default function SuperAdminUsers() {
                                 <button
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
                                     disabled={page === 1}
-                                    className="p-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="p-2 border border-white/50 dark:border-white/5 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 bg-white/40 dark:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
@@ -752,7 +843,7 @@ export default function SuperAdminUsers() {
                                                 className={`w-10 h-10 rounded-xl font-semibold transition-all ${
                                                     page === pageNum
                                                         ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg shadow-primary-500/30'
-                                                        : 'hover:bg-primary-50 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400'
+                                                        : 'hover:bg-white/50 dark:hover:bg-white/5 bg-white/40 dark:bg-transparent border border-white/50 dark:border-white/5 text-gray-600 dark:text-gray-400'
                                                 }`}
                                             >
                                                 {pageNum}
@@ -764,7 +855,7 @@ export default function SuperAdminUsers() {
                                 <button
                                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                     disabled={page === totalPages}
-                                    className="p-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="p-2 border border-white/50 dark:border-white/5 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 bg-white/40 dark:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                     <ChevronRight className="w-5 h-5" />
                                 </button>
@@ -801,7 +892,7 @@ export default function SuperAdminUsers() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 max-w-md w-full border border-white/50 dark:border-white/10 shadow-2xl"
+                            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 max-w-md w-full border border-white/50 dark:border-white/10 shadow-2xl"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Inviter un utilisateur</h3>
@@ -813,7 +904,7 @@ export default function SuperAdminUsers() {
                                         required
                                         value={inviteEmail}
                                         onChange={(e) => setInviteEmail(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-slate-800 dark:text-white transition-all"
+                                        className="w-full px-4 py-2 border border-white/50 dark:border-white/10 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100/50 bg-white/50 dark:bg-slate-800/50 dark:text-white transition-all shadow-sm"
                                         placeholder="email@exemple.com"
                                     />
                                 </div>
@@ -822,7 +913,7 @@ export default function SuperAdminUsers() {
                                     <select
                                         value={inviteRole}
                                         onChange={(e) => setInviteRole(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-slate-800 dark:text-white transition-all"
+                                        className="w-full px-4 py-2 border border-white/50 dark:border-white/10 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100/50 bg-white/50 dark:bg-slate-800/50 dark:text-white transition-all shadow-sm"
                                     >
                                         <option value="student">Étudiant</option>
                                         <option value="org_admin">Admin</option>
@@ -833,7 +924,7 @@ export default function SuperAdminUsers() {
                                     <select
                                         value={inviteOrg}
                                         onChange={(e) => setInviteOrg(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none dark:bg-slate-800 dark:text-white transition-all"
+                                        className="w-full px-4 py-2 border border-white/50 dark:border-white/10 rounded-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100/50 bg-white/50 dark:bg-slate-800/50 dark:text-white transition-all shadow-sm"
                                         required
                                     >
                                         <option value="">Sélectionner une organisation</option>
@@ -848,7 +939,7 @@ export default function SuperAdminUsers() {
                                     <button
                                         type="button"
                                         onClick={() => setShowInviteModal(false)}
-                                        className="flex-1 px-4 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-medium"
+                                        className="flex-1 px-4 py-2.5 border border-white/50 dark:border-white/10 bg-white/40 dark:bg-white/5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-white/10 transition-colors font-medium"
                                     >
                                         Annuler
                                     </button>

@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": Deno.env.get("FRONTEND_URL") || "https://smiris-learn.vercel.app",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-api-key",
   "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
 };
@@ -21,7 +21,8 @@ export async function verifyApiKey(req: Request) {
   // Créer un client Supabase avec la Service Role Key (contourne RLS)
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    Deno.env.get("SERVICE_ROLE_KEY")!,
+    { auth: { persistSession: false } }
   );
 
   // 1. Vérifier si l'API est activée globalement
@@ -78,6 +79,15 @@ export async function verifyApiKey(req: Request) {
   }
 
   return { keyData, supabase, settings };
+}
+
+/**
+ * Vérifie si une clé API a le droit d'accéder à une organisation spécifique.
+ */
+export function checkOrgAccess(keyData: any, orgId: string) {
+  if (keyData.is_super_admin) return true;
+  if (keyData.organization_id === orgId) return true;
+  throw new Error("Unauthorized: API key does not have access to this organization");
 }
 
 /**

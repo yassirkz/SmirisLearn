@@ -1,11 +1,10 @@
-// src/pages/super-admin/SuperAdminSettings.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Settings, User, Mail, Bell, Moon, Sun,
     Shield, Eye, EyeOff, Save, RefreshCw, CheckCircle,
     AlertCircle, X, Key, Download, Zap, Activity, Server, Sparkles,
-    Loader2, Copy, Trash2
+    Loader2, Copy, Trash2, ChevronDown
 } from 'lucide-react';
 import MainLayout from '../../components/layout/MainLayout';
 import { supabase } from '../../lib/supabase';
@@ -58,6 +57,8 @@ export default function SuperAdminSettings() {
         newUserAlert: true,
         sessionTimeout: '30'
     });
+    const [isSessionTimeoutOpen, setIsSessionTimeoutOpen] = useState(false);
+    const sessionTimeoutRef = useRef(null);
 
     const [platformConfig, setPlatformConfig] = useState({
         trial_days: 14,
@@ -90,6 +91,17 @@ export default function SuperAdminSettings() {
         videos: 0,
         storageUsed: 0
     });
+
+    // Fermer le dropdown si on clique ailleurs
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (sessionTimeoutRef.current && !sessionTimeoutRef.current.contains(event.target)) {
+                setIsSessionTimeoutOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [sessionTimeoutRef]);
 
     // ============================================
     // CHARGEMENT INITIAL
@@ -526,7 +538,7 @@ export default function SuperAdminSettings() {
                 className="space-y-8"
             >
                 {/* En-tête premium glassmorphism */}
-                <div className="relative bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white/50 dark:border-white/5 overflow-hidden">
+                <div className="relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 shadow-lg border border-white/50 dark:border-white/5 overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/10 dark:bg-accent-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
@@ -606,7 +618,7 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
                                 <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
@@ -623,10 +635,10 @@ export default function SuperAdminSettings() {
                                     validate="text"
                                     minLength={3}
                                     required
-                                    className="dark:text-white dark:bg-gray-900 dark:border-gray-700 dark:focus:border-primary-500 dark:focus:bg-gray-900 dark:focus:text-white dark:placeholder-gray-400 dark:focus:placeholder-gray-500 dark:focus:ring-primary-500 dark:focus:ring-offset-primary-500 dark:focus:ring-offset-gray-900 dark:focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                                    className="dark:text-white bg-white/40 dark:bg-white/5 border border-white/50 dark:border-white/5 dark:focus:border-primary-500 rounded-2xl focus:ring-4 focus:ring-primary-100/50 shadow-sm transition-all"
                                 />
 
-                                <div className="bg-gray-50/80 dark:bg-slate-800/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                                <div className="bg-white/50 dark:bg-white/5 p-5 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm">
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Email</p>
                                     <p className="text-lg font-medium text-gray-800 dark:text-white flex items-center gap-2">
                                         <Mail className="w-4 h-4 text-primary-600 dark:text-primary-400" />
@@ -655,7 +667,7 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
                                 <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
@@ -674,11 +686,11 @@ export default function SuperAdminSettings() {
                                             value={passwordData.current}
                                             onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
                                             onBlur={() => setPasswordTouched({ ...passwordTouched, current: true })}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-900 dark:text-white dark:border-gray-700 ${passwordErrors.current && passwordTouched.current
-                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500'
+                                            className={`w-full p-3 pr-10 border border-white/50 dark:border-white/5 rounded-xl outline-none transition-all bg-white/40 dark:bg-white/5 dark:text-white shadow-sm ${passwordErrors.current && passwordTouched.current
+                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-4 focus:ring-red-100/50'
                                                 : passwordData.current && !passwordErrors.current
-                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500'
-                                                    : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
+                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500 focus:ring-4 focus:ring-green-100/50'
+                                                    : 'focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100/50'
                                                 }`}
                                             placeholder="********"
                                         />
@@ -704,11 +716,11 @@ export default function SuperAdminSettings() {
                                             value={passwordData.new}
                                             onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
                                             onBlur={() => setPasswordTouched({ ...passwordTouched, new: true })}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-900 dark:text-white dark:border-gray-700 ${passwordErrors.new && passwordTouched.new
-                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500'
+                                            className={`w-full p-3 pr-10 border border-white/50 dark:border-white/5 rounded-xl outline-none transition-all bg-white/40 dark:bg-white/5 dark:text-white shadow-sm ${passwordErrors.new && passwordTouched.new
+                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-4 focus:ring-red-100/50'
                                                 : passwordData.new && !passwordErrors.new
-                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500'
-                                                    : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
+                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500 focus:ring-4 focus:ring-green-100/50'
+                                                    : 'focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100/50'
                                                 }`}
                                             placeholder="********"
                                         />
@@ -734,11 +746,11 @@ export default function SuperAdminSettings() {
                                             value={passwordData.confirm}
                                             onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
                                             onBlur={() => setPasswordTouched({ ...passwordTouched, confirm: true })}
-                                            className={`w-full p-3 pr-10 border-2 rounded-xl outline-none transition-all dark:bg-gray-900 dark:text-white dark:border-gray-700 ${passwordErrors.confirm && passwordTouched.confirm
-                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500'
+                                            className={`w-full p-3 pr-10 border border-white/50 dark:border-white/5 rounded-xl outline-none transition-all bg-white/40 dark:bg-white/5 dark:text-white shadow-sm ${passwordErrors.confirm && passwordTouched.confirm
+                                                ? 'border-red-300 dark:border-red-600 focus:border-red-500 focus:ring-4 focus:ring-red-100/50'
                                                 : passwordData.confirm && !passwordErrors.confirm
-                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500'
-                                                    : 'border-gray-200 dark:border-gray-700 focus:border-primary-400 dark:focus:border-primary-500'
+                                                    ? 'border-green-300 dark:border-green-600 focus:border-green-500 focus:ring-4 focus:ring-green-100/50'
+                                                    : 'focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100/50'
                                                 }`}
                                             placeholder="********"
                                         />
@@ -769,7 +781,7 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
                                 <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
@@ -787,7 +799,7 @@ export default function SuperAdminSettings() {
                                         { key: 'newCompanyAlert', label: 'Nouvelle entreprise créée' },
                                         { key: 'newUserAlert', label: 'Nouvel utilisateur inscrit' }
                                     ].map(item => (
-                                        <label key={item.key} className="flex items-center justify-between p-4 bg-gray-50/80 dark:bg-slate-800/50 rounded-2xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all border border-transparent hover:border-primary-100 dark:hover:border-primary-800/50">
+                                        <label key={item.key} className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-2xl cursor-pointer hover:bg-white/70 dark:hover:bg-white/10 transition-all border border-white/50 dark:border-white/5 shadow-sm">
                                             <span className="text-sm text-gray-700 dark:text-gray-300">{item.label}</span>
                                             <div className="relative">
                                                 <input
@@ -816,9 +828,9 @@ export default function SuperAdminSettings() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => setTheme('light')}
-                                                className={`flex-1 p-3 rounded-xl border-2 transition-all ${theme === 'light'
-                                                    ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30'
-                                                    : 'border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-700'
+                                                className={`flex-1 p-3 rounded-xl border border-white/50 dark:border-white/5 transition-all shadow-sm ${theme === 'light'
+                                                    ? 'border-primary-300 dark:border-primary-400 bg-white/70 dark:bg-white/10 shadow-md transform scale-[1.02]'
+                                                    : 'bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10'
                                                     }`}
                                             >
                                                 <Sun className="w-5 h-5 mx-auto mb-1 text-yellow-500" />
@@ -826,9 +838,9 @@ export default function SuperAdminSettings() {
                                             </button>
                                             <button
                                                 onClick={() => setTheme('dark')}
-                                                className={`flex-1 p-3 rounded-xl border-2 transition-all ${theme === 'dark'
-                                                    ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30'
-                                                    : 'border-gray-200 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-700'
+                                                className={`flex-1 p-3 rounded-xl border border-white/50 dark:border-white/5 transition-all shadow-sm ${theme === 'dark'
+                                                    ? 'border-primary-300 dark:border-primary-400 bg-white/70 dark:bg-white/10 shadow-md transform scale-[1.02]'
+                                                    : 'bg-white/40 dark:bg-white/5 hover:bg-white/60 dark:hover:bg-white/10'
                                                     }`}
                                             >
                                                 <Moon className="w-5 h-5 mx-auto mb-1 text-primary-600 dark:text-primary-400" />
@@ -844,17 +856,57 @@ export default function SuperAdminSettings() {
                                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Sécurité</h3>
                                 <div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Expiration de session</p>
-                                    <select
-                                        value={preferences.sessionTimeout}
-                                        onChange={(e) => setPreferences({ ...preferences, sessionTimeout: e.target.value })}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
-                                    >
-                                        <option value="15">15 minutes</option>
-                                        <option value="30">30 minutes</option>
-                                        <option value="60">1 heure</option>
-                                        <option value="120">2 heures</option>
-                                        <option value="240">4 heures</option>
-                                    </select>
+                                    <div className="relative" ref={sessionTimeoutRef}>
+                                        <button
+                                            onClick={() => setIsSessionTimeoutOpen(!isSessionTimeoutOpen)}
+                                            className="w-full p-3 border border-white/50 dark:border-white/5 rounded-xl bg-white/40 dark:bg-white/5 focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100/50 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white shadow-sm flex items-center justify-between gap-2"
+                                        >
+                                            <span>
+                                                {[
+                                                    { value: '15', label: '15 minutes' },
+                                                    { value: '30', label: '30 minutes' },
+                                                    { value: '60', label: '1 heure' },
+                                                    { value: '120', label: '2 heures' },
+                                                    { value: '240', label: '4 heures' }
+                                                ].find(o => o.value === preferences.sessionTimeout)?.label || 'Sélectionner'}
+                                            </span>
+                                            <ChevronDown size={14} className={`transition-transform duration-200 ${isSessionTimeoutOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        <AnimatePresence>
+                                            {isSessionTimeoutOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                    className="absolute left-0 mt-2 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/50 dark:border-white/5 py-2 z-50 overflow-hidden"
+                                                >
+                                                    {[
+                                                        { value: '15', label: '15 minutes' },
+                                                        { value: '30', label: '30 minutes' },
+                                                        { value: '60', label: '1 heure' },
+                                                        { value: '120', label: '2 heures' },
+                                                        { value: '240', label: '4 heures' }
+                                                    ].map((opt) => (
+                                                        <button
+                                                            key={opt.value}
+                                                            onClick={() => {
+                                                                setPreferences({ ...preferences, sessionTimeout: opt.value });
+                                                                setIsSessionTimeoutOpen(false);
+                                                            }}
+                                                            className={`w-full px-4 py-2.5 text-left text-sm transition-colors
+                                                                ${preferences.sessionTimeout === opt.value 
+                                                                    ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold' 
+                                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-white/10'
+                                                                }`}
+                                                        >
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
                             </div>
 
@@ -874,7 +926,7 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-white/5 relative overflow-hidden group"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 shadow-lg border border-white/50 dark:border-white/5 relative overflow-hidden group"
                         >
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
                                 <div className="p-2.5 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
@@ -894,7 +946,7 @@ export default function SuperAdminSettings() {
                                         type="number"
                                         value={platformConfig.trial_days}
                                         onChange={(e) => setPlatformConfig({ ...platformConfig, trial_days: parseInt(e.target.value) })}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                                        className="w-full p-3 border border-white/50 dark:border-white/5 bg-white/40 dark:bg-white/5 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100/50 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white shadow-sm"
                                         min="0"
                                         max="90"
                                     />
@@ -908,7 +960,7 @@ export default function SuperAdminSettings() {
                                         type="number"
                                         value={platformConfig.max_file_size}
                                         onChange={(e) => setPlatformConfig({ ...platformConfig, max_file_size: parseInt(e.target.value) })}
-                                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all dark:bg-gray-900 dark:text-white"
+                                        className="w-full p-3 border border-white/50 dark:border-white/5 bg-white/40 dark:bg-white/5 rounded-xl focus:border-primary-400 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-100/50 dark:focus:ring-primary-900/30 outline-none transition-all dark:text-white shadow-sm"
                                         min="1"
                                         max="10240"
                                     />
@@ -917,7 +969,7 @@ export default function SuperAdminSettings() {
 
                             {/* Toggles */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <label className="flex items-center justify-between p-4 bg-gray-50/80 dark:bg-slate-800/50 rounded-2xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all border border-transparent hover:border-primary-100 dark:hover:border-primary-800/50">
+                                <label className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-2xl cursor-pointer hover:bg-white/70 dark:hover:bg-white/10 transition-all border border-white/50 dark:border-white/5 shadow-sm">
                                     <div>
                                         <p className="font-medium text-gray-700 dark:text-gray-300">Autoriser les inscriptions</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Les nouveaux utilisateurs peuvent s'inscrire</p>
@@ -937,7 +989,7 @@ export default function SuperAdminSettings() {
                                     </div>
                                 </label>
 
-                                <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
+                                <label className="flex items-center justify-between p-4 bg-white/50 dark:bg-white/5 rounded-2xl cursor-pointer hover:bg-white/70 dark:hover:bg-white/10 transition-all border border-white/50 dark:border-white/5 shadow-sm">
                                     <div>
                                         <p className="font-medium text-gray-700 dark:text-gray-300">Mode maintenance</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">La plateforme est en maintenance</p>
@@ -965,7 +1017,7 @@ export default function SuperAdminSettings() {
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {['mp4', 'webm', 'mov', 'avi', 'mkv'].map(format => (
-                                        <label key={format} className="flex items-center gap-2 px-3 py-2.5 bg-gray-50/80 dark:bg-slate-800/50 rounded-xl cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all border border-transparent hover:border-primary-100 dark:hover:border-primary-800/50">
+                                        <label key={format} className="flex items-center gap-2 px-3 py-2.5 bg-white/50 dark:bg-white/5 rounded-xl cursor-pointer hover:bg-white/70 dark:hover:bg-white/10 transition-all border border-white/50 dark:border-white/5 shadow-sm">
                                             <input
                                                 type="checkbox"
                                                 checked={platformConfig.allowed_video_formats?.includes(format)}
@@ -1091,7 +1143,7 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.55 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 dark:border-white/5"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest flex items-center gap-2">
@@ -1120,7 +1172,7 @@ export default function SuperAdminSettings() {
                             ) : (
                                 <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
                                     {apiKeys.map(key => (
-                                        <div key={key.id} className="p-4 bg-gray-50/80 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                                        <div key={key.id} className="p-4 bg-white/50 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="font-semibold text-gray-800 dark:text-white">{key.name}</span>
                                                 <div className="flex items-center gap-1">
@@ -1160,7 +1212,7 @@ export default function SuperAdminSettings() {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => toggleKeyStatus(key.id, key.is_active)}
-                                                    className="flex-1 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-700 transition-colors"
+                                                    className="flex-1 py-1.5 text-xs font-medium rounded-lg border border-white/50 dark:border-white/10 hover:bg-white/70 dark:hover:bg-white/10 transition-colors bg-white/40 dark:bg-transparent"
                                                 >
                                                     {key.is_active ? 'Révoquer' : 'Activer'}
                                                 </button>
@@ -1183,14 +1235,14 @@ export default function SuperAdminSettings() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 dark:border-white/5"
+                            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5"
                         >
                             <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-widest">Actions rapides</h3>
                             <div className="space-y-2">
                                 <button
                                     onClick={handleRefreshStats}
                                     disabled={refreshing || exporting}
-                                    className="w-full px-4 py-3 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-2xl hover:bg-primary-100 dark:hover:bg-primary-800/50 disabled:opacity-50 transition-all text-sm font-medium flex items-center gap-2 border border-primary-100 dark:border-primary-800/30 hover:shadow-sm"
+                                    className="w-full px-4 py-3 bg-white/50 dark:bg-white/5 text-primary-700 dark:text-primary-300 rounded-2xl hover:bg-white/70 dark:hover:bg-white/10 disabled:opacity-50 transition-all text-sm font-medium flex items-center gap-2 border border-white/50 dark:border-white/5 shadow-sm hover:shadow-md"
                                 >
                                     <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                                     <span>{refreshing ? 'Mise à jour...' : 'Rafraîchir les stats'}</span>
@@ -1198,7 +1250,7 @@ export default function SuperAdminSettings() {
                                 <button
                                     onClick={handleExportData}
                                     disabled={refreshing || exporting}
-                                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800/50 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-100 dark:hover:bg-slate-700/50 disabled:opacity-50 transition-all text-sm font-medium flex items-center gap-2 border border-gray-100 dark:border-gray-700/30 hover:shadow-sm"
+                                    className="w-full px-4 py-3 bg-white/50 dark:bg-white/5 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-white/70 dark:hover:bg-white/10 disabled:opacity-50 transition-all text-sm font-medium flex items-center gap-2 border border-white/50 dark:border-white/5 shadow-sm hover:shadow-md"
                                 >
                                     {exporting ? (
                                         <RefreshCw className="w-4 h-4 animate-spin" />
@@ -1242,7 +1294,7 @@ export default function SuperAdminSettings() {
                                 initial={{ scale: 0.9, y: 20 }}
                                 animate={{ scale: 1, y: 0 }}
                                 exit={{ scale: 0.9, y: 20 }}
-                                className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl border border-white/20 dark:border-gray-700"
+                                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50 dark:border-white/10"
                                 onClick={e => e.stopPropagation()}
                             >
                                 <div className="flex items-center gap-3 mb-4">
@@ -1321,7 +1373,7 @@ export default function SuperAdminSettings() {
                                                 type="datetime-local"
                                                 value={newKeyExpires}
                                                 onChange={e => setNewKeyExpires(e.target.value)}
-                                                className="w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-900 dark:text-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900/30 outline-none transition-all"
+                                                className="w-full p-2.5 border border-white/50 dark:border-white/10 rounded-xl bg-white/50 dark:bg-slate-800/50 dark:text-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100/50 outline-none transition-all shadow-sm"
                                             />
                                         </div>
                                         <div className="flex gap-2 pt-2">
@@ -1360,7 +1412,7 @@ export default function SuperAdminSettings() {
                                 initial={{ scale: 0.9 }}
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0.9 }}
-                                className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+                                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-white/50 dark:border-white/10"
                                 onClick={e => e.stopPropagation()}
                             >
                                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Supprimer la clé API</h3>

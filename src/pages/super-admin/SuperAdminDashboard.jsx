@@ -106,12 +106,21 @@ export default function SuperAdminDashboard() {
     if (loading) {
         return (
             <MainLayout>
-                <div className="min-h-[60vh] flex items-center justify-center">
-                    <div className="relative flex flex-col items-center">
-                        <div className="w-20 h-20 border-4 border-primary-100 dark:border-primary-900 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                        <p className="mt-6 text-sm font-bold text-gray-500 dark:text-gray-400">Chargement de votre dashboard...</p>
-                    </div>
+                <div className="min-h-[60vh] flex flex-col items-center justify-center">
+                    <motion.div
+                        animate={{ scale: [1, 1.1, 1], rotate: [0, 180, 360] }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="relative"
+                    >
+                        <div className="w-20 h-20 border-4 border-primary-100/50 dark:border-gray-700 rounded-full shadow-2xl"></div>
+                        <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full"></div>
+                    </motion.div>
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-6 text-sm font-medium text-gray-500 dark:text-gray-400 tracking-wide animate-pulse"
+                    >Chargement du Control Center...</motion.p>
                 </div>
             </MainLayout>
         );
@@ -120,14 +129,19 @@ export default function SuperAdminDashboard() {
     if (error || !dashboardData) {
         return (
             <MainLayout>
-                <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                        <p className="text-sm text-red-700 dark:text-red-300">Erreur de chargement: {error || "Données non disponibles"}</p>
+                <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-red-200/50 dark:border-red-800/30 p-6 rounded-3xl shadow-lg">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-red-100/80 dark:bg-red-900/20 rounded-2xl">
+                            <AlertCircle className="w-6 h-6 text-red-500" />
+                        </div>
+                        <div>
+                            <p className="font-bold text-gray-900 dark:text-white">Erreur de chargement</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{error || "Données non disponibles"}</p>
+                        </div>
                     </div>
                     <button
                         onClick={fetchDashboardData}
-                        className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"
+                        className="mt-4 px-5 py-2.5 bg-red-500 text-white rounded-2xl text-sm font-semibold hover:bg-red-600 transition-colors shadow-lg shadow-red-500/25"
                     >
                         Réessayer
                     </button>
@@ -149,7 +163,7 @@ export default function SuperAdminDashboard() {
                 {/* ══════════════════════════════════════════════ */}
                 {/* EN-TÊTE PREMIUM GLASSMORPHISM                  */}
                 {/* ══════════════════════════════════════════════ */}
-                <div className="relative bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl border border-white/50 dark:border-white/5 overflow-hidden">
+                <div className="relative bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 shadow-lg border border-white/50 dark:border-white/5 overflow-hidden">
                     {/* Background Glows */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/10 dark:bg-accent-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
@@ -200,7 +214,7 @@ export default function SuperAdminDashboard() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={fetchDashboardData}
-                            className="px-5 py-2.5 bg-white dark:bg-slate-800 border-2 border-primary-100 dark:border-slate-700 rounded-2xl hover:border-primary-300 dark:hover:border-primary-500 transition-all flex items-center justify-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-sm"
+                            className="px-5 py-2.5 bg-white/50 dark:bg-white/5 backdrop-blur-md border border-white/50 dark:border-white/5 rounded-2xl hover:bg-white/80 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-sm hover:shadow-md"
                         >
                             <Zap className="w-4 h-4 text-primary-500" />
                             Rafraîchir
@@ -274,7 +288,7 @@ export default function SuperAdminDashboard() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                     whileHover={{ y: -6, scale: 1.02 }}
-                                    className="bg-white/90 dark:bg-slate-900/80 rounded-3xl p-6 shadow-xl border border-white/50 dark:border-white/5 backdrop-blur-xl relative overflow-hidden group"
+                                    className="bg-white/60 dark:bg-slate-900/60 rounded-3xl p-6 shadow-lg border border-white/50 dark:border-white/5 backdrop-blur-2xl relative overflow-hidden group"
                                 >
                                     {/* Glow de fond */}
                                     <div className={`absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br ${card.color} rounded-full opacity-0 dark:opacity-20 blur-3xl group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity duration-500 pointer-events-none`} />
@@ -300,7 +314,7 @@ export default function SuperAdminDashboard() {
                                         </div>
                                     </div>
                                     
-                                    <div className="mt-5 h-1.5 bg-gray-100 dark:bg-gray-800/50 rounded-full overflow-hidden relative z-10">
+                                    <div className="mt-5 h-1.5 bg-white/40 dark:bg-white/5 rounded-full overflow-hidden relative z-10 border border-white/30 dark:border-white/5">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ 
@@ -344,7 +358,7 @@ export default function SuperAdminDashboard() {
                                 </div>
                                 Onboarding Récent
                             </h2>
-                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full shadow-inner">
+                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/50 dark:border-white/5">
                                 {recent_organizations.length} entreprises
                             </span>
                         </div>
@@ -357,7 +371,7 @@ export default function SuperAdminDashboard() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: index * 0.1 }}
                                     whileHover={{ y: -5 }}
-                                    className="relative group bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-white/50 dark:border-white/5 shadow-xl overflow-hidden"
+                                    className="relative group bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl p-6 rounded-3xl border border-white/50 dark:border-white/5 shadow-lg overflow-hidden"
                                 >
                                     <div className={`absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-primary-500 to-accent-600 rounded-full opacity-0 dark:opacity-10 blur-3xl group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-500 pointer-events-none`} />
                                     
@@ -411,7 +425,7 @@ export default function SuperAdminDashboard() {
                     transition={{ delay: 0.8 }}
                     className="text-center py-4"
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-800 text-xs text-gray-400 dark:text-gray-500">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/40 dark:bg-white/5 backdrop-blur-md rounded-full border border-white/50 dark:border-white/5 text-xs text-gray-400 dark:text-gray-500">
                         <Shield className="w-3.5 h-3.5 text-primary-400" />
                         <span>Données temps réel via RPC • Dernière mise à jour: {lastUpdate.toLocaleTimeString()}</span>
                     </div>

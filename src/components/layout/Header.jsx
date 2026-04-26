@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, User, Shield, Zap, Sun, Moon, Menu } from 'lucide-react'; // ← AJOUT Sun/Moon/Menu
+import { Bell, User, Shield, Sun, Moon, Menu } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
-import { useTheme } from '../../hooks/useTheme'; // ← AJOUT
+import { useTheme } from '../../hooks/useTheme';
 import SearchComponent from '../../pages/SearchComponent';
 import NotificationDropdown from './NotificationDropdown';
 import { supabase } from '../../lib/supabase';
@@ -51,21 +51,29 @@ export default function Header({ onToggleSidebar }) {
         };
     }, [user]);
 
+    const getRoleLabel = () => {
+        if (role === 'super_admin') return 'Super Admin';
+        if (role === 'org_admin') return 'Administration';
+        return 'Étudiant';
+    };
+
     return (
         <motion.header 
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-white/70 dark:bg-secondary-950/70 backdrop-blur-xl border-b border-primary-100 dark:border-gray-800 sticky top-0 z-30"
+            className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border-b border-white/50 dark:border-white/5 sticky top-0 z-30"
         >
-            <div className="flex items-center justify-between px-4 md:px-8 py-4 gap-4">
+            <div className="flex items-center justify-between px-4 md:px-8 py-3.5 gap-4">
+                {/* Hamburger */}
                 <button
                     onClick={onToggleSidebar}
-                    className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 shrink-0"
+                    className="p-2.5 bg-white/50 dark:bg-white/5 rounded-xl hover:bg-white/80 dark:hover:bg-white/10 transition-all text-gray-600 dark:text-gray-300 shrink-0 border border-white/50 dark:border-white/5 shadow-sm"
                     title="Menu"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
-                {/* Barre de recherche */}
+
+                {/* Search bar — desktop */}
                 <div className="hidden md:block flex-1 max-w-2xl">
                     <SearchComponent 
                         placeholder="Rechercher..."
@@ -73,13 +81,12 @@ export default function Header({ onToggleSidebar }) {
                     />
                 </div>
 
-                {/* Actions utilisateur */}
-                <div className="flex items-center gap-3 ml-auto">
-
-                    {/* Bouton Dark Mode */}
+                {/* Right actions */}
+                <div className="flex items-center gap-2.5 ml-auto">
+                    {/* Theme toggle */}
                     <button
                         onClick={toggleTheme}
-                        className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                        className="p-2.5 bg-white/50 dark:bg-white/5 rounded-xl hover:bg-white/80 dark:hover:bg-white/10 transition-all text-gray-600 dark:text-gray-300 border border-white/50 dark:border-white/5 shadow-sm"
                         title={theme === 'light' ? 'Mode Sombre' : 'Mode Clair'}
                     >
                         {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
@@ -91,15 +98,15 @@ export default function Header({ onToggleSidebar }) {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowNotifications(!showNotifications)}
-                            className={`relative p-2.5 rounded-xl transition-all duration-300 ${
+                            className={`relative p-2.5 rounded-xl transition-all duration-300 border shadow-sm ${
                                 showNotifications 
-                                ? 'bg-primary-600 text-white shadow-lg shadow-primary-200 dark:shadow-primary-900/30' 
-                                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30 border-primary-500' 
+                                : 'bg-white/50 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-white/10 border-white/50 dark:border-white/5'
                             }`}
                         >
                             <Bell size={20} />
                             {unreadCount > 0 && (
-                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900 animate-bounce-subtle">
+                                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 animate-pulse">
                                     {unreadCount > 9 ? '9+' : unreadCount}
                                 </span>
                             )}
@@ -111,27 +118,27 @@ export default function Header({ onToggleSidebar }) {
                         />
                     </div>
 
-                    {/* Profil */}
+                    {/* Profile chip */}
                     <motion.div
                         whileHover={{ scale: 1.02 }}
-                        className="flex items-center gap-3 bg-gradient-to-r from-primary-600 to-primary-800 text-white px-4 py-2 rounded-xl shadow-lg cursor-pointer hover:shadow-xl transition-all"
+                        className="flex items-center gap-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-2xl shadow-lg shadow-primary-500/25 cursor-pointer hover:shadow-xl hover:shadow-primary-500/35 transition-all border border-primary-500/50"
                     >
-                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                            <User size={18} />
+                        <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                            <User size={16} />
                         </div>
                         <div className="hidden md:block">
-                            <p className="text-sm font-medium">{user?.email?.split('@')[0]}</p>
-                            <p className="text-xs text-white/70 flex items-center gap-1">
+                            <p className="text-sm font-semibold tracking-tight leading-none">{user?.email?.split('@')[0]}</p>
+                            <p className="text-[11px] text-white/70 flex items-center gap-1 mt-0.5">
                                 <Shield className="w-3 h-3" />
-                                {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Administration' : 'Espace Étudiant'}
+                                {getRoleLabel()}
                             </p>
                         </div>
                     </motion.div>
                 </div>
             </div>
 
-            {/* Barre de recherche mobile */}
-            <div className="md:hidden px-4 pb-4">
+            {/* Mobile search */}
+            <div className="md:hidden px-4 pb-3">
                 <SearchComponent 
                     placeholder="Recherche..."
                     autoFocus={false}

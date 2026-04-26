@@ -91,7 +91,7 @@ export default function PillarDetailPage() {
                                 whileHover={{ scale: 1.05, x: -5 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => navigate('/admin/pillars')}
-                                className="mt-1 p-2.5 bg-white/80 dark:bg-slate-800/80 shadow-md backdrop-blur-md rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all border border-gray-100 dark:border-gray-700 shrink-0"
+                                className="mt-1 p-2.5 bg-white/60 dark:bg-slate-800/60 shadow-lg backdrop-blur-xl rounded-xl hover:bg-white/80 dark:hover:bg-slate-700/80 transition-all border border-white/50 dark:border-white/5 shrink-0"
                                 aria-label="Retour aux piliers"
                             >
                                 <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
@@ -140,7 +140,7 @@ export default function PillarDetailPage() {
                     />
 
                     {/* Liste premium des vidéos associées */}
-                    <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 dark:border-white/5 p-6 sm:p-8 relative overflow-hidden">
+                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl rounded-3xl shadow-lg border border-white/50 dark:border-white/5 p-6 sm:p-8 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
                         
                         <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3 relative z-10">
@@ -151,9 +151,9 @@ export default function PillarDetailPage() {
                         </h2>
                         
                         {pillar.videos && pillar.videos.length > 0 ? (
-                            <ul className="divide-y divide-gray-100 dark:divide-gray-800/50 relative z-10 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                            <ul className="divide-y divide-white/50 dark:divide-white/5 relative z-10 bg-white/40 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5 overflow-hidden shadow-sm">
                                 {pillar.videos.map((video) => (
-                                    <li key={video.id} className="p-4 sm:px-6 hover:bg-white dark:hover:bg-slate-700/50 transition-colors flex items-center justify-between gap-4 group">
+                                    <li key={video.id} className="p-4 sm:px-6 hover:bg-white/60 dark:hover:bg-white/10 transition-colors flex items-center justify-between gap-4 group">
                                         <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                                             <div className="p-2.5 bg-primary-50 dark:bg-primary-900/20 text-primary-500 rounded-xl group-hover:scale-110 group-hover:bg-primary-100 dark:group-hover:bg-primary-900/40 transition-all">
                                                 <Video className="w-4 h-4 shrink-0" />
@@ -168,14 +168,14 @@ export default function PillarDetailPage() {
                                                 </span>
                                             )}
                                         </div>
-                                        <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 shrink-0 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                                        <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 shrink-0 bg-white/50 dark:bg-white/10 px-3 py-1.5 rounded-lg border border-white/50 dark:border-white/5 shadow-sm">
                                             {video.duration ? Math.round(video.duration / 60) + ' min' : '—'}
                                         </span>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <div className="text-center py-10 px-4 relative z-10 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border border-gray-100 dark:border-gray-700 border-dashed">
+                            <div className="text-center py-10 px-4 relative z-10 bg-white/40 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5 border-dashed shadow-sm">
                                 <div className="w-16 h-16 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Video className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                                 </div>
